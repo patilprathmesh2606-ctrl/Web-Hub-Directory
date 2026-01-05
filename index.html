@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Hub Directory</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-content">
+            <div class="header-top">
+                <div>
+                    <h1>Web Hub Directory</h1>
+                    <p>Browse and access all web pages in one place</p>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input 
+                                type="text" 
+                                id="searchInput" 
+                                placeholder="Search by area, shop name, or category..." 
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <span>Filter by category:</span>
+                        <div class="filter-chips">
+                            <div class="filter-chip active" data-category="all">All</div>
+                            <div class="filter-chip" data-category="food">Food</div>
+                            <div class="filter-chip" data-category="retail">Retail</div>
+                            <div class="filter-chip" data-category="service">Service</div>
+                            <div class="filter-chip" data-category="entertainment">Entertainment</div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-count">
+                        <span id="resultCount">16</span> web pages available
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <main class="main-content">
+        <div class="cards-grid" id="cardsContainer">
+            <!-- Cards will be dynamically generated here -->
+        </div>
+        
+        <div id="noResults" class="no-results">
+            <i class="fas fa-search fa-3x"></i>
+            <h3>No results found</h3>
+            <p>Try adjusting your search or filter to find what you're looking for.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>Web Hub Directory &copy; <span id="currentYear"></span> | All pages hosted in the same GitHub repository</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
