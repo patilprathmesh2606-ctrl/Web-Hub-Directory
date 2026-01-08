@@ -6,7 +6,7 @@ const webPages = [
     {
         title: "photographer",
         url: "photographer.html",
-        image: "https://unsplash.com/photos/a-man-holding-a-camera-up-to-take-a-picture-VOewgYwGPLc",
+        image: "https://unsplash.com/photos/person-holding-dslr-camera-jL8QFwnuOcQ?utm_source=unsplash&utm_medium=referral&utm_content=creditShareLink",
         area: "Wada",
         shopName: "photographer",
         category: "photographer"
@@ -14,7 +14,7 @@ const webPages = [
     {
         title: "shahapurelectricalwork",
         url: "shahapurelectricalwork.html",
-        image: "https://unsplash.com/photos/woman-changing-lightbulb-XJ3BG9G0CzM",
+        image: "https://unsplash.com/photos/digital-multimeter-displays-zero-in-front-of-computer-screen-5g_8GPxWj1Y?utm_source=unsplash&utm_medium=referral&utm_content=creditShareLink",
         area: "Shahapur",
         shopName: "shahapurelectricalwork",
         category: "Service"
@@ -820,6 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
