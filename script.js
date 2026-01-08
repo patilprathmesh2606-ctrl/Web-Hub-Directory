@@ -14,7 +14,7 @@ const webPages = [
     {
         title: "shahapurelectricalwork",
         url: "shahapurelectricalwork.html",
-        image: "https://unsplash.com/photos/digital-multimeter-displays-zero-in-front-of-computer-screen-5g_8GPxWj1Y?utm_source=unsplash&utm_medium=referral&utm_content=creditShareLink",
+        image: "https://unsplash.com/photos/digital-multimeter-displays-zero-in-front-of-computer-screen-5g_8GPxWj1Y",
         area: "Shahapur",
         shopName: "shahapurelectricalwork",
         category: "Service"
@@ -820,6 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
