@@ -19,15 +19,15 @@ const webPages = [
         shopName: "shahapurelectricalwork",
         category: "Service"
     },
-      /*{
-        title: "Coffee Haven Menu",
-        url: "coffee-haven.html",
+      {
+        title: "Gym",
+        url: "Gym.html",
         image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Downtown",
-        shopName: "Coffee Haven",
-        category: "food"
+        area: "Wada",
+        shopName: "Gym",
+        category: "Gym"
     }
-   {
+   /*{
         title: "Urban Outfitters Store",
         url: "urban-outfitters.html",
         image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
@@ -820,6 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
