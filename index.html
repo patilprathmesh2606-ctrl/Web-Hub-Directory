@@ -9,49 +9,247 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Header with Expand/Collapse -->
     <div class="header-container">
         <div class="header-content">
-            <div class="header-top">
-                <div>
-                    <h1>Web Hub Directory</h1>
-                    <p>Browse and access all web pages in one place</p>
+            <!-- Top Fixed Bar -->
+            <div class="header-top-bar">
+                <!-- Title on left -->
+                <div class="header-title">
+                    <h1>Web Hub</h1>
+                    <p class="header-subtitle-mobile">Browse all web pages</p>
                 </div>
                 
-                <div class="header-controls">
-                    <div class="search-container">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input 
-                                type="text" 
-                                id="searchInput" 
-                                placeholder="Search by area, shop name, or category..." 
-                            >
-                        </div>
-                    </div>
+                <!-- Expand/Collapse Button for desktop -->
+                <button class="expand-collapse-btn" id="expandCollapseBtn" title="Expand/Collapse header">
+                    <i class="fas fa-chevron-down" id="expandCollapseIcon"></i>
+                </button>
+                
+                <!-- Mobile dropdown menu button -->
+                <button class="mobile-dropdown-btn" id="mobileDropdownBtn" title="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <!-- Action buttons on right -->
+                <div class="header-actions">
+                    <!-- Mobile search button -->
+                    <button class="header-action-btn" id="mobileSearchBtn" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    
+                    <!-- Mobile filter button -->
+                    <button class="header-action-btn" id="mobileFilterBtn" title="Filter">
+                        <i class="fas fa-filter"></i>
+                        <span class="filter-badge" id="filterBadge"></span>
+                    </button>
                 </div>
             </div>
             
-            <div class="filter-section">
-                <div class="filter-controls">
-                    <div class="filter-group">
-                        <span>Filter by category:</span>
-                        <div class="filter-chips">
-                            <div class="filter-chip active" data-category="all">All</div>
-                            <div class="filter-chip" data-category="food">Food</div>
-                            <div class="filter-chip" data-category="retail">Retail</div>
-                            <div class="filter-chip" data-category="service">Service</div>
-                            <div class="filter-chip" data-category="entertainment">Entertainment</div>
-                        </div>
+            <!-- Mobile Dropdown Menu -->
+            <div class="mobile-dropdown-menu" id="mobileDropdownMenu">
+                <div class="mobile-dropdown-content">
+                    <button class="dropdown-item" id="dropdownSearchBtn">
+                        <i class="fas fa-search"></i>
+                        <span>Search</span>
+                    </button>
+                    <button class="dropdown-item" id="dropdownFilterBtn">
+                        <i class="fas fa-filter"></i>
+                        <span>Filter</span>
+                        <span class="dropdown-badge" id="dropdownFilterBadge"></span>
+                    </button>
+                    <button class="dropdown-item" id="dropdownViewAllBtn">
+                        <i class="fas fa-th-large"></i>
+                        <span>View All</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" id="dropdownCollapseBtn">
+                        <i class="fas fa-chevron-up"></i>
+                        <span>Collapse Menu</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Expandable Content Area -->
+            <div class="expandable-content" id="expandableContent">
+                <!-- Desktop search -->
+                <div class="desktop-search">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Search by area, shop name, or category..." 
+                        >
                     </div>
-                    
-                    <div class="result-count">
-                        <span id="resultCount">16</span> web pages available
+                </div>
+                
+                <!-- Desktop filter section -->
+                <div class="filter-section">
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <span>Filter by category:</span>
+                            <div class="filter-chips">
+                                <div class="filter-chip active" data-category="all">All</div>
+                                <div class="filter-chip" data-category="food">Food</div>
+                                <div class="filter-chip" data-category="retail">Retail</div>
+                                <div class="filter-chip" data-category="service">Service</div>
+                                <div class="filter-chip" data-category="entertainment">Entertainment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="result-count">
+                            <span id="resultCount">20</span> web pages available
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- Sidebar Filter for Mobile -->
+    <div class="sidebar-filter-overlay" id="sidebarFilterOverlay"></div>
+    <div class="sidebar-filter" id="sidebarFilter">
+        <div class="sidebar-filter-header">
+            <h3><i class="fas fa-filter"></i> Filter Options</h3>
+            <button class="close-sidebar-filter" id="closeSidebarFilterBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-filter-content">
+            <!-- Category Filter Section -->
+            <div class="filter-section-sidebar">
+                <h4><i class="fas fa-tags"></i> Category</h4>
+                <div class="filter-options">
+                    <button class="filter-option-sidebar active" data-filter-type="category" data-value="all">
+                        <div class="filter-option-content">
+                            <i class="fas fa-th-large"></i>
+                            <span>All Categories</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="category" data-value="food">
+                        <div class="filter-option-content">
+                            <i class="fas fa-utensils"></i>
+                            <span>Food & Restaurants</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="category" data-value="retail">
+                        <div class="filter-option-content">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Retail & Shopping</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="category" data-value="service">
+                        <div class="filter-option-content">
+                            <i class="fas fa-tools"></i>
+                            <span>Services</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="category" data-value="entertainment">
+                        <div class="filter-option-content">
+                            <i class="fas fa-film"></i>
+                            <span>Entertainment</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Area Filter Section -->
+            <div class="filter-section-sidebar">
+                <h4><i class="fas fa-map-marker-alt"></i> Area</h4>
+                <div class="filter-options">
+                    <button class="filter-option-sidebar active" data-filter-type="area" data-value="all">
+                        <div class="filter-option-content">
+                            <i class="fas fa-globe"></i>
+                            <span>All Areas</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="area" data-value="Downtown">
+                        <div class="filter-option-content">
+                            <span>Downtown</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="area" data-value="Shopping District">
+                        <div class="filter-option-content">
+                            <span>Shopping District</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="area" data-value="Tech Park">
+                        <div class="filter-option-content">
+                            <span>Tech Park</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="area" data-value="Food Court">
+                        <div class="filter-option-content">
+                            <span>Food Court</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <button class="filter-option-sidebar" data-filter-type="area" data-value="Library Square">
+                        <div class="filter-option-content">
+                            <span>Library Square</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Shop Name Filter Section -->
+            <div class="filter-section-sidebar">
+                <h4><i class="fas fa-store"></i> Shop Name</h4>
+                <div class="filter-options">
+                    <button class="filter-option-sidebar active" data-filter-type="shop" data-value="all">
+                        <div class="filter-option-content">
+                            <i class="fas fa-store"></i>
+                            <span>All Shops</span>
+                        </div>
+                        <i class="fas fa-check check-icon"></i>
+                    </button>
+                    <!-- Shop options will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-filter-footer">
+            <button class="clear-filter-btn" id="clearFilterBtn">
+                <i class="fas fa-times-circle"></i> Clear All
+            </button>
+            <button class="apply-filter-btn" id="applyFilterBtn">
+                <i class="fas fa-check"></i> Apply Filters
+                <span id="selectedFilterCount">1</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mobile Search Overlay -->
+    <div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <div class="mobile-search-header">
+            <div class="mobile-search-box">
+                <i class="fas fa-search"></i>
+                <input 
+                    type="text" 
+                    id="mobileSearchInput" 
+                    placeholder="Search by area, shop name, or category..." 
+                    autocomplete="off"
+                >
+                <button class="close-search" id="closeSearchBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="search-results" id="mobileSearchResults">
+            <!-- Search results will appear here -->
+        </div>
+    </div>
+    
+    <!-- Main Content -->
     <main class="main-content">
         <div class="cards-grid" id="cardsContainer">
             <!-- Cards will be dynamically generated here -->
@@ -64,6 +262,7 @@
         </div>
     </main>
     
+    <!-- Footer -->
     <footer>
         <p>Web Hub Directory &copy; <span id="currentYear"></span> | All pages hosted in the same GitHub repository</p>
     </footer>
