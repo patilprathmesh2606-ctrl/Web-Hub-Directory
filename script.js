@@ -26,159 +26,8 @@ const webPages = [
         area: "Wada",
         shopName: "Gym",
         category: "Gym"
-    }
-   /*{
-        title: "Urban Outfitters Store",
-        url: "urban-outfitters.html",
-        image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Shopping District",
-        shopName: "Urban Outfitters",
-        category: "retail"
-    },
-    {
-        title: "Tech Support Hub",
-        url: "tech-support.html",
-        image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Tech Park",
-        shopName: "Tech Solutions Inc.",
-        category: "service"
-    },
-    {
-        title: "Pizza Palace Ordering",
-        url: "pizza-palace.html",
-        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Food Court",
-        shopName: "Pizza Palace",
-        category: "food"
-    },
-    {
-        title: "Book Nook Inventory",
-        url: "book-nook.html",
-        image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Library Square",
-        shopName: "The Book Nook",
-        category: "retail"
-    },
-    {
-        title: "Fitness First Schedule",
-        url: "fitness-first.html",
-        image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Westside Mall",
-        shopName: "Fitness First",
-        category: "service"
-    },
-    {
-        title: "Cinema Central Bookings",
-        url: "cinema-central.html",
-        image: "https://images.unsplash.com/photo-1489599809516-9827b6d1cf13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Entertainment Zone",
-        shopName: "Cinema Central",
-        category: "entertainment"
-    },
-    {
-        title: "Sushi Master Menu",
-        url: "sushi-master.html",
-        image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Asian Quarter",
-        shopName: "Sushi Master",
-        category: "food"
-    },
-    {
-        title: "Green Thumb Garden Center",
-        url: "green-thumb.html",
-        image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Eastside Market",
-        shopName: "Green Thumb",
-        category: "retail"
-    },
-    {
-        title: "Fix It All Repairs",
-        url: "fix-it-all.html",
-        image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Industrial Park",
-        shopName: "Fix It All",
-        category: "service"
-    },
-    {
-        title: "Bowling Alley Bookings",
-        url: "bowling-alley.html",
-        image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Leisure Center",
-        shopName: "Strike Zone",
-        category: "entertainment"
-    },
-    {
-        title: "Burger Joint Ordering",
-        url: "burger-joint.html",
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Food Truck Park",
-        shopName: "The Burger Joint",
-        category: "food"
-    },
-    {
-        title: "Art Gallery Exhibits",
-        url: "art-gallery.html",
-        image: "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Cultural District",
-        shopName: "Modern Art Gallery",
-        category: "entertainment"
-    },
-    {
-        title: "Hardware Store",
-        url: "hardware-store.html",
-        image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Industrial Area",
-        shopName: "Tool Masters",
-        category: "retail"
-    },
-    {
-        title: "Pet Grooming Services",
-        url: "pet-grooming.html",
-        image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Pet Care Center",
-        shopName: "Pampered Pets",
-        category: "service"
-    },
-    {
-        title: "Ice Cream Parlor",
-        url: "ice-cream.html",
-        image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Beachfront",
-        shopName: "Scoops & Cones",
-        category: "food"
-    },
-    {
-        title: "Florist Shop",
-        url: "florist.html",
-        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Market Square",
-        shopName: "Blooming Flowers",
-        category: "retail"
-    },
-    {
-        title: "Travel Agency",
-        url: "travel-agency.html",
-        image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Financial District",
-        shopName: "Global Travel",
-        category: "service"
-    },
-    {
-        title: "Video Game Store",
-        url: "game-store.html",
-        image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Tech Hub",
-        shopName: "Game Galaxy",
-        category: "retail"
-    },
-    {
-        title: "Bakery Shop",
-        url: "bakery.html",
-        image: "https://images.unsplash.com/photo-1555507036-ab794f27d2e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
-        area: "Old Town",
-        shopName: "Sweet Treats Bakery",
-        category: "food"
-    }*/
+      } 
+
 ]; 
 
 // DOM elements
@@ -820,6 +669,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
