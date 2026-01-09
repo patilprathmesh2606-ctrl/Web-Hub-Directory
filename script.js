@@ -35,15 +35,23 @@ const webPages = [
         shopName: "The Royal Kitchen",
         category: "Chinese Center"
       } ,
-{
+    {
         title: "Tanvi Fashion Hub",
         url: "tanvifashionhub.html",
-        image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
+        image: "https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Virar",
         shopName: "Tanvi Fashion Hub",
         category: "Fashion"
+      } ,
+    
+{
+        title: "jayeshbhoircatering",
+        url: "jayeshbhoircatering.html",
+        image: "https://images.pexels.com/photos/169190/pexels-photo-169190.jpeg?auto=compress&cs=tinysrgb&w=800",
+        area: "Wada",
+        shopName: "Tanvi Fashion Hub",
+        category: "Event Service"
       } 
-
 ]; 
 
 // DOM elements
@@ -685,6 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
