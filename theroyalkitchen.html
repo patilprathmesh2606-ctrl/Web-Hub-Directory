@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Royal Kitchen - Chinese Restaurant Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .dish-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .floating-plate {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .floating-plate:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+        }
+        .plate-panel {
+            transition: transform 0.3s ease;
+            transform: translateX(100%);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        }
+        .plate-panel.open {
+            transform: translateX(0);
+        }
+        .dish-card {
+            transition: all 0.3s ease;
+            border: 1px solid #f3f4f6;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .dish-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #dc2626;
+        }
+        .category-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .restaurant-closed-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        /* Order Status Styles */
+        .order-status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .order-status-preparing {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .order-status-ready {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .order-status-served {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #6366f1;
+        }
+        .order-status-paid {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #9ca3af;
+        }
+        .order-status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        /* Role-specific backgrounds */
+        .manager-bg {
+            background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
+        }
+        
+        .admin-bg {
+            background: linear-gradient(to bottom right, #fefce8, #fffbeb);
+        }
+        
+        .waiter-bg {
+            background: linear-gradient(to bottom right, #ecfdf5, #d1fae5);
+        }
+        
+        /* Table Status */
+        .table-free {
+            background: linear-gradient(to bottom right, #d1fae5, #a7f3d0);
+            border: 2px solid #10b981;
+        }
+        .table-occupied {
+            background: linear-gradient(to bottom right, #fee2e2, #fecaca);
+            border: 2px solid #ef4444;
+        }
+        
+        /* OTP Modal */
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            margin: 0 5px;
+        }
+        
+        .otp-input:focus {
+            border-color: #dc2626;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        
+        /* User Profile Styles */
+        .user-profile-bg {
+            background: linear-gradient(to bottom right, #faf5ff, #f3e8ff);
+        }
+        
+        /* Notification Styles */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Dragon animation */
+        .dragon-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-amber-50 min-h-screen">
+    <!-- Restaurant Closed Alert -->
+    <div id="restaurantClosedAlert" class="restaurant-closed-alert hidden">
+        <div class="bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 shadow-lg">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-store-slash text-2xl"></i>
+                    <div>
+                        <h3 class="font-bold text-lg">Restaurant Currently Closed</h3>
+                        <p class="text-red-100" id="closureMessage"></p>
+                    </div>
+                </div>
+                <button id="closeAlertBtn" class="bg-white text-red-700 px-4 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors">
+                    Close & Continue Browsing
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-red-700 via-red-600 to-amber-700 text-white py-6 shadow-xl sticky top-0 z-30">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="text-center md:text-left">
+                    <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-3">
+                        <i class="fas fa-dragon dragon-icon"></i>
+                        The Royal Kitchen
+                        <i class="fas fa-dragon dragon-icon"></i>
+                    </h1>
+                    <p class="text-red-100 mt-2">Authentic Chinese Cuisine • Fast Food • Drinks</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex flex-wrap gap-2 justify-center">
+                    <button id="userProfileBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md relative">
+                        <i class="fas fa-user mr-2"></i>My Profile
+                        <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    </button>
+                    <button id="waiterToggle" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md">
+                        <i class="fas fa-user-check mr-2"></i>Waiter
+                    </button>
+                    <button id="managerToggle" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md">
+                        <i class="fas fa-user-tie mr-2"></i>Manager
+                    </button>
+                    <button id="adminToggle" class="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-lg hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </button>
+                    <button id="closeAllDashboards" class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hidden">
+                        <i class="fas fa-times mr-2"></i>Close Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- USER PROFILE SECTION -->
+        <div id="userProfileSection" class="dashboard-container user-profile-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-user-circle text-purple-600"></i>
+                    My Profile
+                </h2>
+                <button id="closeProfileBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+            
+            <!-- Profile Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column - Profile Info -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <div class="text-center mb-6">
+                            <div class="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-red-400 to-amber-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-4xl text-white"></i>
+                            </div>
+                            <h3 id="profileUserName" class="text-xl font-bold text-gray-800">Guest User</h3>
+                            <p id="profileUserPhone" class="text-gray-600">No phone number</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Name</label>
+                                <input type="text" id="profileNameInput" 
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="Enter your name">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">WhatsApp Number *</label>
+                                <input type="tel" id="profilePhoneInput" 
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="+91 9876543210">
+                            </div>
+                            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300">
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Stats -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h4 class="font-bold text-gray-800 mb-4">Order Statistics</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Current Orders</span>
+                                <span id="currentOrdersCount" class="font-bold text-purple-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Total Orders</span>
+                                <span id="totalOrdersCount" class="font-bold text-purple-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Total Spent</span>
+                                <span id="totalSpentAmount" class="font-bold text-purple-600">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Orders -->
+                <div class="lg:col-span-2">
+                    <!-- Current Orders -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-clock text-red-600"></i>
+                            Current Orders
+                        </h3>
+                        <div id="currentOrdersList" class="space-y-4">
+                            <!-- Current orders will be loaded here -->
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-shopping-bag text-4xl mb-3"></i>
+                                <p>No current orders</p>
+                                <p class="text-sm">Orders placed will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order History -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-history text-gray-600"></i>
+                                Order History
+                            </h3>
+                            <button id="authHistoryBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 flex items-center gap-2">
+                                <i class="fas fa-lock"></i>
+                                View History with OTP
+                            </button>
+                        </div>
+                        <div id="orderHistoryList" class="space-y-4">
+                            <!-- Order history will be loaded here -->
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-history text-4xl mb-3"></i>
+                                <p>Authenticate to view your order history</p>
+                                <p class="text-sm mt-2">We'll send an OTP to your WhatsApp number</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WAITER DASHBOARD -->
+        <div id="waiterDashboard" class="dashboard-container waiter-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-user-check text-green-600"></i>
+                    Waiter Dashboard
+                </h2>
+                <button id="waiterLogoutBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+            
+            <!-- Waiter Login Form -->
+            <div id="waiterLoginForm" class="mb-8">
+                <div class="bg-white rounded-xl border border-green-200 p-6">
+                    <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt text-green-600"></i>
+                        Waiter Login
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Username</label>
+                            <input type="text" id="waiterUsername" placeholder="waiter1" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Password</label>
+                            <input type="password" id="waiterPassword" placeholder="password" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm">
+                        </div>
+                    </div>
+                    <button id="waiterLoginBtn" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login as Waiter
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Waiter Content -->
+            <div id="waiterContent" class="hidden">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Assigned Tables</p>
+                                <p class="text-2xl font-bold text-gray-800" id="waiterAssignedTables">0</p>
+                            </div>
+                            <i class="fas fa-chair text-3xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Active Orders</p>
+                                <p class="text-2xl font-bold text-gray-800" id="waiterActiveOrders">0</p>
+                            </div>
+                            <i class="fas fa-clipboard-list text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Today's Served</p>
+                                <p class="text-2xl font-bold text-gray-800" id="waiterServedToday">0</p>
+                            </div>
+                            <i class="fas fa-check-circle text-3xl text-purple-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Performance</p>
+                                <p class="text-2xl font-bold text-gray-800" id="waiterPerformance">0%</p>
+                            </div>
+                            <i class="fas fa-chart-line text-3xl text-red-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Assigned Orders Section -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-clipboard-check text-green-600"></i>
+                        Orders for Your Tables
+                    </h3>
+                    <div id="waiterOrders" class="space-y-4">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Table Status -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-table text-blue-600"></i>
+                        Your Table Status
+                    </h3>
+                    <div id="waiterTables" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <!-- Tables will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MANAGER DASHBOARD -->
+        <div id="managerDashboard" class="dashboard-container manager-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-user-tie text-blue-600"></i>
+                    Manager Dashboard
+                </h2>
+                <button id="managerLogoutBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+            
+            <!-- Manager Login Form -->
+            <div id="managerLoginForm" class="mb-8">
+                <div class="bg-white rounded-xl border border-blue-200 p-6">
+                    <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt text-blue-600"></i>
+                        Manager Login
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Username</label>
+                            <input type="text" id="managerUsername" placeholder="manager" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Password</label>
+                            <input type="password" id="managerPassword" placeholder="password" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
+                        </div>
+                    </div>
+                    <button id="managerLoginBtn" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login as Manager
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Manager Content -->
+            <div id="managerContent" class="hidden">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Free Tables</p>
+                                <p class="text-2xl font-bold text-gray-800" id="managerFreeTables">0</p>
+                            </div>
+                            <i class="fas fa-chair text-3xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Occupied Tables</p>
+                                <p class="text-2xl font-bold text-gray-800" id="managerOccupiedTables">0</p>
+                            </div>
+                            <i class="fas fa-users text-3xl text-red-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Today's Revenue</p>
+                                <p class="text-2xl font-bold text-gray-800" id="managerTodayRevenue">₹0</p>
+                            </div>
+                            <i class="fas fa-rupee-sign text-3xl text-amber-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Active Orders</p>
+                                <p class="text-2xl font-bold text-gray-800" id="managerActiveOrders">0</p>
+                            </div>
+                            <i class="fas fa-clipboard-list text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Restaurant Control Section -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-store text-red-600"></i>
+                        Restaurant Control
+                    </h3>
+                    <div class="bg-white rounded-xl p-6 border border-gray-200">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2 text-sm font-medium">Opening Time</label>
+                                    <input type="time" id="openingTime" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2 text-sm font-medium">Closing Time</label>
+                                    <input type="time" id="closingTime" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                <button id="updateTimings" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300">
+                                    Update Timings
+                                </button>
+                            </div>
+                            <div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2 text-sm font-medium">Restaurant Status</label>
+                                    <div class="flex items-center gap-4">
+                                        <span id="restaurantStatus" class="px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-800">
+                                            OPEN
+                                        </span>
+                                        <button id="toggleRestaurantStatus" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                                            Close Restaurant
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2 text-sm font-medium">Closure Message</label>
+                                    <textarea id="closureMessageInput" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Message to show when closed..."></textarea>
+                                </div>
+                                <button id="saveClosureMessage" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                                    Save Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Orders Section -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-clipboard-list text-blue-600"></i>
+                            Active Orders
+                        </h3>
+                        <button id="refreshOrders" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="activeOrders" class="space-y-4 max-h-96 overflow-y-auto p-2">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="adminDashboard" class="dashboard-container admin-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-lock text-gray-600"></i>
+                    Admin Dashboard
+                </h2>
+                <button id="adminLogoutBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+            
+            <!-- Admin Login Form -->
+            <div id="adminLoginForm" class="mb-8">
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt text-gray-600"></i>
+                        Admin Login
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Username</label>
+                            <input type="text" id="adminUsername" placeholder="admin" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Password</label>
+                            <input type="password" id="adminPassword" placeholder="password" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm">
+                        </div>
+                    </div>
+                    <button id="adminLoginBtn" class="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-3 rounded-lg hover:from-gray-900 hover:to-black transition-all duration-300 shadow-md flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login as Admin
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Admin Content -->
+            <div id="adminContent" class="hidden">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Managers</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalManagers">1</p>
+                            </div>
+                            <i class="fas fa-user-tie text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Waiters</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalWaiters">1</p>
+                            </div>
+                            <i class="fas fa-user-check text-3xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Orders</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalOrders">0</p>
+                            </div>
+                            <i class="fas fa-clipboard-list text-3xl text-purple-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Revenue</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalRevenue">₹0</p>
+                            </div>
+                            <i class="fas fa-rupee-sign text-3xl text-amber-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Staff Section -->
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Staff</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Staff Name</label>
+                                <input type="text" id="staffName" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Username</label>
+                                <input type="text" id="staffUsername" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Role</label>
+                                <select id="staffRole" class="w-full p-3 border border-gray-300 rounded-lg">
+                                    <option value="waiter">Waiter</option>
+                                    <option value="manager">Manager</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="addStaffBtn" class="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800">
+                            Add Staff Member
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Staff List -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Staff Members</h3>
+                    <div id="staffList" class="space-y-3">
+                        <!-- Staff members will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu Section -->
+        <div id="mainMenuSection">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-3">Our Menu</h2>
+                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                    Experience authentic Chinese cuisine, fast food favorites, and refreshing drinks
+                </p>
+                <div class="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <!-- Menu Filters -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10">
+                <button class="filter-btn active px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300" data-category="all">
+                    All Items
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-red-700 border border-red-200 rounded-full font-medium hover:bg-red-50 transition-all duration-300" data-category="chinese">
+                    <i class="fas fa-dragon mr-2"></i>Chinese Food
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-blue-700 border border-blue-200 rounded-full font-medium hover:bg-blue-50 transition-all duration-300" data-category="fastfood">
+                    <i class="fas fa-hamburger mr-2"></i>Fast Food
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-green-700 border border-green-200 rounded-full font-medium hover:bg-green-50 transition-all duration-300" data-category="drinks">
+                    <i class="fas fa-glass-whiskey mr-2"></i>Drinks
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-amber-700 border border-amber-200 rounded-full font-medium hover:bg-amber-50 transition-all duration-300" data-category="soups">
+                    <i class="fas fa-utensil-spoon mr-2"></i>Soups
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-purple-700 border border-purple-200 rounded-full font-medium hover:bg-purple-50 transition-all duration-300" data-category="noodles">
+                    <i class="fas fa-utensils mr-2"></i>Noodles
+                </button>
+            </div>
+            
+            <!-- Menu Grid -->
+            <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Menu items will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Plate (Cart) Button -->
+    <div id="plateBtn" class="fixed bottom-6 right-6 bg-gradient-to-r from-red-600 to-red-700 text-white p-5 rounded-full shadow-2xl floating-plate cursor-pointer z-40">
+        <div class="relative">
+            <i class="fas fa-dragon text-2xl"></i>
+            <span id="plateCount" class="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold shadow-md">0</span>
+        </div>
+    </div>
+
+    <!-- Plate (Cart) Panel -->
+    <div id="platePanel" class="plate-panel fixed top-0 right-0 h-full w-full md:w-96 bg-white z-50">
+        <div class="h-full flex flex-col">
+            <!-- Plate Header -->
+            <div class="p-6 bg-gradient-to-r from-red-600 to-red-700 text-white">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-dragon text-2xl"></i>
+                        <h2 class="text-2xl font-bold">Your Order</h2>
+                    </div>
+                    <button id="closePlate" class="text-white hover:text-red-200 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-red-100 mt-2">Items added to your order</p>
+            </div>
+            
+            <!-- Plate Items -->
+            <div id="plateItems" class="flex-grow overflow-y-auto p-6">
+                <div class="text-center py-12 text-gray-400">
+                    <div class="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-dragon text-3xl text-red-400"></i>
+                    </div>
+                    <p class="text-lg font-medium text-gray-500">Your plate is empty</p>
+                    <p class="text-sm mt-1">Add delicious items from our menu</p>
+                </div>
+            </div>
+            
+            <!-- Plate Footer -->
+            <div class="p-6 border-t border-gray-200 bg-gray-50">
+                <!-- Customer Details -->
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-800 mb-3">Your Details</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Table Number *</label>
+                            <select id="customerTable" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <option value="">Select Table</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">WhatsApp Number *</label>
+                            <input type="tel" id="customerWhatsApp" placeholder="+91 9876543210" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Customer Name (Optional)</label>
+                            <input type="text" id="customerName" placeholder="Your Name" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="border-t border-gray-300 pt-4 mb-6">
+                    <div class="flex justify-between items-center text-xl font-bold">
+                        <span class="text-gray-800">Total:</span>
+                        <span id="plateTotal" class="text-red-700">₹0</span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button id="placeOrder" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md flex items-center justify-center gap-3 mb-3">
+                    <i class="fas fa-paper-plane"></i>
+                    Place Order
+                </button>
+                
+                <button id="whatsappOrder" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md flex items-center justify-center gap-3 mb-3">
+                    <i class="fab fa-whatsapp"></i>
+                    Order via WhatsApp
+                </button>
+                
+                <button id="clearPlate" class="w-full bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 py-3 rounded-xl font-medium hover:from-gray-400 hover:to-gray-500 transition-all duration-300">
+                    Clear Plate
+                </button>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    You'll receive order updates on WhatsApp
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for plate panel -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- OTP Authentication Modal -->
+    <div id="otpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-lock text-3xl text-red-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">OTP Verification</h3>
+                    <p class="text-gray-600 mt-2">Enter the OTP sent to your WhatsApp number</p>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex justify-center gap-2 mb-4" id="otpContainer">
+                        <input type="text" maxlength="1" class="otp-input" data-index="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="1">
+                        <input type="text" maxlength="1" class="otp-input" data-index="2">
+                        <input type="text" maxlength="1" class="otp-input" data-index="3">
+                        <input type="text" maxlength="1" class="otp-input" data-index="4">
+                        <input type="text" maxlength="1" class="otp-input" data-index="5">
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <p id="otpPhoneNumber" class="text-sm text-gray-600 mb-2"></p>
+                        <button id="resendOtpBtn" class="text-sm text-red-600 hover:text-red-800">
+                            Resend OTP
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button id="verifyOtpBtn" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-medium hover:from-green-700 hover:to-green-800 transition-all duration-300">
+                        Verify OTP
+                    </button>
+                    <button id="cancelOtpBtn" class="w-full bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 py-3 rounded-xl font-medium hover:from-gray-400 hover:to-gray-500 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Receipt Modal -->
+    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Order Placed Successfully!</h3>
+                    <p class="text-gray-600 mt-2">Your order has been received</p>
+                </div>
+                
+                <div id="receiptContent" class="space-y-4">
+                    <!-- Receipt content will be generated here -->
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <button id="downloadReceiptBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 mb-3">
+                        <i class="fas fa-download mr-2"></i>Download Receipt
+                    </button>
+                    <button id="closeReceipt" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl font-medium hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                        Close Receipt
+                    </button>
+                    <p class="text-sm text-gray-500 text-center mt-3">
+                        You will receive updates on your WhatsApp number
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-gradient-to-r from-red-800 via-red-700 to-amber-800 text-white py-12 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Restaurant Info -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">The Royal Kitchen</h3>
+                    <p class="text-red-100 mb-4">
+                        Authentic Chinese cuisine, fast food favorites, and refreshing drinks
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-white hover:text-red-200">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-red-200">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-red-200">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Contact Us</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Dragon Street, Chinatown</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-phone"></i>
+                            <span>+91 9876543210</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope"></i>
+                            <span>order@goldendragon.com</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Opening Hours -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Opening Hours</h4>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Monday - Thursday</span>
+                            <span>11:00 AM - 11:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Friday - Sunday</span>
+                            <span>11:00 AM - 12:00 AM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-red-100 hover:text-white">Menu</a></li>
+                        <li><a href="#" class="text-red-100 hover:text-white">Order Online</a></li>
+                        <li><a href="#" class="text-red-100 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-red-100 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-red-700 mt-8 pt-8 text-center">
+                <p class="text-red-100">&copy; 2024 The Royal Kitchen Restaurant. All rights reserved.</p>
+                <p class="text-red-100 text-sm mt-2">Serving authentic Chinese cuisine since 2010</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+// ===============================
+// APPLICATION STATE & CONFIGURATION
+// ===============================
+const APP_CONFIG = {
+    adminUsername: "admin",
+    adminPassword: "admin123",
+    restaurantName: "The Royal Kitchen",
+    currency: "₹",
+    totalTables: 15,
+    whatsappNumber: "919999999999",
+    defaultOpeningTime: "11:00",
+    defaultClosingTime: "23:00"
+};
+
+// Initialize state
+let menuData = [];
+let cart = JSON.parse(localStorage.getItem('dragonCart')) || [];
+let tables = JSON.parse(localStorage.getItem('dragonTables')) || initializeTables();
+let orders = JSON.parse(localStorage.getItem('dragonOrders')) || [];
+let managers = JSON.parse(localStorage.getItem('dragonManagers')) || initializeManagers();
+let waiters = JSON.parse(localStorage.getItem('dragonWaiters')) || initializeWaiters();
+let restaurantSettings = JSON.parse(localStorage.getItem('dragonSettings')) || initializeRestaurantSettings();
+let users = JSON.parse(localStorage.getItem('dragonUsers')) || {};
+let currentFilter = 'all';
+let currentManager = null;
+let currentWaiter = null;
+let currentAdmin = null;
+let currentUser = null;
+let otpGenerated = null;
+let otpPhoneNumber = null;
+
+// ===============================
+// INITIALIZATION FUNCTIONS
+// ===============================
+function initializeTables() {
+    const tables = [];
+    for (let i = 1; i <= APP_CONFIG.totalTables; i++) {
+        tables.push({
+            id: i,
+            number: i,
+            status: 'free',
+            capacity: i <= 5 ? 2 : i <= 10 ? 4 : 6,
+            orderId: null,
+            customerName: '',
+            customerPhone: '',
+            occupiedSince: null,
+            assignedWaiter: null
+        });
+    }
+    localStorage.setItem('dragonTables', JSON.stringify(tables));
+    return tables;
+}
+
+function initializeManagers() {
+    const managers = [{
+        id: 1,
+        name: "Main Manager",
+        username: "manager",
+        password: "manager123",
+        createdDate: new Date().toISOString(),
+        lastLogin: null,
+        performance: {
+            totalOrders: 0,
+            totalRevenue: 0,
+            averageRating: 0
+        }
+    }];
+    localStorage.setItem('dragonManagers', JSON.stringify(managers));
+    return managers;
+}
+
+function initializeWaiters() {
+    const waiters = [{
+        id: 1,
+        name: "John Lee",
+        username: "waiter1",
+        password: "waiter123",
+        assignedTables: [1, 2, 3, 4],
+        createdDate: new Date().toISOString(),
+        lastLogin: null,
+        performance: {
+            ordersServed: 0,
+            averageServiceTime: 0,
+            todayOrders: 0
+        }
+    }];
+    localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
+    return waiters;
+}
+
+function initializeRestaurantSettings() {
+    const settings = {
+        isOpen: true,
+        openingTime: APP_CONFIG.defaultOpeningTime,
+        closingTime: APP_CONFIG.defaultClosingTime,
+        closureMessage: "We are currently closed. We'll reopen at our regular hours.",
+        lastUpdated: new Date().toISOString()
+    };
+    localStorage.setItem('dragonSettings', JSON.stringify(settings));
+    return settings;
+}
+
+function initializeMenuData() {
+    const menu = [
+        // Chinese Food
+        {
+            id: 1,
+            name: "Kung Pao Chicken",
+            category: "chinese",
+            price: 320,
+            description: "Spicy stir-fried chicken with peanuts",
+            image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 2,
+            name: "Sweet & Sour Pork",
+            category: "chinese",
+            price: 280,
+            description: "Crispy pork in tangy sauce",
+            image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 3,
+            name: "Vegetable Spring Rolls",
+            category: "chinese",
+            price: 180,
+            description: "Crispy vegetable filled rolls",
+            image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 4,
+            name: "Mapo Tofu",
+            category: "chinese",
+            price: 240,
+            description: "Spicy tofu with minced meat",
+            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        
+        // Fast Food
+        {
+            id: 5,
+            name: "Dragon Burger",
+            category: "fastfood",
+            price: 220,
+            description: "Special chicken burger with sauces",
+            image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 6,
+            name: "French Fries",
+            category: "fastfood",
+            price: 120,
+            description: "Crispy golden fries",
+            image: "https://images.unsplash.com/photo-1576107232684-1279f390859f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 7,
+            name: "Chicken Wings",
+            category: "fastfood",
+            price: 250,
+            description: "Crispy fried chicken wings",
+            image: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        
+        // Drinks
+        {
+            id: 8,
+            name: "Fresh Lime Soda",
+            category: "drinks",
+            price: 80,
+            description: "Refreshing lime with soda",
+            image: "https://images.unsplash.com/photo-1626073768757-3b63b1115f80?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 9,
+            name: "Mango Lassi",
+            category: "drinks",
+            price: 100,
+            description: "Sweet mango yogurt drink",
+            image: "https://images.unsplash.com/photo-1629367494173-c78a56567877?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 10,
+            name: "Iced Tea",
+            category: "drinks",
+            price: 70,
+            description: "Chilled lemon tea",
+            image: "https://images.unsplash.com/photo-1561047029-3000c68339ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        
+        // Soups
+        {
+            id: 11,
+            name: "Hot & Sour Soup",
+            category: "soups",
+            price: 150,
+            description: "Spicy and tangy soup",
+            image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 12,
+            name: "Sweet Corn Soup",
+            category: "soups",
+            price: 130,
+            description: "Creamy corn soup",
+            image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        
+        // Noodles
+        {
+            id: 13,
+            name: "Hakka Noodles",
+            category: "noodles",
+            price: 200,
+            description: "Stir-fried noodles with vegetables",
+            image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 14,
+            name: "Chicken Chow Mein",
+            category: "noodles",
+            price: 240,
+            description: "Stir-fried noodles with chicken",
+            image: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        }
+    ];
+    return menu;
+}
+
+// ===============================
+// UTILITY FUNCTIONS
+// ===============================
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-amber-500',
+        info: 'bg-blue-500'
+    };
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    notification.className = `${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-64 fixed top-4 right-4 z-50`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas ${icons[type]}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.remove('translate-x-64');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.add('opacity-0', 'translate-x-64');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function generateOrderId() {
+    return 'GD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+}
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ===============================
+// DASHBOARD MANAGEMENT
+// ===============================
+function showDashboard(dashboardType) {
+    document.getElementById('userProfileSection').classList.remove('active');
+    document.getElementById('waiterDashboard').classList.remove('active');
+    document.getElementById('managerDashboard').classList.remove('active');
+    document.getElementById('adminDashboard').classList.remove('active');
+    document.getElementById('mainMenuSection').classList.add('hidden');
+    document.getElementById('closeAllDashboards').classList.remove('hidden');
+    
+    if (dashboardType === 'profile') {
+        document.getElementById('userProfileSection').classList.add('active');
+        loadUserProfile();
+    } else if (dashboardType === 'waiter') {
+        document.getElementById('waiterDashboard').classList.add('active');
+    } else if (dashboardType === 'manager') {
+        document.getElementById('managerDashboard').classList.add('active');
+    } else if (dashboardType === 'admin') {
+        document.getElementById('adminDashboard').classList.add('active');
+    }
+}
+
+function hideAllDashboards() {
+    document.getElementById('userProfileSection').classList.remove('active');
+    document.getElementById('waiterDashboard').classList.remove('active');
+    document.getElementById('managerDashboard').classList.remove('active');
+    document.getElementById('adminDashboard').classList.remove('active');
+    document.getElementById('mainMenuSection').classList.remove('hidden');
+    document.getElementById('closeAllDashboards').classList.add('hidden');
+    
+    resetWaiterLogin();
+    resetManagerLogin();
+    resetAdminLogin();
+}
+
+// ===============================
+// USER PROFILE MANAGEMENT
+// ===============================
+function loadUserProfile() {
+    const phone = localStorage.getItem('dragonUserPhone');
+    const name = localStorage.getItem('dragonUserName');
+    
+    if (phone) {
+        document.getElementById('profilePhoneInput').value = phone;
+        document.getElementById('profileUserPhone').textContent = phone;
+        document.getElementById('customerWhatsApp').value = phone;
+    }
+    
+    if (name) {
+        document.getElementById('profileNameInput').value = name;
+        document.getElementById('profileUserName').textContent = name;
+        document.getElementById('customerName').value = name;
+    }
+    
+    loadUserOrders();
+    updateNotificationBadge();
+}
+
+function saveUserProfile() {
+    const phone = document.getElementById('profilePhoneInput').value.trim();
+    const name = document.getElementById('profileNameInput').value.trim();
+    
+    if (!phone) {
+        showNotification('Please enter your WhatsApp number', 'error');
+        return;
+    }
+    
+    users[phone] = {
+        name: name || 'Guest',
+        phone: phone,
+        createdAt: new Date().toISOString(),
+        totalOrders: 0,
+        totalSpent: 0
+    };
+    
+    localStorage.setItem('dragonUsers', JSON.stringify(users));
+    localStorage.setItem('dragonUserPhone', phone);
+    localStorage.setItem('dragonUserName', name || 'Guest');
+    
+    document.getElementById('customerWhatsApp').value = phone;
+    if (name) {
+        document.getElementById('customerName').value = name;
+    }
+    
+    document.getElementById('profileUserPhone').textContent = phone;
+    document.getElementById('profileUserName').textContent = name || 'Guest';
+    
+    showNotification('Profile saved successfully!', 'success');
+    loadUserOrders();
+}
+
+function loadUserOrders() {
+    const phone = localStorage.getItem('dragonUserPhone');
+    if (!phone) return;
+    
+    const currentOrders = orders.filter(o => 
+        o.customerPhone === phone && 
+        o.status !== 'paid' && 
+        o.status !== 'cancelled' &&
+        o.status !== 'served'
+    );
+    
+    const allOrders = orders.filter(o => o.customerPhone === phone);
+    
+    document.getElementById('currentOrdersCount').textContent = currentOrders.length;
+    document.getElementById('totalOrdersCount').textContent = allOrders.length;
+    
+    const totalSpent = allOrders.reduce((sum, o) => sum + o.total, 0);
+    document.getElementById('totalSpentAmount').textContent = `₹${totalSpent}`;
+    
+    updateNotificationBadge();
+    
+    const currentOrdersList = document.getElementById('currentOrdersList');
+    if (currentOrders.length === 0) {
+        currentOrdersList.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-shopping-bag text-4xl mb-3"></i>
+                <p>No current orders</p>
+                <p class="text-sm">Orders placed will appear here</p>
+            </div>
+        `;
+    } else {
+        currentOrdersList.innerHTML = currentOrders.map(order => `
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                        <p class="text-sm text-gray-600">Table ${order.tableNumber}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                        ${order.status.toUpperCase()}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-700 mb-2">
+                    ${order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')}
+                </p>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-red-700">₹${order.total}</span>
+                    <span class="text-xs text-gray-500">
+                        ${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function updateNotificationBadge() {
+    const phone = localStorage.getItem('dragonUserPhone');
+    if (!phone) return;
+    
+    const currentOrders = orders.filter(o => 
+        o.customerPhone === phone && 
+        o.status !== 'paid' && 
+        o.status !== 'cancelled' &&
+        o.status !== 'served'
+    );
+    
+    const badge = document.getElementById('notificationBadge');
+    if (currentOrders.length > 0) {
+        badge.textContent = currentOrders.length;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+function showOTPModal() {
+    const phone = localStorage.getItem('dragonUserPhone');
+    if (!phone) {
+        showNotification('Please save your profile first', 'error');
+        return;
+    }
+    
+    otpPhoneNumber = phone;
+    otpGenerated = generateOTP();
+    
+    document.getElementById('otpPhoneNumber').textContent = `OTP sent to ${phone}`;
+    document.getElementById('otpModal').classList.remove('hidden');
+    
+    console.log(`OTP for ${phone}: ${otpGenerated}`);
+    showNotification(`OTP sent to ${phone}`, 'info');
+    
+    setTimeout(() => {
+        document.querySelector('.otp-input').focus();
+    }, 100);
+}
+
+function verifyOTP() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const enteredOTP = Array.from(otpInputs).map(input => input.value).join('');
+    
+    if (enteredOTP === otpGenerated) {
+        document.getElementById('otpModal').classList.add('hidden');
+        showNotification('OTP verified successfully!', 'success');
+        loadOrderHistory();
+    } else {
+        showNotification('Invalid OTP. Please try again.', 'error');
+    }
+}
+
+function loadOrderHistory() {
+    const phone = localStorage.getItem('dragonUserPhone');
+    if (!phone) return;
+    
+    const orderHistory = orders.filter(o => o.customerPhone === phone)
+        .sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime));
+    
+    const orderHistoryList = document.getElementById('orderHistoryList');
+    if (orderHistory.length === 0) {
+        orderHistoryList.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-history text-4xl mb-3"></i>
+                <p>No order history found</p>
+            </div>
+        `;
+    } else {
+        orderHistoryList.innerHTML = orderHistory.map(order => `
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                        <p class="text-sm text-gray-600">Table ${order.tableNumber} • ${new Date(order.orderTime).toLocaleDateString()}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                        ${order.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="mb-2">
+                    ${order.items.map(item => `
+                        <div class="flex justify-between text-sm">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>₹${item.price * item.quantity}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t">
+                    <span class="font-bold text-red-700">Total: ₹${order.total}</span>
+                    <button onclick="reorderOrder('${order.id}')" class="text-xs text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-redo mr-1"></i>Reorder
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function reorderOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    cart = order.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+    }));
+    
+    localStorage.setItem('dragonCart', JSON.stringify(cart));
+    updateCart();
+    showNotification('Items added to cart for reorder!', 'success');
+}
+
+// ===============================
+// WAITER DASHBOARD FUNCTIONS
+// ===============================
+function handleWaiterLogin() {
+    const username = document.getElementById('waiterUsername').value.trim();
+    const password = document.getElementById('waiterPassword').value;
+    
+    const waiter = waiters.find(w => w.username === username && w.password === password);
+    
+    if (waiter) {
+        currentWaiter = waiter;
+        waiter.lastLogin = new Date().toISOString();
+        localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
+        
+        document.getElementById('waiterLoginForm').classList.add('hidden');
+        document.getElementById('waiterContent').classList.remove('hidden');
+        updateWaiterDashboard();
+        showNotification(`Welcome, ${waiter.name}!`, 'success');
+    } else {
+        showNotification('Invalid waiter credentials', 'error');
+    }
+}
+
+function handleWaiterLogout() {
+    resetWaiterLogin();
+    showNotification('Waiter logged out', 'info');
+}
+
+function resetWaiterLogin() {
+    currentWaiter = null;
+    document.getElementById('waiterUsername').value = '';
+    document.getElementById('waiterPassword').value = '';
+    document.getElementById('waiterLoginForm').classList.remove('hidden');
+    document.getElementById('waiterContent').classList.add('hidden');
+}
+
+function updateWaiterDashboard() {
+    if (!currentWaiter) return;
+    
+    const assignedTables = currentWaiter.assignedTables.length;
+    const activeOrders = orders.filter(o => 
+        currentWaiter.assignedTables.includes(o.tableNumber) && 
+        o.status !== 'paid' && 
+        o.status !== 'cancelled'
+    ).length;
+    
+    const today = new Date().toDateString();
+    const servedToday = orders.filter(o => 
+        currentWaiter.assignedTables.includes(o.tableNumber) && 
+        o.status === 'served' && 
+        new Date(o.orderTime).toDateString() === today
+    ).length;
+    
+    document.getElementById('waiterAssignedTables').textContent = assignedTables;
+    document.getElementById('waiterActiveOrders').textContent = activeOrders;
+    document.getElementById('waiterServedToday').textContent = servedToday;
+    
+    const performance = Math.min(100, servedToday * 20);
+    document.getElementById('waiterPerformance').textContent = `${performance}%`;
+}
+
+// ===============================
+// MANAGER DASHBOARD FUNCTIONS
+// ===============================
+function handleManagerLogin() {
+    const username = document.getElementById('managerUsername').value.trim();
+    const password = document.getElementById('managerPassword').value;
+    
+    const manager = managers.find(m => m.username === username && m.password === password);
+    
+    if (manager) {
+        currentManager = manager;
+        manager.lastLogin = new Date().toISOString();
+        localStorage.setItem('dragonManagers', JSON.stringify(managers));
+        
+        document.getElementById('managerLoginForm').classList.add('hidden');
+        document.getElementById('managerContent').classList.remove('hidden');
+        updateManagerDashboard();
+        showNotification(`Welcome, ${manager.name}!`, 'success');
+    } else {
+        showNotification('Invalid manager credentials', 'error');
+    }
+}
+
+function handleManagerLogout() {
+    resetManagerLogin();
+    showNotification('Manager logged out', 'info');
+}
+
+function resetManagerLogin() {
+    currentManager = null;
+    document.getElementById('managerUsername').value = '';
+    document.getElementById('managerPassword').value = '';
+    document.getElementById('managerLoginForm').classList.remove('hidden');
+    document.getElementById('managerContent').classList.add('hidden');
+}
+
+function updateManagerDashboard() {
+    if (!currentManager) return;
+    
+    const freeTables = tables.filter(t => t.status === 'free').length;
+    const occupiedTables = tables.filter(t => t.status === 'occupied').length;
+    const activeOrders = orders.filter(o => o.status !== 'paid' && o.status !== 'cancelled').length;
+    
+    const today = new Date().toDateString();
+    const todayOrders = orders.filter(o => 
+        new Date(o.orderTime).toDateString() === today && 
+        o.paymentStatus === 'paid'
+    );
+    const todaysRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+    
+    document.getElementById('managerFreeTables').textContent = freeTables;
+    document.getElementById('managerOccupiedTables').textContent = occupiedTables;
+    document.getElementById('managerTodayRevenue').textContent = `₹${todaysRevenue}`;
+    document.getElementById('managerActiveOrders').textContent = activeOrders;
+}
+
+// ===============================
+// ADMIN DASHBOARD FUNCTIONS
+// ===============================
+function handleAdminLogin() {
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value;
+    
+    if (username === APP_CONFIG.adminUsername && password === APP_CONFIG.adminPassword) {
+        currentAdmin = true;
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+        updateAdminDashboard();
+        showNotification('Welcome, Admin!', 'success');
+    } else {
+        showNotification('Invalid admin credentials', 'error');
+    }
+}
+
+function handleAdminLogout() {
+    resetAdminLogin();
+    showNotification('Admin logged out', 'info');
+}
+
+function resetAdminLogin() {
+    currentAdmin = null;
+    document.getElementById('adminUsername').value = '';
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('adminContent').classList.add('hidden');
+}
+
+function updateAdminDashboard() {
+    document.getElementById('totalManagers').textContent = managers.length;
+    document.getElementById('totalWaiters').textContent = waiters.length;
+    document.getElementById('totalOrders').textContent = orders.length;
+    
+    const totalRevenue = orders
+        .filter(o => o.paymentStatus === 'paid')
+        .reduce((sum, o) => sum + o.total, 0);
+    document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
+}
+
+function addStaffMember() {
+    const name = document.getElementById('staffName').value.trim();
+    const username = document.getElementById('staffUsername').value.trim();
+    const role = document.getElementById('staffRole').value;
+    
+    if (!name || !username) {
+        showNotification('Please fill all fields', 'error');
+        return;
+    }
+    
+    if (role === 'waiter') {
+        const newWaiter = {
+            id: waiters.length + 1,
+            name: name,
+            username: username,
+            password: 'password123',
+            assignedTables: [],
+            createdDate: new Date().toISOString(),
+            lastLogin: null,
+            performance: {
+                ordersServed: 0,
+                averageServiceTime: 0,
+                todayOrders: 0
+            }
+        };
+        waiters.push(newWaiter);
+        localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
+        showNotification(`Waiter ${name} added successfully!`, 'success');
+    } else {
+        const newManager = {
+            id: managers.length + 1,
+            name: name,
+            username: username,
+            password: 'password123',
+            createdDate: new Date().toISOString(),
+            lastLogin: null,
+            performance: {
+                totalOrders: 0,
+                totalRevenue: 0,
+                averageRating: 0
+            }
+        };
+        managers.push(newManager);
+        localStorage.setItem('dragonManagers', JSON.stringify(managers));
+        showNotification(`Manager ${name} added successfully!`, 'success');
+    }
+    
+    document.getElementById('staffName').value = '';
+    document.getElementById('staffUsername').value = '';
+}
+
+// ===============================
+// MENU & ORDER MANAGEMENT
+// ===============================
+function loadMenu() {
+    menuData = initializeMenuData();
+    renderMenuItems();
+    updateTableOptions();
+}
+
+function renderMenuItems() {
+    const container = document.getElementById('menuGrid');
+    const filteredItems = currentFilter === 'all' 
+        ? menuData 
+        : menuData.filter(item => item.category === currentFilter);
+    
+    container.innerHTML = filteredItems.map(item => `
+        <div class="dish-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative">
+                <img src="${item.image}" alt="${item.name}" class="dish-image">
+                <span class="absolute top-3 right-3 category-badge ${item.category === 'chinese' ? 'bg-red-100 text-red-800' : 
+                    item.category === 'fastfood' ? 'bg-blue-100 text-blue-800' : 
+                    item.category === 'drinks' ? 'bg-green-100 text-green-800' : 
+                    item.category === 'soups' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
+                    ${item.category === 'chinese' ? 'Chinese' : 
+                     item.category === 'fastfood' ? 'Fast Food' : 
+                     item.category === 'drinks' ? 'Drinks' : 
+                     item.category === 'soups' ? 'Soup' : 'Noodles'}
+                </span>
+            </div>
+            <div class="p-5 flex-grow">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold text-gray-800">${item.name}</h3>
+                    <span class="text-xl font-bold text-red-700">₹${item.price}</span>
+                </div>
+                <p class="text-gray-600 mb-4 text-sm">${item.description}</p>
+            </div>
+            <div class="p-5 pt-0">
+                <button onclick="addToCart(${item.id})" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>Add to Order
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function addToCart(itemId) {
+    const item = menuData.find(d => d.id === itemId);
+    if (!item) return;
+    
+    const existingItem = cart.find(i => i.id === itemId);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: 1,
+            category: item.category
+        });
+    }
+    
+    localStorage.setItem('dragonCart', JSON.stringify(cart));
+    updateCart();
+    showNotification(`${item.name} added to cart!`, 'success');
+}
+
+function updateCart() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    document.getElementById('plateCount').textContent = totalItems;
+    document.getElementById('plateTotal').textContent = `₹${totalPrice}`;
+    
+    const container = document.getElementById('plateItems');
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-400">
+                <div class="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-dragon text-3xl text-red-400"></i>
+                </div>
+                <p class="text-lg font-medium text-gray-500">Your plate is empty</p>
+                <p class="text-sm mt-1">Add delicious items from our menu</p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = cart.map(item => `
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                <div>
+                    <h4 class="font-bold text-gray-800">${item.name}</h4>
+                    <p class="text-red-700 font-bold">₹${item.price}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="decreaseQuantity(${item.id})" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-minus text-xs"></i>
+                    </button>
+                    <span class="font-bold">${item.quantity}</span>
+                    <button onclick="increaseQuantity(${item.id})" class="w-8 h-8 rounded-full bg-red-100 text-red-700 hover:bg-red-200 flex items-center justify-center">
+                        <i class="fas fa-plus text-xs"></i>
+                    </button>
+                    <button onclick="removeFromCart(${item.id})" class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function increaseQuantity(itemId) {
+    const item = cart.find(i => i.id === itemId);
+    if (item) {
+        item.quantity += 1;
+        localStorage.setItem('dragonCart', JSON.stringify(cart));
+        updateCart();
+    }
+}
+
+function decreaseQuantity(itemId) {
+    const itemIndex = cart.findIndex(i => i.id === itemId);
+    if (itemIndex !== -1) {
+        if (cart[itemIndex].quantity > 1) {
+            cart[itemIndex].quantity -= 1;
+        } else {
+            cart.splice(itemIndex, 1);
+        }
+        localStorage.setItem('dragonCart', JSON.stringify(cart));
+        updateCart();
+    }
+}
+
+function removeFromCart(itemId) {
+    const itemIndex = cart.findIndex(i => i.id === itemId);
+    if (itemIndex !== -1) {
+        const itemName = cart[itemIndex].name;
+        cart.splice(itemIndex, 1);
+        localStorage.setItem('dragonCart', JSON.stringify(cart));
+        updateCart();
+        showNotification(`${itemName} removed from cart`, 'info');
+    }
+}
+
+function updateTableOptions() {
+    const select = document.getElementById('customerTable');
+    select.innerHTML = '<option value="">Select Table</option>' +
+        tables.map(table => `
+            <option value="${table.number}" ${table.status === 'occupied' ? 'disabled' : ''}>
+                Table ${table.number} ${table.status === 'occupied' ? '(Occupied)' : ''}
+            </option>
+        `).join('');
+}
+
+function placeOrder() {
+    const tableNumber = parseInt(document.getElementById('customerTable').value);
+    const phone = document.getElementById('customerWhatsApp').value.trim();
+    const name = document.getElementById('customerName').value.trim();
+    
+    if (!tableNumber) {
+        showNotification('Please select a table number', 'error');
+        return;
+    }
+    
+    if (!phone) {
+        showNotification('Please enter your WhatsApp number', 'error');
+        return;
+    }
+    
+    if (cart.length === 0) {
+        showNotification('Your cart is empty', 'error');
+        return;
+    }
+    
+    const table = tables.find(t => t.number === tableNumber);
+    if (table.status === 'occupied') {
+        showNotification('This table is already occupied', 'error');
+        return;
+    }
+    
+    if (!users[phone]) {
+        users[phone] = {
+            name: name || 'Guest',
+            phone: phone,
+            createdAt: new Date().toISOString(),
+            totalOrders: 0,
+            totalSpent: 0
+        };
+        localStorage.setItem('dragonUsers', JSON.stringify(users));
+    }
+    
+    localStorage.setItem('dragonUserPhone', phone);
+    if (name) {
+        localStorage.setItem('dragonUserName', name);
+    }
+    
+    const order = {
+        id: generateOrderId(),
+        tableNumber: tableNumber,
+        customerName: name || 'Guest',
+        customerPhone: phone,
+        items: [...cart],
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        status: 'pending',
+        paymentStatus: 'pending',
+        orderTime: new Date().toISOString(),
+        estimatedTime: 20,
+        notes: ''
+    };
+    
+    orders.push(order);
+    localStorage.setItem('dragonOrders', JSON.stringify(orders));
+    
+    table.status = 'occupied';
+    table.orderId = order.id;
+    table.customerName = order.customerName;
+    table.customerPhone = order.customerPhone;
+    table.occupiedSince = new Date().toISOString();
+    localStorage.setItem('dragonTables', JSON.stringify(tables));
+    
+    users[phone].totalOrders = (users[phone].totalOrders || 0) + 1;
+    users[phone].totalSpent = (users[phone].totalSpent || 0) + order.total;
+    localStorage.setItem('dragonUsers', JSON.stringify(users));
+    
+    cart = [];
+    localStorage.setItem('dragonCart', JSON.stringify(cart));
+    updateCart();
+    
+    showReceipt(order);
+    updateTableOptions();
+    loadUserProfile();
+    
+    showNotification('Order placed successfully!', 'success');
+}
+
+function showReceipt(order) {
+    const content = document.getElementById('receiptContent');
+    content.innerHTML = `
+        <div class="text-center mb-6">
+            <h4 class="font-bold text-gray-800 text-lg">${APP_CONFIG.restaurantName}</h4>
+            <p class="text-gray-600">Order Receipt</p>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+            <div class="flex justify-between">
+                <span class="text-gray-600">Order ID:</span>
+                <span class="font-bold">${order.id.slice(-8)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Table:</span>
+                <span class="font-bold">${order.tableNumber}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Time:</span>
+                <span class="font-bold">${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        </div>
+        
+        <div class="border-t border-b border-gray-200 py-4 my-4">
+            ${order.items.map(item => `
+                <div class="flex justify-between mb-2">
+                    <div>
+                        <span class="font-medium">${item.quantity}x ${item.name}</span>
+                    </div>
+                    <span>₹${item.price * item.quantity}</span>
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="flex justify-between text-xl font-bold">
+            <span>Total:</span>
+            <span class="text-red-700">₹${order.total}</span>
+        </div>
+        
+        <div class="mt-6 p-4 bg-green-50 rounded-lg">
+            <p class="text-sm text-green-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                Your order has been received. Estimated preparation time: ${order.estimatedTime} minutes
+            </p>
+        </div>
+    `;
+    
+    document.getElementById('receiptModal').classList.remove('hidden');
+}
+
+// ===============================
+// EVENT LISTENERS
+// ===============================
+document.addEventListener('DOMContentLoaded', function() {
+    loadMenu();
+    updateCart();
+    
+    // User Profile Button
+    document.getElementById('userProfileBtn').addEventListener('click', () => {
+        showDashboard('profile');
+    });
+    
+    document.getElementById('closeProfileBtn').addEventListener('click', () => {
+        hideAllDashboards();
+    });
+    
+    document.getElementById('saveProfileBtn').addEventListener('click', saveUserProfile);
+    
+    document.getElementById('authHistoryBtn').addEventListener('click', showOTPModal);
+    
+    // Dashboard Toggle Buttons
+    document.getElementById('waiterToggle').addEventListener('click', () => {
+        showDashboard('waiter');
+    });
+    
+    document.getElementById('managerToggle').addEventListener('click', () => {
+        showDashboard('manager');
+    });
+    
+    document.getElementById('adminToggle').addEventListener('click', () => {
+        showDashboard('admin');
+    });
+    
+    document.getElementById('closeAllDashboards').addEventListener('click', hideAllDashboards);
+    
+    // Waiter Login
+    document.getElementById('waiterLoginBtn').addEventListener('click', handleWaiterLogin);
+    document.getElementById('waiterLogoutBtn').addEventListener('click', handleWaiterLogout);
+    
+    // Manager Login
+    document.getElementById('managerLoginBtn').addEventListener('click', handleManagerLogin);
+    document.getElementById('managerLogoutBtn').addEventListener('click', handleManagerLogout);
+    
+    // Admin Login
+    document.getElementById('adminLoginBtn').addEventListener('click', handleAdminLogin);
+    document.getElementById('adminLogoutBtn').addEventListener('click', handleAdminLogout);
+    
+    // Add Staff Button
+    document.getElementById('addStaffBtn').addEventListener('click', addStaffMember);
+    
+    // Menu Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.category;
+            renderMenuItems();
+        });
+    });
+    
+    // Cart Management
+    document.getElementById('plateBtn').addEventListener('click', function() {
+        document.getElementById('platePanel').classList.add('open');
+        document.getElementById('overlay').classList.remove('hidden');
+    });
+    
+    document.getElementById('closePlate').addEventListener('click', function() {
+        document.getElementById('platePanel').classList.remove('open');
+        document.getElementById('overlay').classList.add('hidden');
+    });
+    
+    document.getElementById('overlay').addEventListener('click', function() {
+        document.getElementById('platePanel').classList.remove('open');
+        this.classList.add('hidden');
+    });
+    
+    document.getElementById('clearPlate').addEventListener('click', function() {
+        cart = [];
+        localStorage.setItem('dragonCart', JSON.stringify(cart));
+        updateCart();
+        showNotification('Cart cleared', 'info');
+    });
+    
+    document.getElementById('placeOrder').addEventListener('click', placeOrder);
+    
+    // OTP Modal
+    document.getElementById('verifyOtpBtn').addEventListener('click', verifyOTP);
+    document.getElementById('cancelOtpBtn').addEventListener('click', function() {
+        document.getElementById('otpModal').classList.add('hidden');
+    });
+    
+    document.querySelectorAll('.otp-input').forEach((input, index) => {
+        input.addEventListener('input', function() {
+            if (this.value.length === 1 && index < 5) {
+                document.querySelector(`.otp-input[data-index="${index + 1}"]`).focus();
+            }
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                document.querySelector(`.otp-input[data-index="${index - 1}"]`).focus();
+            }
+        });
+    });
+    
+    // Receipt Modal
+    document.getElementById('closeReceipt').addEventListener('click', function() {
+        document.getElementById('receiptModal').classList.add('hidden');
+    });
+    
+    // Update table options when cart opens
+    document.getElementById('plateBtn').addEventListener('click', updateTableOptions);
+});
+    </script>
+</body>
+</html>

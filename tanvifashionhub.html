@@ -1,0 +1,1817 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanvi Fashion Hub - Virar Mumbai | Online Clothing Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        .product-card {
+            transition: all 0.3s ease;
+            border: 1px solid #f3f4f6;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #ec4899;
+        }
+        .product-image {
+            height: 280px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .category-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        
+        /* Cart Panel */
+        .cart-panel {
+            transition: transform 0.3s ease;
+            transform: translateX(100%);
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+        }
+        .cart-panel.open {
+            transform: translateX(0);
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        .dashboard-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        /* Status Styles */
+        .order-status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .order-status-processing {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        .order-status-shipped {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .order-status-delivered {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border: 1px solid #6366f1;
+        }
+        .order-status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Fashion Hub Specific */
+        .fashion-bg {
+            background: linear-gradient(to bottom right, #fdf2f8, #fce7f3);
+        }
+        .admin-bg {
+            background: linear-gradient(to bottom right, #fefce8, #fffbeb);
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .fashion-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ec4899;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Size Selection */
+        .size-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .size-btn.selected {
+            border-color: #ec4899;
+            background-color: #fce7f3;
+            color: #ec4899;
+            font-weight: bold;
+        }
+        
+        /* Color Selection */
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .color-btn.selected {
+            border-color: #ec4899;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-purple-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-pink-600 via-purple-600 to-pink-700 text-white py-6 shadow-xl sticky top-0 z-30">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="text-center md:text-left">
+                    <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-3">
+                        <i class="fas fa-tshirt fashion-icon"></i>
+                        Tanvi Fashion Hub
+                        <i class="fas fa-heart fashion-icon"></i>
+                    </h1>
+                    <p class="text-pink-100 mt-2">Virar, Mumbai • Free Delivery Across Mumbai</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex flex-wrap gap-2 justify-center">
+                    <button id="userProfileBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md relative">
+                        <i class="fas fa-user mr-2"></i>My Profile
+                        <span id="notificationBadge" class="notification-badge hidden">0</span>
+                    </button>
+                    <button id="trackOrderBtn" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md">
+                        <i class="fas fa-truck mr-2"></i>Track Order
+                    </button>
+                    <button id="adminToggle" class="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-lg hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-lock mr-2"></i>Admin
+                    </button>
+                    <button id="closeAllDashboards" class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hidden">
+                        <i class="fas fa-times mr-2"></i>Close Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- USER PROFILE SECTION -->
+        <div id="userProfileSection" class="dashboard-container fashion-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-user-circle text-purple-600"></i>
+                    My Profile
+                </h2>
+                <button id="closeProfileBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+            
+            <!-- Profile Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column - Profile Info -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <div class="text-center mb-6">
+                            <div class="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-4xl text-white"></i>
+                            </div>
+                            <h3 id="profileUserName" class="text-xl font-bold text-gray-800">Guest User</h3>
+                            <p id="profileUserPhone" class="text-gray-600">No phone number</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Full Name *</label>
+                                <input type="text" id="profileNameInput" 
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="Enter your name">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">WhatsApp Number *</label>
+                                <input type="tel" id="profilePhoneInput" 
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="+91 9876543210">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Delivery Address *</label>
+                                <textarea id="profileAddressInput" rows="3"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="Enter your complete address in Mumbai"></textarea>
+                            </div>
+                            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300">
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Stats -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h4 class="font-bold text-gray-800 mb-4">Order Statistics</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Active Orders</span>
+                                <span id="currentOrdersCount" class="font-bold text-purple-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Total Orders</span>
+                                <span id="totalOrdersCount" class="font-bold text-purple-600">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Total Spent</span>
+                                <span id="totalSpentAmount" class="font-bold text-purple-600">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column - Orders -->
+                <div class="lg:col-span-2">
+                    <!-- Current Orders -->
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-clock text-pink-600"></i>
+                            Active Orders
+                        </h3>
+                        <div id="currentOrdersList" class="space-y-4">
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-shopping-bag text-4xl mb-3"></i>
+                                <p>No active orders</p>
+                                <p class="text-sm">Your orders will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order History -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-history text-gray-600"></i>
+                                Order History
+                            </h3>
+                            <button id="authHistoryBtn" class="bg-gradient-to-r from-pink-600 to-pink-700 text-white px-4 py-2 rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all duration-300 flex items-center gap-2">
+                                <i class="fas fa-lock"></i>
+                                View History with OTP
+                            </button>
+                        </div>
+                        <div id="orderHistoryList" class="space-y-4">
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-history text-4xl mb-3"></i>
+                                <p>Authenticate to view your order history</p>
+                                <p class="text-sm mt-2">We'll send an OTP to your WhatsApp number</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD -->
+        <div id="adminDashboard" class="dashboard-container admin-bg rounded-2xl shadow-xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-lock text-gray-600"></i>
+                    Admin Dashboard
+                </h2>
+                <button id="adminLogoutBtn" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+            
+            <!-- Admin Login Form -->
+            <div id="adminLoginForm" class="mb-8">
+                <div class="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 class="text-lg font-medium mb-4 flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt text-gray-600"></i>
+                        Admin Login
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Username</label>
+                            <input type="text" id="adminUsername" placeholder="admin" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 text-sm font-medium">Password</label>
+                            <input type="password" id="adminPassword" placeholder="password" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent shadow-sm">
+                        </div>
+                    </div>
+                    <button id="adminLoginBtn" class="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-3 rounded-lg hover:from-gray-900 hover:to-black transition-all duration-300 shadow-md flex items-center gap-2">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login as Admin
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Admin Content -->
+            <div id="adminContent" class="hidden">
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Products</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalProducts">0</p>
+                            </div>
+                            <i class="fas fa-tshirt text-3xl text-pink-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Today's Orders</p>
+                                <p class="text-2xl font-bold text-gray-800" id="todaysOrders">0</p>
+                            </div>
+                            <i class="fas fa-shopping-bag text-3xl text-blue-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Today's Revenue</p>
+                                <p class="text-2xl font-bold text-gray-800" id="todaysRevenue">₹0</p>
+                            </div>
+                            <i class="fas fa-rupee-sign text-3xl text-green-500"></i>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Active Deliveries</p>
+                                <p class="text-2xl font-bold text-gray-800" id="activeDeliveries">0</p>
+                            </div>
+                            <i class="fas fa-truck text-3xl text-purple-500"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add Product Section -->
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Product</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Product Name</label>
+                                <input type="text" id="productName" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Category</label>
+                                <select id="productCategory" class="w-full p-3 border border-gray-300 rounded-lg">
+    <option value="women">Women's Wear</option>
+    <option value="men">Men's Wear</option>
+    <option value="kids">Kids Wear</option>
+    <option value="ethnic">Ethnic Wear</option>
+    <option value="western">Western Wear</option>
+    <option value="jewellery">Jewellery</option>
+</select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Price (₹)</label>
+                                <input type="number" id="productPrice" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Stock Quantity</label>
+                                <input type="number" id="productStock" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2">Description</label>
+                                <textarea id="productDescription" rows="2" class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
+                            </div>
+                        </div>
+                        <div>
+    <label class="block text-gray-700 mb-2">Pair With (Product IDs)</label>
+    <input type="text" id="productPairedWith" placeholder="1,2,3" 
+           class="w-full p-3 border border-gray-300 rounded-lg">
+    <p class="text-xs text-gray-500 mt-1">Comma separated product IDs to suggest as pairs</p>
+</div>
+                        <button id="addProductBtn" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800">
+                            Add Product
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Order Management -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Recent Orders</h3>
+                    <div id="adminOrdersList" class="space-y-3">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Store Section -->
+        <div id="mainStoreSection">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-pink-600 to-purple-700 text-white rounded-2xl p-8 mb-12 shadow-xl">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h2 class="text-4xl font-bold mb-4">Latest Fashion Collection</h2>
+                        <p class="text-lg mb-6 text-pink-100">Free Delivery Across Mumbai • Cash on Delivery Available</p>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="bg-white text-pink-700 px-4 py-2 rounded-full font-medium">
+                                <i class="fas fa-truck mr-2"></i>Same Day Delivery
+                            </span>
+                            <span class="bg-white text-pink-700 px-4 py-2 rounded-full font-medium">
+                                <i class="fas fa-shield-alt mr-2"></i>Quality Guaranteed
+                            </span>
+                            <span class="bg-white text-pink-700 px-4 py-2 rounded-full font-medium">
+                                <i class="fas fa-exchange-alt mr-2"></i>Easy Returns
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="relative inline-block">
+                            <i class="fas fa-tshirt text-8xl opacity-50"></i>
+                            <i class="fas fa-heart text-6xl text-red-400 absolute top-4 right-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store Filters -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10">
+                <button class="filter-btn active px-5 py-2.5 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300" data-category="all">
+                    All Products
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-pink-700 border border-pink-200 rounded-full font-medium hover:bg-pink-50 transition-all duration-300" data-category="women">
+                    <i class="fas fa-female mr-2"></i>Women's Wear
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-blue-700 border border-blue-200 rounded-full font-medium hover:bg-blue-50 transition-all duration-300" data-category="men">
+                    <i class="fas fa-male mr-2"></i>Men's Wear
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-green-700 border border-green-200 rounded-full font-medium hover:bg-green-50 transition-all duration-300" data-category="kids">
+                    <i class="fas fa-child mr-2"></i>Kids Wear
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-purple-700 border border-purple-200 rounded-full font-medium hover:bg-purple-50 transition-all duration-300" data-category="ethnic">
+                    <i class="fas fa-gem mr-2"></i>Ethnic Wear
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-red-700 border border-red-200 rounded-full font-medium hover:bg-red-50 transition-all duration-300" data-category="western">
+                    <i class="fas fa-star mr-2"></i>Western Wear
+                </button>
+                <button class="filter-btn px-5 py-2.5 bg-white text-yellow-700 border border-yellow-200 rounded-full font-medium hover:bg-yellow-50 transition-all duration-300" data-category="jewellery">
+                    <i class="fas fa-gem mr-2"></i>Jewellery
+                </button>
+            </div>
+            
+            <!-- Products Grid -->
+            <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Cart Button -->
+    <div id="cartBtn" class="fixed bottom-6 right-6 bg-gradient-to-r from-pink-600 to-purple-700 text-white p-5 rounded-full shadow-2xl cursor-pointer z-40 hover:scale-110 transition-transform duration-300">
+        <div class="relative">
+            <i class="fas fa-shopping-bag text-2xl"></i>
+            <span id="cartCount" class="absolute -top-3 -right-3 bg-pink-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold shadow-md">0</span>
+        </div>
+    </div>
+
+    <!-- Cart Panel -->
+    <div id="cartPanel" class="cart-panel fixed top-0 right-0 h-full w-full md:w-96 bg-white z-50">
+        <div class="h-full flex flex-col">
+            <!-- Cart Header -->
+            <div class="p-6 bg-gradient-to-r from-pink-600 to-purple-700 text-white">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-shopping-bag text-2xl"></i>
+                        <h2 class="text-2xl font-bold">Your Cart</h2>
+                    </div>
+                    <button id="closeCart" class="text-white hover:text-pink-200 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-pink-100 mt-2">Items added to your shopping bag</p>
+            </div>
+            
+            <!-- Cart Items -->
+            <div id="cartItems" class="flex-grow overflow-y-auto p-6">
+                <div class="text-center py-12 text-gray-400">
+                    <div class="w-20 h-20 mx-auto bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-shopping-bag text-3xl text-pink-400"></i>
+                    </div>
+                    <p class="text-lg font-medium text-gray-500">Your cart is empty</p>
+                    <p class="text-sm mt-1">Add fashionable items from our collection</p>
+                </div>
+            </div>
+            
+            <!-- Cart Footer -->
+            <div class="p-6 border-t border-gray-200 bg-gray-50">
+                <!-- Delivery Details -->
+                <div class="mb-6">
+                    <h4 class="font-bold text-gray-800 mb-3">Delivery Details</h4>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Full Name *</label>
+                            <input type="text" id="customerName" placeholder="Your Name" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">WhatsApp Number *</label>
+                            <input type="tel" id="customerWhatsApp" placeholder="+91 9876543210" 
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Delivery Address *</label>
+                            <textarea id="customerAddress" rows="3" placeholder="Complete address in Mumbai"
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm mb-1">Delivery Area</label>
+                            <select id="deliveryArea" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                <option value="virar">Virar</option>
+                                <option value="vasai">Vasai</option>
+                                <option value="naigaon">Naigaon</option>
+                                <option value="nalasopara">Nalasopara</option>
+                                <option value="borivali">Borivali</option>
+                                <option value="andheri">Andheri</option>
+                                <option value="bandra">Bandra</option>
+                                <option value="south_mumbai">South Mumbai</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="border-t border-gray-300 pt-4 mb-6">
+                    <div class="space-y-2 mb-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span id="cartSubtotal" class="font-medium">₹0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Delivery Charge</span>
+                            <span id="deliveryCharge" class="font-medium">₹0</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-xl font-bold border-t pt-3">
+                        <span class="text-gray-800">Total:</span>
+                        <span id="cartTotal" class="text-pink-700">₹0</span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button id="placeOrder" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md flex items-center justify-center gap-3 mb-3">
+                    <i class="fas fa-check-circle"></i>
+                    Place Order
+                </button>
+                
+                <button id="whatsappOrder" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl font-medium hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md flex items-center justify-center gap-3 mb-3">
+                    <i class="fab fa-whatsapp"></i>
+                    Order via WhatsApp
+                </button>
+                
+                <button id="clearCart" class="w-full bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 py-3 rounded-xl font-medium hover:from-gray-400 hover:to-gray-500 transition-all duration-300">
+                    Clear Cart
+                </button>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Cash on Delivery Available • Free Delivery in Mumbai
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for cart panel -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- OTP Authentication Modal -->
+    <div id="otpModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-pink-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-lock text-3xl text-pink-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">OTP Verification</h3>
+                    <p class="text-gray-600 mt-2">Enter the OTP sent to your WhatsApp number</p>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex justify-center gap-2 mb-4" id="otpContainer">
+                        <input type="text" maxlength="1" class="otp-input" data-index="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="1">
+                        <input type="text" maxlength="1" class="otp-input" data-index="2">
+                        <input type="text" maxlength="1" class="otp-input" data-index="3">
+                        <input type="text" maxlength="1" class="otp-input" data-index="4">
+                        <input type="text" maxlength="1" class="otp-input" data-index="5">
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <p id="otpPhoneNumber" class="text-sm text-gray-600 mb-2"></p>
+                        <button id="resendOtpBtn" class="text-sm text-pink-600 hover:text-pink-800">
+                            Resend OTP
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button id="verifyOtpBtn" class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-medium hover:from-green-700 hover:to-green-800 transition-all duration-300">
+                        Verify OTP
+                    </button>
+                    <button id="cancelOtpBtn" class="w-full bg-gradient-to-r from-gray-300 to-gray-400 text-gray-800 py-3 rounded-xl font-medium hover:from-gray-400 hover:to-gray-500 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Receipt Modal -->
+    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800">Order Placed Successfully!</h3>
+                    <p class="text-gray-600 mt-2">Your order has been confirmed</p>
+                </div>
+                
+                <div id="receiptContent" class="space-y-4">
+                    <!-- Receipt content will be generated here -->
+                </div>
+                
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <button id="downloadReceiptBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 mb-3">
+                        <i class="fas fa-download mr-2"></i>Download Receipt
+                    </button>
+                    <button id="trackOrderBtn2" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl font-medium hover:from-purple-700 hover:to-purple-800 transition-all duration-300 mb-3">
+                        <i class="fas fa-truck mr-2"></i>Track Your Order
+                    </button>
+                    <button id="closeReceipt" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl font-medium hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                        Close Receipt
+                    </button>
+                    <p class="text-sm text-gray-500 text-center mt-3">
+                        Delivery executive will contact you before delivery
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-purple-800 via-pink-800 to-purple-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Store Info -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Tanvi Fashion Hub</h3>
+                    <p class="text-pink-100 mb-4">
+                        Your trusted fashion partner in Virar, Mumbai. Quality clothing with free delivery across Mumbai.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="text-white hover:text-pink-200">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-pink-200">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-white hover:text-pink-200">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Contact Us</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Shop No. 5, Sai Plaza, Near Railway Station, Virar East, Mumbai - 401305</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-phone"></i>
+                            <span>+91 98765 43210</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-clock"></i>
+                            <span>10:00 AM - 9:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delivery Areas -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">We Deliver To</h4>
+                    <div class="space-y-2 text-sm">
+                        <p>• Virar, Vasai, Nalasopara</p>
+                        <p>• Borivali, Kandivali, Malad</p>
+                        <p>• Andheri, Bandra, Dadar</p>
+                        <p>• All over Mumbai</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-pink-100 hover:text-white">New Arrivals</a></li>
+                        <li><a href="#" class="text-pink-100 hover:text-white">Women's Collection</a></li>
+                        <li><a href="#" class="text-pink-100 hover:text-white">Men's Collection</a></li>
+                        <li><a href="#" class="text-pink-100 hover:text-white">Track Order</a></li>
+                        <li><a href="#" class="text-pink-100 hover:text-white">Return Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-pink-700 mt-8 pt-8 text-center">
+                <p class="text-pink-100">&copy; 2024 Tanvi Fashion Hub. All rights reserved.</p>
+                <p class="text-pink-100 text-sm mt-2">Virar, Mumbai • GSTIN: 27ABCDE1234F1Z5</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+// ===============================
+// APPLICATION STATE & CONFIGURATION
+// ===============================
+const APP_CONFIG = {
+    adminUsername: "admin",
+    adminPassword: "admin123",
+    storeName: "Tanvi Fashion Hub",
+    currency: "₹",
+    whatsappNumber: "919876543210",
+    deliveryCharges: {
+        'virar': 0,
+        'vasai': 30,
+        'naigaon': 40,
+        'nalasopara': 50,
+        'borivali': 80,
+        'andheri': 100,
+        'bandra': 120,
+        'south_mumbai': 150
+    }
+};
+
+// Initialize state
+let productsData = [];
+let cart = JSON.parse(localStorage.getItem('fashionCart')) || [];
+let orders = JSON.parse(localStorage.getItem('fashionOrders')) || [];
+let users = JSON.parse(localStorage.getItem('fashionUsers')) || {};
+let currentFilter = 'all';
+let currentAdmin = null;
+let otpGenerated = null;
+let otpPhoneNumber = null;
+
+// ===============================
+// INITIALIZATION FUNCTIONS
+// ===============================
+function initializeProductsData() {
+    const products = [
+        // Women's Wear
+        {
+            id: 1,
+            name: "Floral Print Dress",
+            category: "women",
+            price: 1299,
+            description: "Beautiful floral print summer dress",
+            image: "https://images.unsplash.com/photo-1567095761054-7a02e69e5c43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['S', 'M', 'L', 'XL'],
+            colors: ['Pink', 'Blue', 'White'],
+            stock: 25,
+            pairedWith: [11, 12] // Paired with jewellery IDs
+        },
+        {
+            id: 2,
+            name: "Designer Saree",
+            category: "ethnic",
+            price: 2499,
+            description: "Traditional silk saree with embroidery",
+            image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['Free Size'],
+            colors: ['Red', 'Blue', 'Green'],
+            stock: 15,
+            pairedWith: [13, 14]
+        },
+        
+        // Jewellery Products
+        {
+            id: 11,
+            name: "Gold Plated Necklace Set",
+            category: "jewellery",
+            price: 1999,
+            description: "Elegant necklace with matching earrings",
+            image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['One Size'],
+            colors: ['Gold', 'Silver'],
+            stock: 30,
+            pairedWith: [1, 2] // Paired with clothing IDs
+        },
+        {
+            id: 12,
+            name: "Pearl Earrings",
+            category: "jewellery",
+            price: 899,
+            description: "Classic pearl stud earrings",
+            image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['One Size'],
+            colors: ['White', 'Pink'],
+            stock: 40,
+            pairedWith: [1, 3]
+        },
+        {
+            id: 13,
+            name: "Traditional Jhumka",
+            category: "jewellery",
+            price: 1499,
+            description: "Traditional Indian jhumka earrings",
+            image: "https://images.unsplash.com/photo-1535632787350-4a68f527f1c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['One Size'],
+            colors: ['Gold', 'Silver'],
+            stock: 25,
+            pairedWith: [2, 9]
+        },
+        {
+            id: 14,
+            name: "Bridal Set",
+            category: "jewellery",
+            price: 3499,
+            description: "Complete bridal jewellery set",
+            image: "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+            sizes: ['One Size'],
+            colors: ['Gold', 'Diamond'],
+            stock: 15,
+            pairedWith: [2, 10]
+        }
+    ];
+    return products;
+}
+
+// ===============================
+// UTILITY FUNCTIONS
+// ===============================
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-amber-500',
+        info: 'bg-blue-500'
+    };
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    notification.className = `${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-64 fixed top-4 right-4 z-50`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas ${icons[type]}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.remove('translate-x-64');
+    }, 10);
+    
+    setTimeout(() => {
+        notification.classList.add('opacity-0', 'translate-x-64');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function generateOrderId() {
+    return 'TFH-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// ===============================
+// DASHBOARD MANAGEMENT
+// ===============================
+function showDashboard(dashboardType) {
+    document.getElementById('userProfileSection').classList.remove('active');
+    document.getElementById('adminDashboard').classList.remove('active');
+    document.getElementById('mainStoreSection').classList.add('hidden');
+    document.getElementById('closeAllDashboards').classList.remove('hidden');
+    
+    if (dashboardType === 'profile') {
+        document.getElementById('userProfileSection').classList.add('active');
+        loadUserProfile();
+    } else if (dashboardType === 'admin') {
+        document.getElementById('adminDashboard').classList.add('active');
+    }
+}
+
+function hideAllDashboards() {
+    document.getElementById('userProfileSection').classList.remove('active');
+    document.getElementById('adminDashboard').classList.remove('active');
+    document.getElementById('mainStoreSection').classList.remove('hidden');
+    document.getElementById('closeAllDashboards').classList.add('hidden');
+    resetAdminLogin();
+}
+
+// ===============================
+// USER PROFILE MANAGEMENT
+// ===============================
+function loadUserProfile() {
+    const phone = localStorage.getItem('fashionUserPhone');
+    const name = localStorage.getItem('fashionUserName');
+    const address = localStorage.getItem('fashionUserAddress');
+    
+    if (phone) {
+        document.getElementById('profilePhoneInput').value = phone;
+        document.getElementById('profileUserPhone').textContent = phone;
+        document.getElementById('customerWhatsApp').value = phone;
+    }
+    
+    if (name) {
+        document.getElementById('profileNameInput').value = name;
+        document.getElementById('profileUserName').textContent = name;
+        document.getElementById('customerName').value = name;
+    }
+    
+    if (address) {
+        document.getElementById('profileAddressInput').value = address;
+        document.getElementById('customerAddress').value = address;
+    }
+    
+    loadUserOrders();
+    updateNotificationBadge();
+}
+
+function saveUserProfile() {
+    const phone = document.getElementById('profilePhoneInput').value.trim();
+    const name = document.getElementById('profileNameInput').value.trim();
+    const address = document.getElementById('profileAddressInput').value.trim();
+    
+    if (!phone) {
+        showNotification('Please enter your WhatsApp number', 'error');
+        return;
+    }
+    
+    if (!address) {
+        showNotification('Please enter your delivery address', 'error');
+        return;
+    }
+    
+    users[phone] = {
+        name: name || 'Guest',
+        phone: phone,
+        address: address,
+        createdAt: new Date().toISOString(),
+        totalOrders: 0,
+        totalSpent: 0
+    };
+    
+    localStorage.setItem('fashionUsers', JSON.stringify(users));
+    localStorage.setItem('fashionUserPhone', phone);
+    localStorage.setItem('fashionUserName', name || 'Guest');
+    localStorage.setItem('fashionUserAddress', address);
+    
+    document.getElementById('customerWhatsApp').value = phone;
+    document.getElementById('customerName').value = name || 'Guest';
+    document.getElementById('customerAddress').value = address;
+    
+    document.getElementById('profileUserPhone').textContent = phone;
+    document.getElementById('profileUserName').textContent = name || 'Guest';
+    
+    showNotification('Profile saved successfully!', 'success');
+    loadUserOrders();
+}
+
+function loadUserOrders() {
+    const phone = localStorage.getItem('fashionUserPhone');
+    if (!phone) return;
+    
+    const currentOrders = orders.filter(o => 
+        o.customerPhone === phone && 
+        o.status !== 'delivered' && 
+        o.status !== 'cancelled'
+    );
+    
+    const allOrders = orders.filter(o => o.customerPhone === phone);
+    
+    document.getElementById('currentOrdersCount').textContent = currentOrders.length;
+    document.getElementById('totalOrdersCount').textContent = allOrders.length;
+    
+    const totalSpent = allOrders.reduce((sum, o) => sum + o.total, 0);
+    document.getElementById('totalSpentAmount').textContent = `₹${totalSpent}`;
+    
+    updateNotificationBadge();
+    
+    const currentOrdersList = document.getElementById('currentOrdersList');
+    if (currentOrders.length === 0) {
+        currentOrdersList.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-shopping-bag text-4xl mb-3"></i>
+                <p>No active orders</p>
+                <p class="text-sm">Your orders will appear here</p>
+            </div>
+        `;
+    } else {
+        currentOrdersList.innerHTML = currentOrders.map(order => `
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                        <p class="text-sm text-gray-600">${order.deliveryArea}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                        ${order.status.toUpperCase()}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-700 mb-2">
+                    ${order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')}
+                </p>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-pink-700">₹${order.total}</span>
+                    <span class="text-xs text-gray-500">
+                        ${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function updateNotificationBadge() {
+    const phone = localStorage.getItem('fashionUserPhone');
+    if (!phone) return;
+    
+    const currentOrders = orders.filter(o => 
+        o.customerPhone === phone && 
+        o.status !== 'delivered' && 
+        o.status !== 'cancelled'
+    );
+    
+    const badge = document.getElementById('notificationBadge');
+    if (currentOrders.length > 0) {
+        badge.textContent = currentOrders.length;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+function showOTPModal() {
+    const phone = localStorage.getItem('fashionUserPhone');
+    if (!phone) {
+        showNotification('Please save your profile first', 'error');
+        return;
+    }
+    
+    otpPhoneNumber = phone;
+    otpGenerated = generateOTP();
+    
+    document.getElementById('otpPhoneNumber').textContent = `OTP sent to ${phone}`;
+    document.getElementById('otpModal').classList.remove('hidden');
+    
+    console.log(`OTP for ${phone}: ${otpGenerated}`);
+    showNotification(`OTP sent to ${phone}`, 'info');
+    
+    setTimeout(() => {
+        document.querySelector('.otp-input').focus();
+    }, 100);
+}
+
+function verifyOTP() {
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const enteredOTP = Array.from(otpInputs).map(input => input.value).join('');
+    
+    if (enteredOTP === otpGenerated) {
+        document.getElementById('otpModal').classList.add('hidden');
+        showNotification('OTP verified successfully!', 'success');
+        loadOrderHistory();
+    } else {
+        showNotification('Invalid OTP. Please try again.', 'error');
+    }
+}
+
+function loadOrderHistory() {
+    const phone = localStorage.getItem('fashionUserPhone');
+    if (!phone) return;
+    
+    const orderHistory = orders.filter(o => o.customerPhone === phone)
+        .sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime));
+    
+    const orderHistoryList = document.getElementById('orderHistoryList');
+    if (orderHistory.length === 0) {
+        orderHistoryList.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-history text-4xl mb-3"></i>
+                <p>No order history found</p>
+            </div>
+        `;
+    } else {
+        orderHistoryList.innerHTML = orderHistory.map(order => `
+            <div class="border border-gray-200 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                        <p class="text-sm text-gray-600">${order.deliveryArea} • ${new Date(order.orderTime).toLocaleDateString()}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                        ${order.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="mb-2">
+                    ${order.items.map(item => `
+                        <div class="flex justify-between text-sm">
+                            <span>${item.quantity}x ${item.name}</span>
+                            <span>₹${item.price * item.quantity}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t">
+                    <span class="font-bold text-pink-700">Total: ₹${order.total}</span>
+                    <button onclick="reorderOrder('${order.id}')" class="text-xs text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-redo mr-1"></i>Reorder
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function reorderOrder(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    cart = order.items.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color
+    }));
+    
+    localStorage.setItem('fashionCart', JSON.stringify(cart));
+    updateCart();
+    showNotification('Items added to cart for reorder!', 'success');
+}
+
+// ===============================
+// ADMIN DASHBOARD FUNCTIONS
+// ===============================
+function handleAdminLogin() {
+    const username = document.getElementById('adminUsername').value.trim();
+    const password = document.getElementById('adminPassword').value;
+    
+    if (username === APP_CONFIG.adminUsername && password === APP_CONFIG.adminPassword) {
+        currentAdmin = true;
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+        updateAdminDashboard();
+        showNotification('Welcome to Admin Dashboard!', 'success');
+    } else {
+        showNotification('Invalid admin credentials', 'error');
+    }
+}
+
+function handleAdminLogout() {
+    resetAdminLogin();
+    showNotification('Admin logged out', 'info');
+}
+
+function resetAdminLogin() {
+    currentAdmin = null;
+    document.getElementById('adminUsername').value = '';
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('adminContent').classList.add('hidden');
+}
+
+function updateAdminDashboard() {
+    if (!currentAdmin) return;
+    
+    document.getElementById('totalProducts').textContent = productsData.length;
+    
+    const today = new Date().toDateString();
+    const todayOrders = orders.filter(o => 
+        new Date(o.orderTime).toDateString() === today
+    );
+    const todaysRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+    const activeDeliveries = orders.filter(o => 
+        o.status === 'processing' || o.status === 'shipped'
+    ).length;
+    
+    document.getElementById('todaysOrders').textContent = todayOrders.length;
+    document.getElementById('todaysRevenue').textContent = `₹${todaysRevenue}`;
+    document.getElementById('activeDeliveries').textContent = activeDeliveries;
+}
+
+function addProduct() {
+    const name = document.getElementById('productName').value.trim();
+    const category = document.getElementById('productCategory').value;
+    const price = parseInt(document.getElementById('productPrice').value);
+    const stock = parseInt(document.getElementById('productStock').value);
+    const description = document.getElementById('productDescription').value.trim();
+    const pairedWithInput = document.getElementById('productPairedWith').value.trim();
+    
+    if (!name || !price || !stock) {
+        showNotification('Please fill all required fields', 'error');
+        return;
+    }
+    
+    // Convert pairedWith string to array of numbers
+    const pairedWith = pairedWithInput 
+        ? pairedWithInput.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id))
+        : [];
+    
+    const newProduct = {
+        id: productsData.length + 1,
+        name: name,
+        category: category,
+        price: price,
+        description: description,
+        image: `https://images.unsplash.com/photo-1567095761054-7a02e69e5c43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=${productsData.length}`,
+        sizes: category === 'jewellery' ? ['One Size'] : ['S', 'M', 'L', 'XL'],
+        colors: getDefaultColors(category),
+        stock: stock,
+        pairedWith: pairedWith
+    };
+    
+    productsData.push(newProduct);
+    showNotification(`Product "${name}" added successfully!`, 'success');
+    renderProducts();
+    updateAdminDashboard();
+    
+    // Clear form
+    document.getElementById('productName').value = '';
+    document.getElementById('productPrice').value = '';
+    document.getElementById('productStock').value = '';
+    document.getElementById('productDescription').value = '';
+    document.getElementById('productPairedWith').value = '';
+}
+
+function getDefaultColors(category) {
+    if (category === 'jewellery') {
+        return ['Gold', 'Silver'];
+    }
+    return ['Red', 'Blue', 'Black'];
+}
+
+// ===============================
+// STORE MANAGEMENT
+// ===============================
+function loadStore() {
+    productsData = initializeProductsData();
+    renderProducts();
+}
+
+function renderProducts() {
+    const container = document.getElementById('productsGrid');
+    const filteredProducts = currentFilter === 'all' 
+        ? productsData 
+        : productsData.filter(item => item.category === currentFilter);
+    
+    container.innerHTML = filteredProducts.map(product => {
+        // Find paired items
+        const pairedItems = product.pairedWith?.map(id => 
+            productsData.find(p => p.id === id)
+        ).filter(p => p) || [];
+        
+        return `
+        <div class="product-card bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="relative">
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <span class="absolute top-3 right-3 category-badge ${product.category === 'women' ? 'bg-pink-100 text-pink-800' : 
+                    product.category === 'men' ? 'bg-blue-100 text-blue-800' : 
+                    product.category === 'kids' ? 'bg-green-100 text-green-800' : 
+                    product.category === 'ethnic' ? 'bg-purple-100 text-purple-800' : 
+                    product.category === 'jewellery' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                    ${product.category === 'women' ? 'Women' : 
+                     product.category === 'men' ? 'Men' : 
+                     product.category === 'kids' ? 'Kids' : 
+                     product.category === 'ethnic' ? 'Ethnic' : 
+                     product.category === 'jewellery' ? 'Jewellery' : 'Western'}
+                </span>
+            </div>
+            <div class="p-5 flex-grow">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-lg font-bold text-gray-800">${product.name}</h3>
+                    <span class="text-xl font-bold text-pink-700">₹${product.price}</span>
+                </div>
+                <p class="text-gray-600 mb-4 text-sm">${product.description}</p>
+                
+                ${product.category !== 'jewellery' ? `
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-sm text-gray-500">Sizes:</span>
+                    ${product.sizes.map(size => `
+                        <span class="size-btn ${size === 'M' ? 'selected' : ''}">${size}</span>
+                    `).join('')}
+                </div>
+                ` : ''}
+                
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-sm text-gray-500">Colors:</span>
+                    ${product.colors.map((color, index) => `
+                        <div class="color-btn ${index === 0 ? 'selected' : ''}" style="background-color: ${getColorHex(color)}" title="${color}"></div>
+                    `).join('')}
+                </div>
+                
+                <!-- Paired Items Section -->
+                ${pairedItems.length > 0 ? `
+                <div class="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <p class="text-xs text-yellow-800 mb-2">
+                        <i class="fas fa-star mr-1"></i>
+                        ${product.category === 'jewellery' ? 'Pairs well with:' : 'Accessorize with:'}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        ${pairedItems.slice(0, 2).map(item => `
+                            <span class="text-xs px-2 py-1 rounded-full bg-white border border-yellow-300 text-yellow-700">
+                                ${item.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="flex justify-between items-center">
+                    <span class="text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}">
+                        ${product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
+                    </span>
+                    <span class="text-xs text-gray-500">Free Delivery</span>
+                </div>
+            </div>
+            <div class="p-5 pt-0">
+                <button onclick="addToCart(${product.id})" 
+                        class="w-full bg-gradient-to-r from-pink-600 to-pink-700 text-white py-3 rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all duration-300 ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${product.stock === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    ${product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function getColorHex(color) {
+    const colors = {
+        'Red': '#ef4444',
+        'Blue': '#3b82f6',
+        'Black': '#000000',
+        'White': '#ffffff',
+        'Pink': '#ec4899',
+        'Green': '#10b981',
+        'Yellow': '#fbbf24',
+        'Purple': '#8b5cf6',
+        'Gray': '#6b7280',
+        'Navy': '#1e3a8a',
+        'Gold': '#f59e0b',
+        'Silver': '#c0c0c0',
+        'Diamond': '#b9f2ff'
+    };
+    return colors[color] || '#6b7280';
+}
+
+function addToCart(productId) {
+    const product = productsData.find(p => p.id === productId);
+    if (!product || product.stock === 0) return;
+    
+    const existingItem = cart.find(i => i.id === productId);
+    if (existingItem) {
+        if (existingItem.quantity < product.stock) {
+            existingItem.quantity += 1;
+        } else {
+            showNotification('Maximum stock reached for this item', 'warning');
+            return;
+        }
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1,
+            size: 'M',
+            color: product.colors[0]
+        });
+    }
+    
+    localStorage.setItem('fashionCart', JSON.stringify(cart));
+    updateCart();
+    showNotification(`${product.name} added to cart!`, 'success');
+}
+
+function updateCart() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    const deliveryArea = document.getElementById('deliveryArea').value;
+    const deliveryCharge = APP_CONFIG.deliveryCharges[deliveryArea] || 0;
+    const total = subtotal + deliveryCharge;
+    
+    document.getElementById('cartCount').textContent = totalItems;
+    document.getElementById('cartSubtotal').textContent = `₹${subtotal}`;
+    document.getElementById('deliveryCharge').textContent = `₹${deliveryCharge}`;
+    document.getElementById('cartTotal').textContent = `₹${total}`;
+    
+    const container = document.getElementById('cartItems');
+    if (cart.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-400">
+                <div class="w-20 h-20 mx-auto bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-shopping-bag text-3xl text-pink-400"></i>
+                </div>
+                <p class="text-lg font-medium text-gray-500">Your cart is empty</p>
+                <p class="text-sm mt-1">Add fashionable items from our collection</p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = cart.map(item => `
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                <div class="flex items-start gap-3">
+                    <div class="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">${item.name}</h4>
+                        <p class="text-sm text-gray-600">Size: ${item.size} | Color: ${item.color}</p>
+                        <p class="text-pink-700 font-bold">₹${item.price}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="decreaseQuantity(${item.id})" class="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center justify-center">
+                        <i class="fas fa-minus text-xs"></i>
+                    </button>
+                    <span class="font-bold min-w-8 text-center">${item.quantity}</span>
+                    <button onclick="increaseQuantity(${item.id})" class="w-8 h-8 rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200 flex items-center justify-center">
+                        <i class="fas fa-plus text-xs"></i>
+                    </button>
+                    <button onclick="removeFromCart(${item.id})" class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center ml-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function increaseQuantity(itemId) {
+    const item = cart.find(i => i.id === itemId);
+    const product = productsData.find(p => p.id === itemId);
+    
+    if (item && product && item.quantity < product.stock) {
+        item.quantity += 1;
+        localStorage.setItem('fashionCart', JSON.stringify(cart));
+        updateCart();
+    } else {
+        showNotification('Maximum stock reached for this item', 'warning');
+    }
+}
+
+function decreaseQuantity(itemId) {
+    const itemIndex = cart.findIndex(i => i.id === itemId);
+    if (itemIndex !== -1) {
+        if (cart[itemIndex].quantity > 1) {
+            cart[itemIndex].quantity -= 1;
+        } else {
+            cart.splice(itemIndex, 1);
+        }
+        localStorage.setItem('fashionCart', JSON.stringify(cart));
+        updateCart();
+    }
+}
+
+function removeFromCart(itemId) {
+    const itemIndex = cart.findIndex(i => i.id === itemId);
+    if (itemIndex !== -1) {
+        const itemName = cart[itemIndex].name;
+        cart.splice(itemIndex, 1);
+        localStorage.setItem('fashionCart', JSON.stringify(cart));
+        updateCart();
+        showNotification(`${itemName} removed from cart`, 'info');
+    }
+}
+
+function placeOrder() {
+    const name = document.getElementById('customerName').value.trim();
+    const phone = document.getElementById('customerWhatsApp').value.trim();
+    const address = document.getElementById('customerAddress').value.trim();
+    const area = document.getElementById('deliveryArea').value;
+    
+    if (!name) {
+        showNotification('Please enter your name', 'error');
+        return;
+    }
+    
+    if (!phone) {
+        showNotification('Please enter your WhatsApp number', 'error');
+        return;
+    }
+    
+    if (!address) {
+        showNotification('Please enter your delivery address', 'error');
+        return;
+    }
+    
+    if (cart.length === 0) {
+        showNotification('Your cart is empty', 'error');
+        return;
+    }
+    
+    // Check stock availability
+    for (const cartItem of cart) {
+        const product = productsData.find(p => p.id === cartItem.id);
+        if (!product || product.stock < cartItem.quantity) {
+            showNotification(`${cartItem.name} is out of stock or quantity unavailable`, 'error');
+            return;
+        }
+    }
+    
+    // Update stock
+    for (const cartItem of cart) {
+        const product = productsData.find(p => p.id === cartItem.id);
+        if (product) {
+            product.stock -= cartItem.quantity;
+        }
+    }
+    
+    if (!users[phone]) {
+        users[phone] = {
+            name: name,
+            phone: phone,
+            address: address,
+            createdAt: new Date().toISOString(),
+            totalOrders: 0,
+            totalSpent: 0
+        };
+        localStorage.setItem('fashionUsers', JSON.stringify(users));
+    }
+    
+    localStorage.setItem('fashionUserPhone', phone);
+    localStorage.setItem('fashionUserName', name);
+    localStorage.setItem('fashionUserAddress', address);
+    
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const deliveryCharge = APP_CONFIG.deliveryCharges[area] || 0;
+    const total = subtotal + deliveryCharge;
+    
+    const order = {
+        id: generateOrderId(),
+        customerName: name,
+        customerPhone: phone,
+        deliveryAddress: address,
+        deliveryArea: area,
+        items: [...cart],
+        subtotal: subtotal,
+        deliveryCharge: deliveryCharge,
+        total: total,
+        status: 'pending',
+        paymentMethod: 'cod',
+        orderTime: new Date().toISOString(),
+        estimatedDelivery: '24-48 hours'
+    };
+    
+    orders.push(order);
+    localStorage.setItem('fashionOrders', JSON.stringify(orders));
+    
+    users[phone].totalOrders = (users[phone].totalOrders || 0) + 1;
+    users[phone].totalSpent = (users[phone].totalSpent || 0) + order.total;
+    localStorage.setItem('fashionUsers', JSON.stringify(users));
+    
+    cart = [];
+    localStorage.setItem('fashionCart', JSON.stringify(cart));
+    updateCart();
+    
+    showReceipt(order);
+    loadUserProfile();
+    renderProducts();
+    
+    showNotification('Order placed successfully! Delivery executive will contact you.', 'success');
+}
+
+function showReceipt(order) {
+    const content = document.getElementById('receiptContent');
+    content.innerHTML = `
+        <div class="text-center mb-6">
+            <h4 class="font-bold text-gray-800 text-lg">${APP_CONFIG.storeName}</h4>
+            <p class="text-gray-600">Virar, Mumbai</p>
+        </div>
+        
+        <div class="space-y-2 mb-4">
+            <div class="flex justify-between">
+                <span class="text-gray-600">Order ID:</span>
+                <span class="font-bold">${order.id}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Customer:</span>
+                <span class="font-bold">${order.customerName}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Delivery Area:</span>
+                <span class="font-bold">${order.deliveryArea.toUpperCase()}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Time:</span>
+                <span class="font-bold">${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        </div>
+        
+        <div class="border-t border-b border-gray-200 py-4 my-4">
+            ${order.items.map(item => `
+                <div class="flex justify-between mb-2">
+                    <div>
+                        <span class="font-medium">${item.quantity}x ${item.name}</span>
+                        <p class="text-xs text-gray-500">${item.size} | ${item.color}</p>
+                    </div>
+                    <span>₹${item.price * item.quantity}</span>
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span>Subtotal:</span>
+                <span>₹${order.subtotal}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Delivery Charge:</span>
+                <span>₹${order.deliveryCharge}</span>
+            </div>
+            <div class="flex justify-between text-xl font-bold border-t pt-3">
+                <span>Total:</span>
+                <span class="text-pink-700">₹${order.total}</span>
+            </div>
+        </div>
+        
+        <div class="mt-6 p-4 bg-green-50 rounded-lg">
+            <p class="text-sm text-green-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                Order confirmed! Estimated delivery: ${order.estimatedDelivery}<br>
+                <small>Cash on Delivery • Free Returns within 7 days</small>
+            </p>
+        </div>
+    `;
+    
+    document.getElementById('receiptModal').classList.remove('hidden');
+}
+
+// ===============================
+// EVENT LISTENERS
+// ===============================
+document.addEventListener('DOMContentLoaded', function() {
+    loadStore();
+    updateCart();
+    
+    // User Profile Button
+    document.getElementById('userProfileBtn').addEventListener('click', () => {
+        showDashboard('profile');
+    });
+    
+    document.getElementById('closeProfileBtn').addEventListener('click', () => {
+        hideAllDashboards();
+    });
+    
+    document.getElementById('saveProfileBtn').addEventListener('click', saveUserProfile);
+    
+    document.getElementById('authHistoryBtn').addEventListener('click', showOTPModal);
+    
+    // Track Order Button
+    document.getElementById('trackOrderBtn').addEventListener('click', () => {
+        showOTPModal();
+    });
+    
+    document.getElementById('trackOrderBtn2').addEventListener('click', () => {
+        showOTPModal();
+    });
+    
+    // Dashboard Toggle Buttons
+    document.getElementById('adminToggle').addEventListener('click', () => {
+        showDashboard('admin');
+    });
+    
+    document.getElementById('closeAllDashboards').addEventListener('click', hideAllDashboards);
+    
+    // Admin Login
+    document.getElementById('adminLoginBtn').addEventListener('click', handleAdminLogin);
+    document.getElementById('adminLogoutBtn').addEventListener('click', handleAdminLogout);
+    
+    // Add Product Button
+    document.getElementById('addProductBtn').addEventListener('click', addProduct);
+    
+    // Store Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.category;
+            renderProducts();
+        });
+    });
+    
+    // Cart Management
+    document.getElementById('cartBtn').addEventListener('click', function() {
+        document.getElementById('cartPanel').classList.add('open');
+        document.getElementById('overlay').classList.remove('hidden');
+    });
+    
+    document.getElementById('closeCart').addEventListener('click', function() {
+        document.getElementById('cartPanel').classList.remove('open');
+        document.getElementById('overlay').classList.add('hidden');
+    });
+    
+    document.getElementById('overlay').addEventListener('click', function() {
+        document.getElementById('cartPanel').classList.remove('open');
+        this.classList.add('hidden');
+    });
+    
+    document.getElementById('clearCart').addEventListener('click', function() {
+        cart = [];
+        localStorage.setItem('fashionCart', JSON.stringify(cart));
+        updateCart();
+        showNotification('Cart cleared', 'info');
+    });
+    
+    document.getElementById('placeOrder').addEventListener('click', placeOrder);
+    
+    // Delivery area change
+    document.getElementById('deliveryArea').addEventListener('change', updateCart);
+    
+    // OTP Modal
+    document.getElementById('verifyOtpBtn').addEventListener('click', verifyOTP);
+    document.getElementById('cancelOtpBtn').addEventListener('click', function() {
+        document.getElementById('otpModal').classList.add('hidden');
+    });
+    
+    document.querySelectorAll('.otp-input').forEach((input, index) => {
+        input.addEventListener('input', function() {
+            if (this.value.length === 1 && index < 5) {
+                document.querySelector(`.otp-input[data-index="${index + 1}"]`).focus();
+            }
+        });
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                document.querySelector(`.otp-input[data-index="${index - 1}"]`).focus();
+            }
+        });
+    });
+    
+    // Receipt Modal
+    document.getElementById('closeReceipt').addEventListener('click', function() {
+        document.getElementById('receiptModal').classList.add('hidden');
+    });
+    
+    // Auto-fill customer details from profile
+    document.getElementById('customerWhatsApp').addEventListener('blur', function() {
+        const phone = this.value.trim();
+        if (users[phone]) {
+            document.getElementById('customerName').value = users[phone].name || '';
+            document.getElementById('customerAddress').value = users[phone].address || '';
+        }
+    });
+});
+    </script>
+</body>
+</html>
