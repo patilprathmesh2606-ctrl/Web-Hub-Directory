@@ -60,9 +60,9 @@
             z-index: -1;
         }
         
-        /* Header Styles */
+        /* Enhanced Header Styles - Desktop Optimized */
         header {
-            background-color: rgba(26, 60, 110, 0.95);
+            background-color: rgba(26, 60, 110, 0.98);
             color: white;
             padding: 15px 0;
             position: fixed;
@@ -74,58 +74,135 @@
             transition: all 0.3s ease;
         }
         
-        .header-top {
+        .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 5%;
-            flex-wrap: wrap;
+            position: relative;
         }
         
-        .contact-info {
-            font-size: 1rem;
+        /* Desktop Header Layout */
+        .header-left {
+            flex: 1;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
         }
         
-        .contact-info i {
-            margin-right: 8px;
-            color: var(--primary);
+        .header-center {
+            flex: 2;
+            display: flex;
+            justify-content: center;
         }
         
+        .header-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        /* Shop Name - Desktop Full Display */
         .shop-name {
-            text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: white;
+            text-align: center;
+            white-space: nowrap;
+            overflow: visible;
+            max-width: none;
         }
         
         .shop-name span {
             color: var(--primary);
         }
         
-        .social-icons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-icons a {
-            color: white;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+        /* Contact Info in Header */
+        .header-contact-info {
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
+            gap: 15px;
+            font-size: 0.9rem;
         }
         
-        .social-icons a:hover {
+        .header-contact-info i {
             color: var(--primary);
-            background: white;
-            transform: translateY(-3px);
+            margin-right: 5px;
+        }
+        
+        .contact-link {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .contact-link:hover {
+            color: var(--primary);
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Mobile Social Icons */
+        .mobile-social-icons {
+            display: none !important;
+        }
+        
+        /* Navigation */
+        .nav-menu {
+            display: none; /* Hidden in desktop */
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background: var(--secondary);
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 0;
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            z-index: 999;
+            list-style: none;
+        }
+        
+        .nav-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .nav-menu li {
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-menu li a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-menu li a:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--primary);
         }
         
         /* Main Hero Section */
@@ -218,6 +295,295 @@
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
+        }
+        
+        /* Services Section */
+        .services-section {
+            background-color: var(--light);
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: white;
+        }
+        
+        .service-card h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        /* Testimonials Section - Enhanced */
+        .testimonials-section {
+            background-color: white;
+        }
+        
+        .testimonial-slider {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .testimonial {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .testimonial-content {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .delete-review-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; /* Hidden by default, shown for admin */
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-testimonial-form {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        /* Pricing Section with Admin Controls */
+        .pricing-section {
+            background-color: var(--light);
+        }
+        
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .pricing-card.popular {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.popular:before {
+            content: 'Most Popular';
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+        
+        .pricing-header {
+            background: var(--secondary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .edit-price-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none; /* Hidden by default, shown for admin */
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .pricing-price span {
+            font-size: 1rem;
+            font-weight: normal;
+        }
+        
+        .pricing-features {
+            padding: 30px;
+            list-style: none;
+        }
+        
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pricing-features li i {
+            color: var(--success);
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            background-color: white;
+        }
+        
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .faq-item {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .faq-question {
+            background: var(--light);
+            padding: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--secondary);
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+        
+        /* Service Area Section */
+        .service-area-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .area-map {
+            height: 400px;
+            background: #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 40px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .map-placeholder {
+            text-align: center;
+            color: var(--secondary);
+        }
+        
+        .map-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
         }
         
         /* Profile Section */
@@ -554,24 +920,6 @@
             text-align: center;
         }
         
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        
         .login-btn {
             width: 100%;
             background: var(--primary);
@@ -592,6 +940,30 @@
         
         .logout-btn {
             background-color: var(--danger);
+        }
+        
+        /* Edit Price Modal */
+        .edit-price-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .edit-price-box {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.5s ease;
         }
         
         /* Animations */
@@ -617,7 +989,13 @@
             }
         }
         
-        /* Responsive */
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .header-container {
+                padding: 0 20px;
+            }
+        }
+        
         @media (max-width: 992px) {
             .hero h1 {
                 font-size: 2.8rem;
@@ -630,20 +1008,97 @@
             .profile-img {
                 min-height: 300px;
             }
+            
+            .pricing-card.popular {
+                transform: scale(1);
+            }
         }
         
         @media (max-width: 768px) {
-            .header-top {
-                flex-direction: column;
-                gap: 15px;
+            /* Mobile Header Styles */
+            .header-left, .header-center, .header-right {
+                flex: none;
             }
             
-            .shop-name {
-                order: -1;
-                width: 100%;
-                margin-bottom: 10px;
+            .header-contact-info {
+                display: none; /* Hide contact info in mobile header */
             }
             
+            .mobile-menu-btn {
+                display: block;
+                order: 1;
+            }
+            
+            ./* Desktop - Keep as is (center aligned) */
+.shop-name {
+    font-size: 2.0rem;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
+    max-width: none;
+}
+
+/* Mobile - Move to left corner */
+@media (max-width: 768px) {
+    .shop-name {
+        order: 1; /* Change from 2 to 1 - moves to left */
+        flex-grow: 0; /* Change from 1 to 0 - don't take extra space */
+        text-align: left; /* Align text to left */
+        justify-content: flex-start; /* Align to left */
+        font-size: 1.3rem;
+        white-space: normal;
+        line-height: 1.1;
+        overflow: visible;
+        max-width: none;
+        padding: 0 8px;
+        margin-right: auto; /* Push everything else to the right */
+    }
+    
+    /* Adjust hamburger menu position */
+    .mobile-menu-btn {
+        order: 2; /* Move menu to the right */
+        margin-left: auto; /* Push to far right */
+    }
+    
+    /* Hide social icons completely in mobile */
+    .mobile-social-icons {
+        display: none !important;
+    }
+}
+            }
+            
+            /* REMOVED: mobile-contact-icons section entirely */
+            /* Phone call button is now completely removed from mobile header */
+            
+            .mobile-social-icons {
+                display: flex;
+                order: 3;
+                gap: 10px;
+            }
+            
+            .mobile-social-icons a {
+                color: white;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.1);
+                text-decoration: none;
+            }
+            
+            .mobile-social-icons a:hover {
+                color: var(--primary);
+                background: white;
+                transform: scale(1.1);
+            }
+            
+            /* Mobile Hero */
             .hero h1 {
                 font-size: 2.2rem;
             }
@@ -652,15 +1107,26 @@
                 font-size: 1.1rem;
             }
             
+            /* Mobile Sections */
             .section {
                 padding: 70px 5%;
             }
             
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            /* Mobile Calendar */
             .calendar td {
                 padding: 10px 5px;
                 height: 80px;
             }
             
+            .calendar .date {
+                font-size: 1rem;
+            }
+            
+            /* Mobile Gallery */
             .gallery {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
@@ -676,11 +1142,34 @@
             }
             
             .section-title h2 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+            
+            .services-grid,
+            .pricing-cards {
+                grid-template-columns: 1fr;
             }
             
             .gallery {
                 grid-template-columns: 1fr;
+            }
+            
+            .shop-name {
+                font-size: 1.1rem;
+                max-width: 180px;
+            }
+            
+            .mobile-social-icons a {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .shop-name {
+                font-size: 1rem;
+                max-width: 150px;
             }
         }
     </style>
@@ -688,27 +1177,49 @@
 <body>
     <!-- Header -->
     <header id="main-header">
-        <div class="header-top">
-            <div class="contact-info">
-                <i class="fas fa-phone-alt"></i>
-                <span>+91 98765 43210</span>
+        <div class="header-container">
+            <div class="header-left">
+                <div class="header-contact-info">
+                    <a href="tel:+919876543210" class="contact-link">
+                        <i class="fas fa-phone-alt"></i> +91 98765 43210
+                    </a>
+                </div>
             </div>
             
-            <div class="shop-name">
-                <span>Rahul Shirke</span> Electrical Services
+            <div class="header-center">
+                <div class="shop-name">
+                    <span>Rahul Shirke</span> Electrical Services
+                </div>
             </div>
             
-            <div class="social-icons">
-                <a href="https://wa.me/919876543210" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                <a href="#" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+            <div class="header-right">
+                <div class="header-contact-info">
+                    <a href="mailto:rahul.shirke@example.com" class="contact-link">
+                        <i class="fas fa-envelope"></i> rahul.shirke@example.com
+                    </a>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
+        
+        <nav>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#profile">About</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#calendar">Availability</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
     </header>
 
     <!-- Hero Section -->
-    <section class="parallax hero" style="background-image: url('https://images.unsplash.com/photo-1621905252507-b35492cc74b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');">
+    <section class="parallax hero" id="home" style="background-image: url('https://images.unsplash.com/photo-1621905252507-b35492cc74b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');">
         <div class="hero-content">
             <h1>Professional Electrical Services in Shahapur</h1>
             <p>Expert electrical solutions for residential, commercial, and industrial needs. Serving Shahapur with excellence for over 15 years.</p>
@@ -719,6 +1230,63 @@
             <a href="#contact" class="cta-button">
                 <i class="fas fa-phone-alt"></i> Contact Now
             </a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="section services-section" id="services">
+        <div class="section-title">
+            <h2>Our Services</h2>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Electrical Wiring</h3>
+                <p>Complete house wiring, rewiring, switchboard installation and upgrades for residential and commercial properties.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+                <h3>Solar Installations</h3>
+                <p>Professional solar panel setup, maintenance, and repair services for homes and businesses.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3>Repair Services</h3>
+                <p>All types of electrical repairs, troubleshooting, and maintenance for both residential and commercial clients.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3>Lighting Solutions</h3>
+                <p>Indoor/outdoor lighting installation, LED upgrades, decorative lighting, and energy-efficient solutions.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <h3>Power Solutions</h3>
+                <p>Generator installations, UPS systems, voltage stabilizers, and backup power solutions.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>Commercial Projects</h3>
+                <p>Complete electrical solutions for offices, shops, factories, and industrial establishments.</p>
+            </div>
         </div>
     </section>
 
@@ -758,6 +1326,157 @@
                         <p>Office, shop, and industrial electrical work</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="section testimonials-section" id="testimonials">
+        <div class="section-title">
+            <h2>Customer Testimonials</h2>
+        </div>
+        
+        <div class="testimonial-slider" id="testimonialContainer">
+            <!-- Testimonials will be loaded here -->
+        </div>
+        
+        <div class="add-testimonial-form">
+            <h3 style="color: var(--secondary); margin-bottom: 20px; text-align: center;">Add Your Review</h3>
+            <form id="testimonialForm">
+                <div class="form-group">
+                    <input type="text" id="reviewerName" class="form-control" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="reviewText" class="form-control" placeholder="Your Review" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="section pricing-section" id="pricing">
+        <div class="section-title">
+            <h2>Service Pricing</h2>
+        </div>
+        
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <button class="edit-price-btn" data-plan="basic">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <h3>Basic</h3>
+                    <div class="pricing-price" id="basicPrice">₹999<span>/service</span></div>
+                    <p>Small Electrical Jobs</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Switch & Socket Installation</li>
+                    <li><i class="fas fa-check"></i> Fan & Light Fitting</li>
+                    <li><i class="fas fa-check"></i> Minor Electrical Repairs</li>
+                    <li><i class="fas fa-check"></i> 30 Days Service Warranty</li>
+                </ul>
+            </div>
+            
+            <div class="pricing-card popular">
+                <div class="pricing-header">
+                    <button class="edit-price-btn" data-plan="standard">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <h3>Standard</h3>
+                    <div class="pricing-price" id="standardPrice">₹2,999<span>/room</span></div>
+                    <p>Complete Room Wiring</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Complete Room Wiring</li>
+                    <li><i class="fas fa-check"></i> Switchboard Installation</li>
+                    <li><i class="fas fa-check"></i> All Fittings Included</li>
+                    <li><i class="fas fa-check"></i> 6 Months Warranty</li>
+                </ul>
+            </div>
+            
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <button class="edit-price-btn" data-plan="premium">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <h3>Premium</h3>
+                    <div class="pricing-price" id="premiumPrice">₹15,999<span>/house</span></div>
+                    <p>Full House Wiring</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Complete House Wiring</li>
+                    <li><i class="fas fa-check"></i> Modern Electrical Solutions</li>
+                    <li><i class="fas fa-check"></i> Quality Materials</li>
+                    <li><i class="fas fa-check"></i> 1 Year Warranty</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section faq-section">
+        <div class="section-title">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Do you provide emergency electrical services?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, we provide 24/7 emergency electrical services in Shahapur and surrounding areas. Call us anytime for urgent electrical issues.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What areas do you serve?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>We primarily serve Shahapur and nearby areas within a 25km radius. For specific locations, please contact us to confirm service availability.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Are you licensed and insured?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, we are fully licensed electricians with comprehensive insurance coverage for all our work, ensuring peace of mind for our customers.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Do you provide materials or should I arrange them?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>We can provide all necessary materials at competitive prices, or you can provide your own materials. We'll guide you on quality specifications.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Service Area Section -->
+    <section class="section service-area-section">
+        <div class="section-title">
+            <h2>Our Service Area</h2>
+        </div>
+        
+        <div class="area-map">
+            <div class="map-placeholder">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Service Area: Shahapur & Surrounding Areas</h3>
+                <p>We serve within 25km radius of Shahapur, Maharashtra</p>
+                <p>Emergency services available in wider area</p>
             </div>
         </div>
     </section>
@@ -884,7 +1603,9 @@
             <div>
                 <h4 style="color: white; margin-bottom: 20px;">Quick Links</h4>
                 <ul style="list-style: none;">
+                    <li style="margin-bottom: 10px;"><a href="#services" style="color: #aaa; text-decoration: none;">Services</a></li>
                     <li style="margin-bottom: 10px;"><a href="#profile" style="color: #aaa; text-decoration: none;">About</a></li>
+                    <li style="margin-bottom: 10px;"><a href="#pricing" style="color: #aaa; text-decoration: none;">Pricing</a></li>
                     <li style="margin-bottom: 10px;"><a href="#gallery" style="color: #aaa; text-decoration: none;">Gallery</a></li>
                     <li style="margin-bottom: 10px;"><a href="#contact" style="color: #aaa; text-decoration: none;">Contact</a></li>
                 </ul>
@@ -892,12 +1613,23 @@
             
             <div>
                 <h4 style="color: white; margin-bottom: 20px;">Connect With Us</h4>
-                <div class="social-icons">
-                    <a href="https://wa.me/919876543210" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <a href="https://wa.me/919876543210" target="_blank" style="color: white; background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="#" target="_blank" style="color: white; background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" target="_blank" style="color: white; background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
                 </div>
+                <p style="color: #aaa;">
+                    <i class="fas fa-phone-alt"></i> +91 98765 43210
+                </p>
+                <p style="color: #aaa; margin-top: 10px;">
+                    <i class="fas fa-envelope"></i> rahul.shirke@example.com
+                </p>
             </div>
         </div>
         
@@ -926,8 +1658,37 @@
                 </button>
             </form>
             <div style="margin-top: 20px; text-align: center; color: var(--gray); font-size: 0.9rem;">
-                <p>Default login: admin / rahul123</p>
+                <p>Default login: admin / brother</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Price Modal -->
+    <div class="edit-price-modal" id="editPriceModal">
+        <div class="edit-price-box">
+            <h3>Edit Price</h3>
+            <form id="editPriceForm" onsubmit="handlePriceUpdate(event)">
+                <div class="form-group">
+                    <label for="planName">Plan Name</label>
+                    <input type="text" id="planName" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="newPrice">New Price</label>
+                    <input type="text" id="newPrice" class="form-control" placeholder="Enter new price" required>
+                </div>
+                <div class="form-group">
+                    <label for="priceSuffix">Price Suffix</label>
+                    <input type="text" id="priceSuffix" class="form-control" placeholder="e.g., /service, /room, /house">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="login-btn" style="flex: 1;">
+                        <i class="fas fa-save"></i> Update Price
+                    </button>
+                    <button type="button" class="login-btn" onclick="closeEditPriceModal()" style="flex: 1; background: var(--gray);">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -936,6 +1697,8 @@
         let isLoggedIn = false;
         let galleryPhotos = [];
         let selectedPhotos = [];
+        let testimonials = [];
+        let editingPlan = null;
         
         // Initial gallery photos
         const initialPhotos = [
@@ -945,6 +1708,13 @@
             { id: 4, url: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', title: 'Solar Panel Setup' },
             { id: 5, url: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', title: 'Cable Management' },
             { id: 6, url: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80', title: 'Commercial Project' }
+        ];
+        
+        // Initial testimonials
+        const initialTestimonials = [
+            { id: 1, name: 'Rajesh Sharma', text: 'Rahul provided excellent electrical wiring for our new home. He was professional, punctual, and his work was flawless. Highly recommended!', date: '2023-10-15' },
+            { id: 2, name: 'Sunita Patil', text: 'Our shop needed complete electrical overhaul. Rahul and his team completed the work efficiently with minimal disruption to our business. Great service!', date: '2023-11-20' },
+            { id: 3, name: 'Amit Deshmukh', text: 'Emergency service at midnight when our main switchboard failed. Rahul arrived within 30 minutes and fixed the issue. Truly reliable 24/7 service!', date: '2023-12-05' }
         ];
         
         // Initialize the page
@@ -957,19 +1727,57 @@
             renderGallery();
             updatePhotoCounter();
             
+            // Initialize testimonials
+            testimonials = [...initialTestimonials];
+            renderTestimonials();
+            
             // Generate calendar
             generateCalendar();
             
             // Set up event listeners
             document.getElementById('loginBtn').addEventListener('click', showLoginModal);
             document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('mobileMenuBtn').addEventListener('click', toggleMobileMenu);
+            document.getElementById('testimonialForm').addEventListener('submit', handleTestimonialSubmit);
+            
+            // Setup edit price buttons
+            document.querySelectorAll('.edit-price-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (isLoggedIn) {
+                        const plan = this.dataset.plan;
+                        openEditPriceModal(plan);
+                    } else {
+                        alert('Please login as owner to edit prices.');
+                        showLoginModal();
+                    }
+                });
+            });
+            
+            // FAQ functionality
+            initFAQ();
             
             // Header scroll effect
             window.addEventListener('scroll', handleHeaderScroll);
             
             // Check if already logged in (for demo purposes)
             checkLoginStatus();
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const navMenu = document.getElementById('navMenu');
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                
+                if (!navMenu.contains(event.target) && !mobileMenuBtn.contains(event.target) && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                }
+            });
         });
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
         
         // Header scroll effect
         function handleHeaderScroll() {
@@ -979,8 +1787,27 @@
                 header.style.backgroundColor = 'rgba(26, 60, 110, 0.98)';
             } else {
                 header.style.padding = '15px 0';
-                header.style.backgroundColor = 'rgba(26, 60, 110, 0.95)';
+                header.style.backgroundColor = 'rgba(26, 60, 110, 0.98)';
             }
+        }
+        
+        // FAQ initialization
+        function initFAQ() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const faqItem = question.parentElement;
+                    faqItem.classList.toggle('active');
+                    
+                    // Close other FAQ items
+                    faqQuestions.forEach(otherQuestion => {
+                        if (otherQuestion !== question) {
+                            otherQuestion.parentElement.classList.remove('active');
+                        }
+                    });
+                });
+            });
         }
         
         // Calendar Generation
@@ -1045,6 +1872,156 @@
             }
         }
         
+        // Testimonials Functions
+        function renderTestimonials() {
+            const container = document.getElementById('testimonialContainer');
+            container.innerHTML = '';
+            
+            testimonials.forEach(testimonial => {
+                const testimonialElement = document.createElement('div');
+                testimonialElement.className = 'testimonial';
+                testimonialElement.dataset.id = testimonial.id;
+                
+                testimonialElement.innerHTML = `
+                    <button class="delete-review-btn" onclick="deleteTestimonial(${testimonial.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="testimonial-content">
+                        "${testimonial.text}"
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">${testimonial.name.charAt(0)}</div>
+                        <div>
+                            <h4>${testimonial.name}</h4>
+                            <p>${new Date(testimonial.date).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(testimonialElement);
+            });
+            
+            // Show/hide delete buttons based on login status
+            updateTestimonialDeleteButtons();
+        }
+        
+        function handleTestimonialSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('reviewerName').value;
+            const text = document.getElementById('reviewText').value;
+            
+            if (!name.trim() || !text.trim()) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            const newTestimonial = {
+                id: testimonials.length > 0 ? Math.max(...testimonials.map(t => t.id)) + 1 : 1,
+                name: name.trim(),
+                text: text.trim(),
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            testimonials.push(newTestimonial);
+            renderTestimonials();
+            
+            // Clear form
+            document.getElementById('testimonialForm').reset();
+            
+            alert('Thank you for your review!');
+        }
+        
+        function deleteTestimonial(id) {
+            if (!isLoggedIn) {
+                alert('Please login as owner to delete reviews.');
+                showLoginModal();
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete this review?')) {
+                testimonials = testimonials.filter(testimonial => testimonial.id !== id);
+                renderTestimonials();
+                alert('Review deleted successfully!');
+            }
+        }
+        
+        function updateTestimonialDeleteButtons() {
+            const deleteButtons = document.querySelectorAll('.delete-review-btn');
+            deleteButtons.forEach(btn => {
+                btn.style.display = isLoggedIn ? 'flex' : 'none';
+            });
+        }
+        
+        // Pricing Functions
+        function openEditPriceModal(plan) {
+            editingPlan = plan;
+            
+            let planName, currentPrice, priceSuffix;
+            
+            switch(plan) {
+                case 'basic':
+                    planName = 'Basic';
+                    currentPrice = document.getElementById('basicPrice').textContent;
+                    break;
+                case 'standard':
+                    planName = 'Standard';
+                    currentPrice = document.getElementById('standardPrice').textContent;
+                    break;
+                case 'premium':
+                    planName = 'Premium';
+                    currentPrice = document.getElementById('premiumPrice').textContent;
+                    break;
+            }
+            
+            // Extract price and suffix
+            const priceMatch = currentPrice.match(/₹([\d,]+)(.*)/);
+            if (priceMatch) {
+                currentPrice = priceMatch[1];
+                priceSuffix = priceMatch[2] || '';
+            }
+            
+            document.getElementById('planName').value = planName;
+            document.getElementById('newPrice').value = currentPrice;
+            document.getElementById('priceSuffix').value = priceSuffix;
+            
+            document.getElementById('editPriceModal').style.display = 'flex';
+        }
+        
+        function closeEditPriceModal() {
+            document.getElementById('editPriceModal').style.display = 'none';
+            editingPlan = null;
+        }
+        
+        function handlePriceUpdate(event) {
+            event.preventDefault();
+            
+            const newPrice = document.getElementById('newPrice').value;
+            const priceSuffix = document.getElementById('priceSuffix').value;
+            
+            if (!newPrice) {
+                alert('Please enter a valid price.');
+                return;
+            }
+            
+            const formattedPrice = `₹${newPrice}${priceSuffix}`;
+            
+            switch(editingPlan) {
+                case 'basic':
+                    document.getElementById('basicPrice').innerHTML = `${formattedPrice}<span>${priceSuffix}</span>`;
+                    break;
+                case 'standard':
+                    document.getElementById('standardPrice').innerHTML = `${formattedPrice}<span>${priceSuffix}</span>`;
+                    break;
+                case 'premium':
+                    document.getElementById('premiumPrice').innerHTML = `${formattedPrice}<span>${priceSuffix}</span>`;
+                    break;
+            }
+            
+            closeEditPriceModal();
+            alert('Price updated successfully!');
+        }
+        
         // Login Functions
         function showLoginModal() {
             document.getElementById('loginModal').style.display = 'flex';
@@ -1066,7 +2043,7 @@
                 isLoggedIn = true;
                 hideLoginModal();
                 updateLoginStatus();
-                alert('Login successful! You can now manage the gallery and calendar.');
+                alert('Login successful! You can now manage the gallery, calendar, prices, and testimonials.');
             } else {
                 document.getElementById('loginError').style.display = 'block';
             }
@@ -1091,16 +2068,29 @@
             const loginBtn = document.getElementById('loginBtn');
             const logoutBtn = document.getElementById('logoutBtn');
             const galleryManagement = document.getElementById('galleryManagement');
+            const editPriceButtons = document.querySelectorAll('.edit-price-btn');
             
             if (isLoggedIn) {
                 loginBtn.style.display = 'none';
                 logoutBtn.style.display = 'block';
                 galleryManagement.style.display = 'block';
+                
+                // Show edit price buttons
+                editPriceButtons.forEach(btn => {
+                    btn.style.display = 'flex';
+                });
+                
                 localStorage.setItem('electricalShopLoggedIn', 'true');
             } else {
                 loginBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
                 galleryManagement.style.display = 'none';
+                
+                // Hide edit price buttons
+                editPriceButtons.forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                
                 localStorage.removeItem('electricalShopLoggedIn');
                 
                 // Clear photo selection
@@ -1109,6 +2099,9 @@
                     item.classList.remove('selected');
                 });
             }
+            
+            // Update testimonial delete buttons
+            updateTestimonialDeleteButtons();
         }
         
         // Gallery Functions
@@ -1223,6 +2216,9 @@
                 
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
+                    // Close mobile menu if open
+                    document.getElementById('navMenu').classList.remove('active');
+                    
                     window.scrollTo({
                         top: targetElement.offsetTop - 80,
                         behavior: 'smooth'
