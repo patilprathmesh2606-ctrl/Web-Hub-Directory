@@ -26,6 +26,22 @@ const webPages = [
         area: "Wada",
         shopName: "Gym",
         category: "Gym"
+      } ,
+    {
+        title: "The Royal Kitchen",
+        url: "theroyalkitchen.html",
+        image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
+        area: "Bhaveghar",
+        shopName: "The Royal Kitchen",
+        category: "Chinese Center"
+      } ,
+{
+        title: "Tanvi Fashion Hub",
+        url: "tanvifashionhub.html",
+        image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
+        area: "Virar",
+        shopName: "Tanvi Fashion Hub",
+        category: "Fashion"
       } 
 
 ]; 
@@ -669,6 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
