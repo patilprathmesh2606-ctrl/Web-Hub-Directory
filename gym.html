@@ -330,6 +330,42 @@
             color: white;
         }
         
+        /* Mobile Contact Info Popup */
+        .contact-info-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1f1f1f;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 250px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-info-popup.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .contact-info-popup p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .contact-info-popup .action-text {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-style: italic;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            padding-top: 8px;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .gallery-item {
@@ -360,6 +396,15 @@
             .section-title {
                 font-size: 2rem;
             }
+            
+            /* Hide phone and email text on mobile */
+            .top-bar-text {
+                display: none !important;
+            }
+            
+            .mobile-contact-icons {
+                display: flex !important;
+            }
         }
         
         @media (max-width: 480px) {
@@ -387,29 +432,78 @@
                 font-size: 1.8rem;
             }
         }
+        
+        /* Desktop: Show text, hide mobile icons */
+        @media (min-width: 769px) {
+            .mobile-contact-icons {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900">
     <!-- Top Bar -->
     <div class="bg-gray-800 py-3 px-4 md:px-8">
         <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <!-- Desktop Contact Info (hidden on mobile) -->
             <div class="flex items-center space-x-4 mb-3 md:mb-0 flex-wrap justify-center md:justify-start">
-                <div class="flex items-center text-sm mr-4">
+                <div class="flex items-center text-sm mr-4 top-bar-text">
                     <a href="tel:7506068152" class="icon-btn icon-btn-small phone-btn mr-2">
                         <i class="fas fa-phone-alt"></i>
                     </a>
                     <span>+91 75060 68152</span>
                 </div>
-                <div class="hidden md:block text-gray-500">|</div>
-                <div class="flex items-center text-sm mt-2 md:mt-0">
+                <div class="hidden md:block text-gray-500 top-bar-text">|</div>
+                <div class="flex items-center text-sm mt-2 md:mt-0 top-bar-text">
                     <a href="mailto:info@powerflexgym.com" class="icon-btn icon-btn-small email-btn mr-2">
                         <i class="fas fa-envelope"></i>
                     </a>
                     <span>info@powerflexgym.com</span>
                 </div>
+                <div class="hidden md:block text-gray-500 top-bar-text">|</div>
+                <div class="flex items-center text-sm mt-2 md:mt-0 top-bar-text">
+                    <i class="fas fa-map-marker-alt text-orange-500 mr-2"></i>
+                    <span>Wada, Palghar, Maharashtra</span>
+                </div>
             </div>
             
-            <div class="flex items-center space-x-3 mt-3 md:mt-0">
+            <!-- Mobile Contact Icons (hidden on desktop) -->
+            <div class="mobile-contact-icons hidden space-x-3 mt-3 md:mt-0">
+                <!-- Phone Icon with click/double-click functionality -->
+                <div class="contact-icon-container" data-type="phone" data-value="+917506068152" data-display="+91 75060 68152">
+                    <button class="icon-btn icon-btn-small phone-btn contact-trigger">
+                        <i class="fas fa-phone-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- Email Icon with click/double-click functionality -->
+                <div class="contact-icon-container" data-type="email" data-value="info@powerflexgym.com" data-display="info@powerflexgym.com">
+                    <button class="icon-btn icon-btn-small email-btn contact-trigger">
+                        <i class="fas fa-envelope"></i>
+                    </button>
+                </div>
+                
+                <!-- Address Icon -->
+                <div class="contact-icon-container" data-type="address" data-value="Wada, Palghar, Maharashtra" data-display="Wada, Palghar, Maharashtra">
+                    <button class="icon-btn icon-btn-small map-btn contact-trigger">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </button>
+                </div>
+                
+                <!-- Social Media Icons -->
+                <a href="https://facebook.com" target="_blank" class="icon-btn icon-btn-small facebook-btn">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://instagram.com" target="_blank" class="icon-btn icon-btn-small instagram-btn">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://wa.me/917506068152" target="_blank" class="icon-btn icon-btn-small whatsapp-btn">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+            
+            <!-- Desktop Social Icons -->
+            <div class="hidden md:flex items-center space-x-3 mt-3 md:mt-0">
                 <a href="https://facebook.com" target="_blank" class="icon-btn icon-btn-small facebook-btn">
                     <i class="fab fa-facebook-f"></i>
                 </a>
@@ -481,7 +575,7 @@
                 <span class="text-orange-500 block md:inline">LIMITS</span>
             </h1>
             <p class="text-xl md:text-2xl mb-10 text-gray-300 max-w-3xl mx-auto">
-                Transform your body and mind at the most advanced fitness facility in the city. Join us today and start your journey.
+                Transform your body and mind at the most advanced fitness facility in Wada, Palghar. Join us today and start your journey.
             </p>
             <a href="#booking" class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-full text-lg glow-button">
                 BOOK FREE TRIAL
@@ -517,8 +611,9 @@
                                 </a>
                                 <div>
                                     <h4 class="font-bold text-white">Address</h4>
-                                    <p class="text-gray-300">123 Fitness Street, Gym District</p>
-                                    <p class="text-gray-300">New York, NY 10001</p>
+                                    <p class="text-gray-300">Shop No. 5, Ground Floor</p>
+                                    <p class="text-gray-300">Near Bus Stand, Wada</p>
+                                    <p class="text-gray-300">Palghar, Maharashtra 421303</p>
                                 </div>
                             </div>
                             
@@ -568,8 +663,8 @@
                         <div class="map-placeholder h-64 rounded-lg flex items-center justify-center relative">
                             <div class="text-center">
                                 <i class="fas fa-map-marked-alt text-4xl text-gray-500 mb-4"></i>
-                                <p class="text-gray-400">Google Maps Location</p>
-                                <p class="text-sm text-gray-500">Click the button to view on Google Maps</p>
+                                <p class="text-gray-400">Wada, Palghar, Maharashtra</p>
+                                <p class="text-sm text-gray-500">Near Bus Stand, Wada</p>
                             </div>
                             <a href="https://maps.app.goo.gl/Cgwk9KpWsMkh2fMfA" target="_blank" class="absolute bottom-4 right-4 icon-btn icon-btn-large map-btn">
                                 <i class="fas fa-external-link-alt"></i>
@@ -954,7 +1049,7 @@
                         
                         <div class="gallery-item">
                             <div class="year-badge">2023</div>
-                            <img src="https://images.unsplash.com/photo-1598974357801-cbca100e5d10?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Transformation 5">
+                            <img src="https://images.unsplash.com/photo-1571019613911-3e4c5f38c6a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Transformation 5">
                             <div class="gallery-overlay">
                                 <h4 class="font-bold text-lg">Mike's Success</h4>
                                 <p class="text-sm">Transformed in 6 months</p>
@@ -963,7 +1058,7 @@
                         
                         <div class="gallery-item">
                             <div class="year-badge">2022</div>
-                            <img src="https://images.unsplash.com/photo-1549060279-7e168fce7090?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=70" alt="Transformation 6">
+                            <img src="https://images.unsplash.com/photo-1598974357801-cbca100e5d10?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=70" alt="Transformation 6">
                             <div class="gallery-overlay">
                                 <h4 class="font-bold text-lg">Anna's Journey</h4>
                                 <p class="text-sm">Strength increased 200%</p>
@@ -999,7 +1094,7 @@
                         
                         <div class="gallery-item">
                             <div class="year-badge">2022</div>
-                            <img src="https://images.unsplash.com/photo-1598974357801-cbca100e5d10?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=20" alt="Transformation 10">
+                            <img src="https://images.unsplash.com/photo-1571019613911-3e4c5f38c6a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Transformation 10">
                             <div class="gallery-overlay">
                                 <h4 class="font-bold text-lg">Sophia's Success</h4>
                                 <p class="text-sm">12-week challenge winner</p>
@@ -1290,7 +1385,7 @@
                         </h2>
                     </a>
                     <p class="text-gray-400 mt-4 max-w-md">
-                        The premier fitness destination for those who want to push their limits and transform their lives.
+                        Shop No. 5, Near Bus Stand, Wada, Palghar, Maharashtra 421303
                     </p>
                 </div>
                 
@@ -1334,6 +1429,15 @@
             </div>
         </div>
     </footer>
+    
+    <!-- Contact Info Popup (for mobile) -->
+    <div id="contactPopup" class="contact-info-popup">
+        <div id="popupContent"></div>
+        <p class="action-text">Double-click to call/email</p>
+        <button id="closePopup" class="absolute top-2 right-2 text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
     
     <!-- JavaScript -->
     <script>
@@ -1512,6 +1616,104 @@
                 }
             });
         });
+        
+        // Mobile Contact Icons Functionality
+        const contactTriggers = document.querySelectorAll('.contact-trigger');
+        const contactPopup = document.getElementById('contactPopup');
+        const popupContent = document.getElementById('popupContent');
+        const closePopup = document.getElementById('closePopup');
+        
+        let clickTimer = null;
+        let isDoubleClick = false;
+        
+        contactTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const container = this.closest('.contact-icon-container');
+                const type = container.getAttribute('data-type');
+                const value = container.getAttribute('data-value');
+                const display = container.getAttribute('data-display');
+                
+                // Single click handling
+                if (!isDoubleClick) {
+                    clearTimeout(clickTimer);
+                    clickTimer = setTimeout(() => {
+                        // Show contact info in popup
+                        let content = '';
+                        let icon = '';
+                        
+                        if (type === 'phone') {
+                            icon = '<i class="fas fa-phone-alt text-orange-500 mr-2"></i>';
+                            content = `<p>${icon}<strong>Phone:</strong> ${display}</p>`;
+                        } else if (type === 'email') {
+                            icon = '<i class="fas fa-envelope text-orange-500 mr-2"></i>';
+                            content = `<p>${icon}<strong>Email:</strong> ${display}</p>`;
+                        } else if (type === 'address') {
+                            icon = '<i class="fas fa-map-marker-alt text-orange-500 mr-2"></i>';
+                            content = `<p>${icon}<strong>Address:</strong> ${display}</p>`;
+                        }
+                        
+                        popupContent.innerHTML = content;
+                        contactPopup.classList.add('show');
+                    }, 300); // Wait 300ms to see if it's a double click
+                }
+                
+                isDoubleClick = false;
+            });
+            
+            trigger.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                
+                clearTimeout(clickTimer);
+                isDoubleClick = true;
+                
+                const container = this.closest('.contact-icon-container');
+                const type = container.getAttribute('data-type');
+                const value = container.getAttribute('data-value');
+                
+                // Double click handling - trigger action
+                if (type === 'phone') {
+                    // Make phone call
+                    window.location.href = `tel:${value}`;
+                } else if (type === 'email') {
+                    // Open email client
+                    window.location.href = `mailto:${value}`;
+                } else if (type === 'address') {
+                    // Open maps
+                    window.open('https://maps.google.com?q=Wada, Palghar, Maharashtra', '_blank');
+                }
+                
+                // Hide popup if visible
+                contactPopup.classList.remove('show');
+            });
+        });
+        
+        // Close popup when close button is clicked
+        closePopup.addEventListener('click', () => {
+            contactPopup.classList.remove('show');
+        });
+        
+        // Close popup when clicking outside
+        contactPopup.addEventListener('click', (e) => {
+            if (e.target === contactPopup) {
+                contactPopup.classList.remove('show');
+            }
+        });
+        
+        // Initialize mobile contact icons visibility
+        function checkMobileView() {
+            const mobileContactIcons = document.querySelector('.mobile-contact-icons');
+            if (window.innerWidth <= 768) {
+                mobileContactIcons.style.display = 'flex';
+            } else {
+                mobileContactIcons.style.display = 'none';
+            }
+        }
+        
+        // Check on load and resize
+        window.addEventListener('load', checkMobileView);
+        window.addEventListener('resize', checkMobileView);
     </script>
 </body>
 </html>
