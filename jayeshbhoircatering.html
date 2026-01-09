@@ -1,0 +1,1198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jayesh Bhoir Catering | Maharashtra's Premier Catering Service</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #d32f2f;
+            --secondary-color: #ff9800;
+            --dark-color: #333;
+            --light-color: #f5f5f5;
+            --text-color: #444;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: var(--primary-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        section {
+            padding: 5rem 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background: #b71c1c;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary-color);
+        }
+        
+        .btn-secondary:hover {
+            background: #f57c00;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0;
+            color: var(--primary-color);
+        }
+        
+        .logo span {
+            color: var(--secondary-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .login-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+        }
+        
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding-top: 80px;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .highlight {
+            color: var(--secondary-color);
+        }
+        
+        /* About Section */
+        .about {
+            background: var(--light-color);
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .about-text p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .owner-profile {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .owner-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--light-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .service-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .service-content {
+            padding: 1.5rem;
+        }
+        
+        .service-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Gallery Section */
+        .gallery {
+            background: var(--light-color);
+        }
+        
+        .gallery-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .gallery-item {
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            height: 250px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        url('https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .stats h2 {
+            color: white;
+        }
+        
+        .stats h2:after {
+            background: var(--secondary-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .stat-item i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .stat-item h3 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Contact Section */
+        .contact {
+            background: white;
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .contact-item:hover {
+            background: var(--light-color);
+            border-color: #eee;
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+        
+        .contact-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .contact-icon:hover {
+            background: #b71c1c;
+            transform: scale(1.1);
+        }
+        
+        .contact-icon.phone {
+            background: #25D366; /* WhatsApp green */
+        }
+        
+        .contact-icon.phone:hover {
+            background: #1da851;
+        }
+        
+        .contact-icon.email {
+            background: #EA4335; /* Gmail red */
+        }
+        
+        .contact-icon.email:hover {
+            background: #d23c2f;
+        }
+        
+        .contact-icon.location {
+            background: #4285F4; /* Google Maps blue */
+        }
+        
+        .contact-icon.location:hover {
+            background: #3a77d9;
+        }
+        
+        .contact-icon.calendar {
+            background: var(--secondary-color);
+        }
+        
+        .contact-icon.calendar:hover {
+            background: #e68900;
+        }
+        
+        .contact-details {
+            flex-grow: 1;
+        }
+        
+        .contact-details h4 {
+            margin-bottom: 0.3rem;
+            color: var(--dark-color);
+        }
+        
+        .contact-details p {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-action {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-top: 0.3rem;
+            display: inline-block;
+        }
+        
+        .contact-form {
+            background: var(--light-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Login Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .login-modal {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-overlay.active .login-modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-logo h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links h4, .footer-contact h4 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+        
+        .copyright {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #555;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+            
+            h2 {
+                font-size: 2.2rem;
+            }
+            
+            .nav-links li {
+                margin-left: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem 0;
+                box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            .nav-links li {
+                margin: 1rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            section {
+                padding: 3rem 1.5rem;
+            }
+            
+            .contact-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .contact-icon {
+                margin: 0 auto 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 10px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <h3>Jayesh<span>Bhoir</span> Catering</h3>
+            </div>
+            <div class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#" class="login-btn" id="loginBtn"><i class="fas fa-user-circle"></i> Login</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-modal">
+            <div class="modal-header">
+                <h3>Admin Login</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn" style="width: 100%;">Login</button>
+                </div>
+                
+                <p style="text-align: center; font-size: 0.9rem; color: #666;">Login to manage gallery and client bookings</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Maharashtra's Premier Catering Service</h1>
+            <p>Experience authentic Maharashtrian cuisine and beyond. We cater to <span class="highlight">all types of events</span>, from intimate gatherings to large-scale celebrations, serving <span class="highlight">both class and mass</span> with equal dedication and excellence.</p>
+            <a href="#contact" class="btn">Book Your Event</a>
+            <a href="#gallery" class="btn btn-secondary">View Our Gallery</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2>About Our Catering Service</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>With years of experience in the catering industry, we have established ourselves as one of Maharashtra's most reliable and versatile catering services. Our expertise spans across various types of events, from traditional Maharashtrian weddings to corporate gatherings and social celebrations.</p>
+                    <p>We take pride in our ability to handle <strong>both small and large crowds</strong> with equal finesse, ensuring every guest experiences the same level of culinary excellence and service quality regardless of the event size.</p>
+                    <p>Our team is committed to providing authentic flavors, hygienic preparation, and timely service that has made us the preferred choice for clients across Maharashtra.</p>
+                </div>
+                <div class="owner-profile">
+                    <img src="https://randomuser.me/api/portraits/men/50.jpg" alt="Jayesh Bhoir" class="owner-img">
+                    <h3>Jayesh Bhoir</h3>
+                    <p><strong>Owner & Operation Head</strong></p>
+                    <p>With over 15 years of experience in the catering industry, Jayesh personally oversees every event to ensure the highest standards of quality and customer satisfaction.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <h2>Our Catering Services</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">From traditional Maharashtrian feasts to contemporary multi-cuisine spreads, we provide comprehensive catering solutions for all types of events.</p>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Wedding Catering" class="service-img">
+                    <div class="service-content">
+                        <h3>Wedding Catering</h3>
+                        <p>Complete wedding feast solutions with traditional Maharashtrian delicacies and customized menus to match your preferences.</p>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <img src="https://images.unsplash.com/photo-1554679665-f5537f187268?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Corporate Events" class="service-img">
+                    <div class="service-content">
+                        <h3>Corporate Events</h3>
+                        <p>Professional catering for corporate gatherings, conferences, and office parties with efficient service and diverse menu options.</p>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Social Celebrations" class="service-img">
+                    <div class="service-content">
+                        <h3>Social Celebrations</h3>
+                        <p>Birthdays, anniversaries, religious ceremonies, and other social events catered with personalized attention to detail.</p>
+                    </div>
+                </div>
+                
+                <div class="service-card">
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Large Scale Events" class="service-img">
+                    <div class="service-content">
+                        <h3>Large Scale Events</h3>
+                        <p>Specialized in handling crowds of 500+ with efficient service, maintaining quality and taste at scale.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <h2>Our Work Gallery</h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">Browse through our portfolio of successfully catered events across Maharashtra.</p>
+            
+            <div class="gallery-filter">
+                <button class="filter-btn active" data-filter="all">All Events</button>
+                <button class="filter-btn" data-filter="wedding">Weddings</button>
+                <button class="filter-btn" data-filter="corporate">Corporate</button>
+                <button class="filter-btn" data-filter="social">Social Events</button>
+                <button class="filter-btn" data-filter="large">Large Events</button>
+            </div>
+            
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery items will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats" id="stats">
+        <div class="container">
+            <h2>Why Choose Our Catering Service</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <h3>500+</h3>
+                    <p>Events Catered</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-utensils"></i>
+                    <h3>50+</h3>
+                    <p>Menu Options</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>All Over</h3>
+                    <p>Maharashtra</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-smile"></i>
+                    <h3>100%</h3>
+                    <p>Client Satisfaction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Get in Touch</h3>
+                    <p>Ready to plan your next event? Contact us directly through any of the options below:</p>
+                    
+                    <!-- Contact Items with Icon Buttons -->
+                    <div class="contact-item">
+                        <a href="tel:+919876543210" class="contact-icon phone" title="Call Now">
+                            <i class="fas fa-phone-alt"></i>
+                        </a>
+                        <div class="contact-details">
+                            <h4>Call Directly</h4>
+                            <p>+91 98765 43210</p>
+                            <span class="contact-action">Click the phone icon to call</span>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <a href="https://wa.me/919876543210?text=Hello%20Jayesh%20Bhoir%20Catering,%20I%20would%20like%20to%20inquire%20about%20your%20services" target="_blank" class="contact-icon phone" title="WhatsApp Message">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <div class="contact-details">
+                            <h4>WhatsApp Message</h4>
+                            <p>+91 98765 43210</p>
+                            <span class="contact-action">Click the WhatsApp icon to message</span>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <a href="mailto:info@jayeshbhoircatering.com?subject=Catering%20Inquiry&body=Hello%20Jayesh%20Bhoir%20Catering,%0A%0AI%20would%20like%20to%20inquire%20about%20your%20catering%20services%20for%20my%20event." class="contact-icon email" title="Send Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <div class="contact-details">
+                            <h4>Send Email</h4>
+                            <p>info@jayeshbhoircatering.com</p>
+                            <span class="contact-action">Click the envelope icon to email</span>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <a href="https://maps.google.com/?q=Maharashtra+India" target="_blank" class="contact-icon location" title="View Location">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </a>
+                        <div class="contact-details">
+                            <h4>Our Location</h4>
+                            <p>Maharashtra, India</p>
+                            <span class="contact-action">Click the map icon for directions</span>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <a href="#contact-form" class="contact-icon calendar" title="Book Consultation">
+                            <i class="fas fa-calendar-alt"></i>
+                        </a>
+                        <div class="contact-details">
+                            <h4>Book Consultation</h4>
+                            <p>Schedule a free consultation</p>
+                            <span class="contact-action">Click the calendar icon to book</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form" id="contact-form">
+                    <h3>Request a Quote</h3>
+                    <form id="quoteForm">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" placeholder="Your Phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eventType">Event Type</label>
+                            <select id="eventType" class="form-control" required>
+                                <option value="">Select Event Type</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="corporate">Corporate Event</option>
+                                <option value="social">Social Celebration</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="guests">Approximate Number of Guests</label>
+                            <input type="number" id="guests" class="form-control" placeholder="Number of Guests" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Additional Details</label>
+                            <textarea id="message" class="form-control" rows="4" placeholder="Tell us about your event..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h3>Jayesh<span>Bhoir</span> Catering</h3>
+                <p>Maharashtra's trusted catering service for all types of events, big or small.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-contact">
+                <h4>Contact Info</h4>
+                <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                <p><i class="fas fa-envelope"></i> info@jayeshbhoircatering.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Maharashtra, India</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2023 Jayesh Bhoir Catering. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Navigation Toggle
+        const mobileToggle = document.getElementById('mobileToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileToggle.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            });
+        });
+        
+        // Login Modal Functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.add('active');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+            }
+        });
+        
+        // Login Form Submission
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // In a real application, you would validate credentials with a server
+            // For this demo, we'll use a simple check
+            if (username === "admin" && password === "password") {
+                alert("Login successful! Redirecting to admin dashboard...");
+                loginModal.classList.remove('active');
+                // In a real app, you would redirect to admin page
+                // window.location.href = "admin-dashboard.html";
+            } else {
+                alert("Invalid credentials. Please try again.");
+            }
+        });
+        
+        // Gallery Data
+        const galleryItems = [
+            { id: 1, category: "wedding", img: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Traditional Maharashtrian Wedding", desc: "500+ guests" },
+            { id: 2, category: "corporate", img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&auto=format&fit=crop&w-800&q=80", title: "Corporate Conference", desc: "300+ attendees" },
+            { id: 3, category: "social", img: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Birthday Celebration", desc: "Family gathering" },
+            { id: 4, category: "large", img: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Community Festival", desc: "1000+ attendees" },
+            { id: 5, category: "wedding", img: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Modern Wedding Reception", desc: "Elegant setup" },
+            { id: 6, category: "corporate", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Office Party", desc: "Annual celebration" },
+            { id: 7, category: "social", img: "https://images.unsplash.com/photo-1532634922-8fe0b757fb13?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Anniversary Celebration", desc: "Golden anniversary" },
+            { id: 8, category: "large", img: "https://images.unsplash.com/photo-1519677100203-6f5d4c7a08c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Political Rally", desc: "Mass catering" },
+            { id: 9, category: "wedding", img: "https://images.unsplash.com/photo-1520854221256-17463ccb8b9d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", title: "Outdoor Wedding", desc: "Garden setup" }
+        ];
+        
+        // Initialize Gallery
+        const galleryGrid = document.getElementById('galleryGrid');
+        
+        function renderGallery(filter = 'all') {
+            galleryGrid.innerHTML = '';
+            
+            const filteredItems = filter === 'all' 
+                ? galleryItems 
+                : galleryItems.filter(item => item.category === filter);
+            
+            filteredItems.forEach(item => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.setAttribute('data-category', item.category);
+                galleryItem.innerHTML = `
+                    <img src="${item.img}" alt="${item.title}">
+                    <div class="gallery-overlay">
+                        <h4>${item.title}</h4>
+                        <p>${item.desc}</p>
+                    </div>
+                `;
+                galleryGrid.appendChild(galleryItem);
+            });
+        }
+        
+        // Initialize with all items
+        renderGallery();
+        
+        // Gallery Filter
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                // Filter gallery
+                const filter = btn.getAttribute('data-filter');
+                renderGallery(filter);
+            });
+        });
+        
+        // Form Submission
+        const quoteForm = document.getElementById('quoteForm');
+        quoteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const eventType = document.getElementById('eventType').value;
+            
+            // In a real application, you would send this data to a server
+            alert(`Thank you ${name}! Your catering request for a ${eventType} event has been received. We will contact you at ${phone} shortly.`);
+            
+            // Reset form
+            quoteForm.reset();
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Icon click confirmation
+        document.querySelectorAll('.contact-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                const action = this.getAttribute('title');
+                console.log(`${action} clicked`);
+            });
+        });
+    </script>
+</body>
+</html>
