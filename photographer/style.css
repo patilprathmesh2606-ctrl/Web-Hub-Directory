@@ -1172,6 +1172,39 @@ header {
     }
 }
 
+/* --- PROFILE / VISIONARY MOBILE FIX --- */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column !important; /* Stack image on top of text */
+        height: auto !important; /* Let the section grow with content */
+        padding: 0 !important;
+    }
+
+    .profile-left {
+        width: 100% !important;
+        height: 400px !important; /* Fixed height for the photo on mobile */
+        background-attachment: scroll !important; /* Disable parallax on mobile for better performance */
+        background-position: center 20% !important; /* Focuses on the face area */
+    }
+
+    .profile-right {
+        width: 100% !important;
+        padding: 40px 10% !important; /* Give text breathing room */
+        text-align: center; /* Center text for a cleaner mobile look */
+    }
+
+    .visionary-text-details {
+        text-align: left; /* Keep contact info left-aligned for readability */
+        display: inline-block; /* But keep the block centered */
+        margin-top: 20px;
+    }
+
+    .profile-right h2 {
+        font-size: 2.2rem !important;
+        margin-bottom: 10px;
+    }
+}
+
 
 
 
