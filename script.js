@@ -4,15 +4,15 @@ document.getElementById('currentYear').textContent = new Date().getFullYear();
 // Web pages data array
 const webPages = [
     {
-        title: "photographer",
-        url: "photographer.html",
+        title: "Photographer",
+        url: "photographer",
         image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&auto=format&fit=crop",
         area: "Wada",
         shopName: "photographer",
         category: "photographer"
     },
     {
-        title: "shahapurelectricalwork",
+        title: "Shahapur Electrical Work",
         url: "shahapurelectricalwork.html",
         image: "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Shahapur",
@@ -45,7 +45,7 @@ const webPages = [
       } ,
     
 {
-        title: "jayeshbhoircatering",
+        title: "Jayeshbhoir Catering",
         url: "jayeshbhoircatering.html",
         image: "https://images.pexels.com/photos/169190/pexels-photo-169190.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
@@ -693,6 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
