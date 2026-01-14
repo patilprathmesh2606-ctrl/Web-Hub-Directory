@@ -1105,6 +1105,32 @@ header {
 
 
 
+/* --- MOBILE HEADER FIX --- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column; /* Stack logo above icons */
+        padding: 15px 5% !important;
+        height: auto !important;
+        gap: 10px;
+    }
+
+    .header-right {
+        width: 100%;
+        justify-content: center; /* Center buttons on mobile */
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 1.2rem !important; /* Smaller logo for phones */
+        text-align: center;
+    }
+
+    /* Make the WhatsApp button slightly smaller on phones */
+    .whatsapp-header-btn {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+    }
+}
 
 
 
@@ -1112,8 +1138,39 @@ header {
 
 
 
+/* --- RESPONSIVE GALLERY WALL --- */
+.gallery-wall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+}
 
+/* Default Desktop: 4 columns */
+.frame {
+    flex: 1 1 calc(25% - 20px);
+    height: 300px;
+}
 
+/* Tablet: 3 columns */
+@media (max-width: 1024px) {
+    .frame {
+        flex: 1 1 calc(33.33% - 20px);
+    }
+}
+
+/* Mobile: 2 columns */
+@media (max-width: 600px) {
+    .frame {
+        flex: 1 1 calc(50% - 10px) !important; /* Two photos side-by-side */
+        height: 200px !important; /* Shorter height so they stay square-ish */
+    }
+    
+    .gallery-wall {
+        gap: 8px !important;
+        padding: 5px !important;
+    }
+}
 
 
 
