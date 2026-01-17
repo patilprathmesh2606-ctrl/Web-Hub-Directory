@@ -8,7 +8,7 @@ const webPages = [
         url: "Photographer",
         image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=800&auto=format&fit=crop",
         area: "Wada",
-        shopName: "photographer",
+        shopName: "Photographer",
         category: "Service"
     },
     {
@@ -16,7 +16,7 @@ const webPages = [
         url: "Shahapur Electrical Work",
         image: "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Shahapur",
-        shopName: "shahapurelectricalwork",
+        shopName: "Shahapur Electrical Work",
         category: "Service"
     },
     {
@@ -850,5 +850,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
