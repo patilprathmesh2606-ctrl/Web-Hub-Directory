@@ -1235,27 +1235,7 @@ function initializeTables() {
     localStorage.setItem('dragonTables', JSON.stringify(tables));
     return tables;
 }
-
-function initializeManagers() {
-    const managers = [{
-        id: 1,
-        name: "Main Manager",
-        username: "manager",
-        password: "manager123",
-        createdDate: new Date().toISOString(),
-        lastLogin: null,
-        isActive: true,
-        permissions: {
-            viewRevenue: false,
-            viewHistory: false,
-            manageTables: true,
-            manageOrders: true
-        }
-    }];
-    localStorage.setItem('dragonManagers', JSON.stringify(managers));
-    return managers;
-}
-
+// Replace the initializeWaiters() function with this:
 function initializeWaiters() {
     const waiters = [{
         id: 1,
@@ -1265,7 +1245,7 @@ function initializeWaiters() {
         assignedTables: [1, 2, 3, 4],
         createdDate: new Date().toISOString(),
         lastLogin: null,
-        isActive: false, // Initially inactive
+        isActive: false, // DISABLED BY DEFAULT
         performance: {
             ordersServed: 0,
             averageServiceTime: 0,
@@ -1274,6 +1254,27 @@ function initializeWaiters() {
     }];
     localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
     return waiters;
+}
+
+// Replace the initializeManagers() function with this:
+function initializeManagers() {
+    const managers = [{
+        id: 1,
+        name: "Main Manager",
+        username: "manager",
+        password: "manager123",
+        createdDate: new Date().toISOString(),
+        lastLogin: null,
+        isActive: false, // DISABLED BY DEFAULT
+        permissions: {
+            viewRevenue: false,
+            viewHistory: false,
+            manageTables: true,
+            manageOrders: true
+        }
+    }];
+    localStorage.setItem('dragonManagers', JSON.stringify(managers));
+    return managers;
 }
 
 function initializeRestaurantSettings() {
