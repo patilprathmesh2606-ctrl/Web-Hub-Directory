@@ -47,7 +47,7 @@ const webPages = [
 {
         title: "Jayeshbhoir Catering",
         url: "jayeshbhoircatering.html",
-        image: "https://images.pexels.com/photos/169190/pexels-photo-169190.jpeg?auto=compress&cs=tinysrgb&w=800",
+        image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Tanvi Fashion Hub",
         category: "Event Service"
@@ -693,6 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
