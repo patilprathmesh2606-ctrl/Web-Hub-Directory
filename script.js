@@ -13,7 +13,7 @@ const webPages = [
     },
     {
         title: "Shahapur Electrical Work",
-        url: "shahapurelectricalwork.html",
+        url: "Shahapur Electrical Work",
         image: "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Shahapur",
         shopName: "shahapurelectricalwork",
@@ -21,7 +21,7 @@ const webPages = [
     },
     {
         title: "Gym",
-        url: "gym.html",
+        url: "Gym",
         image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Gym",
@@ -29,7 +29,7 @@ const webPages = [
     },
     {
         title: "The Royal Kitchen",
-        url: "theroyalkitchen.html",
+        url: "The Royal Kitchen",
         image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Bhaveghar",
         shopName: "The Royal Kitchen",
@@ -37,15 +37,15 @@ const webPages = [
     },
     {
         title: "Tanvi Fashion Hub",
-        url: "tanvifashionhub.html",
+        url: "Tanvi Fashion Hub",
         image: "https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Virar",
         shopName: "Tanvi Fashion Hub",
         category: "Retail"
     },
     {
-        title: "Jayeshbhoir Catering",
-        url: "jayeshbhoircatering.html",
+        title: "JayeshBhoir Catering",
+        url: "JayeshBhoir Catering",
         image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Jayeshbhoir Catering",
@@ -850,3 +850,4 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
