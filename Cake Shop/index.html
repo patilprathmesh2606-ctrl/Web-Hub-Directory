@@ -1,0 +1,2901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Dreams Cake Shop 🎂</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Custom CSS */
+        :root {
+            --primary-color: #f472b6;
+            --secondary-color: #fbbf24;
+            --accent-color: #a78bfa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(244, 114, 182, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .cart-item-enter {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 114, 182, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0); }
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-processing { background-color: #dbeafe; color: #1e40af; }
+        .status-shipped { background-color: #f0f9ff; color: #0c4a6e; }
+        .status-delivered { background-color: #d1fae5; color: #065f46; }
+        .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        
+        /* Scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a5a5a5;
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsive fixes */
+        @media (max-width: 768px) {
+            .mobile-hide {
+                display: none;
+            }
+            
+            .mobile-stack {
+                flex-direction: column;
+            }
+            
+            .mobile-full {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+                    <i class="fas fa-birthday-cake text-white text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Sweet Dreams 🎂</h1>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#home" class="nav-link text-gray-700 hover:text-pink-500 font-medium">Home</a>
+                <a href="#shop" class="nav-link text-gray-700 hover:text-pink-500 font-medium">Shop</a>
+                <a href="#about" class="nav-link text-gray-700 hover:text-pink-500 font-medium">About</a>
+                <a href="#contact" class="nav-link text-gray-700 hover:text-pink-500 font-medium">Contact</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button id="cartBtn" class="relative p-2">
+                    <i class="fas fa-shopping-cart text-gray-700 text-xl"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+                
+                <div class="relative">
+                    <button id="userMenuBtn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 flex items-center justify-center text-white font-semibold">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="hidden md:inline text-gray-700 font-medium" id="userName">Account</span>
+                        <i class="fas fa-chevron-down text-gray-500"></i>
+                    </button>
+                    
+                    <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                        <a href="#profile" class="user-menu-item block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-user-circle mr-2"></i> My Profile
+                        </a>
+                        <a href="#orders" class="user-menu-item block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-shopping-bag mr-2"></i> My Orders
+                        </a>
+                        <a href="#wishlist" class="user-menu-item block px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-heart mr-2"></i> Wishlist
+                        </a>
+                        <hr class="my-2">
+                        <button id="adminBtn" class="admin-only hidden block w-full text-left px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-tachometer-alt mr-2"></i> Admin Dashboard
+                        </button>
+                        <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </button>
+                        <button id="loginBtn" class="auth-hidden block w-full text-left px-4 py-2 text-gray-700 hover:bg-pink-50 hover:text-pink-600">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login / Register
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <button id="mobileMenuBtn" class="md:hidden p-2">
+                    <i class="fas fa-bars text-gray-700 text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t px-4 py-3">
+            <div class="flex flex-col space-y-3">
+                <a href="#home" class="nav-link text-gray-700 hover:text-pink-500 font-medium py-2">Home</a>
+                <a href="#shop" class="nav-link text-gray-700 hover:text-pink-500 font-medium py-2">Shop</a>
+                <a href="#about" class="nav-link text-gray-700 hover:text-pink-500 font-medium py-2">About</a>
+                <a href="#contact" class="nav-link text-gray-700 hover:text-pink-500 font-medium py-2">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Customer View (Default) -->
+        <div id="customerView">
+            <!-- Hero Section -->
+            <section id="home" class="mb-16">
+                <div class="rounded-2xl gradient-bg p-8 md:p-12 text-white">
+                    <div class="max-w-2xl">
+                        <h2 class="text-4xl md:text-5xl font-bold mb-4">Delicious Cakes for Every Celebration</h2>
+                        <p class="text-xl mb-8 opacity-90">Freshly baked custom cakes, cupcakes, and desserts made with love and the finest ingredients.</p>
+                        <button class="bg-white text-purple-700 font-bold px-8 py-3 rounded-full hover:bg-gray-100 transition duration-300">
+                            Order Now <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product Categories -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Shop By Category</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <button class="category-btn active-category bg-pink-100 border-2 border-pink-300 rounded-xl p-4 text-center hover:bg-pink-200 transition duration-300" data-category="all">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-pink-400 to-rose-400 flex items-center justify-center">
+                            <i class="fas fa-star text-white text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-800">All Cakes</span>
+                    </button>
+                    <button class="category-btn bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center hover:bg-yellow-100 transition duration-300" data-category="birthday">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center">
+                            <i class="fas fa-birthday-cake text-white text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-800">Birthday</span>
+                    </button>
+                    <button class="category-btn bg-purple-50 border-2 border-purple-200 rounded-xl p-4 text-center hover:bg-purple-100 transition duration-300" data-category="wedding">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 flex items-center justify-center">
+                            <i class="fas fa-ring text-white text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-800">Wedding</span>
+                    </button>
+                    <button class="category-btn bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center hover:bg-blue-100 transition duration-300" data-category="cupcakes">
+                        <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-blue-400 to-cyan-400 flex items-center justify-center">
+                            <i class="fas fa-cupcake text-white text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-800">Cupcakes</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Product Grid -->
+            <section id="shop" class="mb-16">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Our Delicious Cakes</h2>
+                    <div class="flex space-x-2">
+                        <div class="relative">
+                            <input type="text" id="productSearch" placeholder="Search cakes..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <select id="sortProducts" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            <option value="name">Sort by Name</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="popular">Most Popular</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Products will be loaded dynamically -->
+                </div>
+                
+                <div class="text-center mt-12">
+                    <button id="loadMore" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full hover:opacity-90 transition duration-300">
+                        Load More Cakes <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Shopping Cart Modal -->
+            <div id="cartModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex justify-end">
+                <div class="bg-white w-full md:w-1/3 h-full overflow-y-auto custom-scrollbar">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Your Cart</h2>
+                            <button id="closeCartBtn" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <div id="cartItems" class="mb-6">
+                            <!-- Cart items will be loaded here -->
+                            <div id="emptyCart" class="text-center py-12">
+                                <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500 text-lg">Your cart is empty</p>
+                                <p class="text-gray-400">Add some delicious cakes!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span id="cartSubtotal" class="font-bold">$0.00</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">Shipping</span>
+                                <span id="cartShipping" class="font-bold">$5.00</span>
+                            </div>
+                            <div class="flex justify-between mb-4 text-lg">
+                                <span class="font-bold">Total</span>
+                                <span id="cartTotal" class="font-bold text-pink-600">$5.00</span>
+                            </div>
+                            
+                            <button id="checkoutBtn" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300 mb-4">
+                                Proceed to Checkout <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                            
+                            <button id="continueShopping" class="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-50 transition duration-300">
+                                Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout Modal -->
+            <div id="checkoutModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800">Checkout</h2>
+                            <button id="closeCheckoutBtn" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times text-2xl"></i>
+                            </button>
+                        </div>
+                        
+                        <form id="checkoutForm">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Shipping Information</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-gray-700 mb-2">Full Name</label>
+                                            <input type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 mb-2">Email Address</label>
+                                            <input type="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 mb-2">Phone Number</label>
+                                            <input type="tel" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 mb-2">Address</label>
+                                            <textarea rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Order Summary</h3>
+                                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                        <div id="checkoutItems">
+                                            <!-- Order items will be loaded here -->
+                                        </div>
+                                        <div class="border-t pt-3 mt-3">
+                                            <div class="flex justify-between mb-2">
+                                                <span class="text-gray-600">Subtotal</span>
+                                                <span id="checkoutSubtotal" class="font-bold">$0.00</span>
+                                            </div>
+                                            <div class="flex justify-between mb-2">
+                                                <span class="text-gray-600">Shipping</span>
+                                                <span id="checkoutShipping" class="font-bold">$5.00</span>
+                                            </div>
+                                            <div class="flex justify-between mb-2">
+                                                <span class="text-gray-600">Tax</span>
+                                                <span id="checkoutTax" class="font-bold">$0.00</span>
+                                            </div>
+                                            <div class="flex justify-between text-lg font-bold border-t pt-2">
+                                                <span>Total</span>
+                                                <span id="checkoutTotal" class="text-pink-600">$5.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Payment Method</h3>
+                                    <div class="space-y-3 mb-6">
+                                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                            <input type="radio" name="payment" value="cod" checked class="mr-3">
+                                            <div>
+                                                <div class="font-medium">Cash on Delivery</div>
+                                                <div class="text-sm text-gray-500">Pay when you receive your order</div>
+                                            </div>
+                                        </label>
+                                        <label class="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                            <input type="radio" name="payment" value="card" class="mr-3">
+                                            <div>
+                                                <div class="font-medium">Credit/Debit Card</div>
+                                                <div class="text-sm text-gray-500">Pay securely with your card</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    
+                                    <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300">
+                                        Place Order <i class="fas fa-check ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard (Hidden by default) -->
+        <div id="adminView" class="hidden">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Sidebar -->
+                <div class="md:w-1/5 bg-white rounded-xl shadow p-4 h-fit">
+                    <div class="flex items-center mb-8">
+                        <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center mr-3">
+                            <i class="fas fa-crown text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">Admin Panel</h3>
+                            <p class="text-sm text-gray-500">Sweet Dreams Dashboard</p>
+                        </div>
+                    </div>
+                    
+                    <nav class="space-y-2">
+                        <button class="sidebar-btn active w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                        </button>
+                        <button class="sidebar-btn w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="orders">
+                            <i class="fas fa-shopping-bag mr-3"></i> Orders
+                            <span id="pendingOrdersBadge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">0</span>
+                        </button>
+                        <button class="sidebar-btn w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="products">
+                            <i class="fas fa-birthday-cake mr-3"></i> Products
+                        </button>
+                        <button class="sidebar-btn w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="customers">
+                            <i class="fas fa-users mr-3"></i> Customers
+                        </button>
+                        <button class="sidebar-btn w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="analytics">
+                            <i class="fas fa-chart-line mr-3"></i> Analytics
+                        </button>
+                        <button class="sidebar-btn w-full text-left px-4 py-3 rounded-lg sidebar-item" data-section="inventory">
+                            <i class="fas fa-boxes mr-3"></i> Inventory
+                        </button>
+                        <hr class="my-4">
+                        <button id="backToStore" class="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                            <i class="fas fa-store mr-3"></i> Back to Store
+                        </button>
+                    </nav>
+                </div>
+                
+                <!-- Main Content -->
+                <div class="md:w-4/5">
+                    <!-- Dashboard -->
+                    <div id="dashboardSection" class="admin-section">
+                        <div class="bg-white rounded-xl shadow p-6 mb-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Total Revenue</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">$12,458</h3>
+                                        </div>
+                                        <div class="bg-blue-100 p-3 rounded-lg">
+                                            <i class="fas fa-dollar-sign text-blue-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-green-600 text-sm mt-3"><i class="fas fa-arrow-up mr-1"></i> 12.5% from last month</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Total Orders</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">324</h3>
+                                        </div>
+                                        <div class="bg-pink-100 p-3 rounded-lg">
+                                            <i class="fas fa-shopping-bag text-pink-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-green-600 text-sm mt-3"><i class="fas fa-arrow-up mr-1"></i> 8.2% from last month</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Total Customers</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">1,248</h3>
+                                        </div>
+                                        <div class="bg-purple-100 p-3 rounded-lg">
+                                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-green-600 text-sm mt-3"><i class="fas fa-arrow-up mr-1"></i> 5.7% from last month</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Pending Orders</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">18</h3>
+                                        </div>
+                                        <div class="bg-yellow-100 p-3 rounded-lg">
+                                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-red-600 text-sm mt-3"><i class="fas fa-arrow-down mr-1"></i> 3 from yesterday</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Recent Orders</h3>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div id="recentOrdersList" class="space-y-4">
+                                            <!-- Recent orders will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Top Products</h3>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div id="topProductsList" class="space-y-4">
+                                            <!-- Top products will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Orders Management -->
+                    <div id="ordersSection" class="admin-section hidden">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Order Management</h2>
+                                <div class="flex space-x-3">
+                                    <div class="relative">
+                                        <input type="text" id="orderSearch" placeholder="Search orders..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                    </div>
+                                    <select id="orderFilter" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                        <option value="all">All Orders</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="processing">Processing</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                    <button id="exportOrdersBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-4 py-2 rounded-lg transition duration-300">
+                                        <i class="fas fa-file-export mr-2"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Order ID</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Customer</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Total</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ordersTableBody">
+                                        <!-- Orders will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Management -->
+                    <div id="productsSection" class="admin-section hidden">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Product Management</h2>
+                                <button id="addProductBtn" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-5 py-2.5 rounded-lg hover:opacity-90 transition duration-300">
+                                    <i class="fas fa-plus mr-2"></i> Add Product
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Total Products</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2" id="totalProducts">0</h3>
+                                        </div>
+                                        <div class="bg-green-100 p-3 rounded-lg">
+                                            <i class="fas fa-birthday-cake text-green-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Out of Stock</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2" id="outOfStock">0</h3>
+                                        </div>
+                                        <div class="bg-amber-100 p-3 rounded-lg">
+                                            <i class="fas fa-exclamation-triangle text-amber-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Low Stock (< 10)</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2" id="lowStock">0</h3>
+                                        </div>
+                                        <div class="bg-red-100 p-3 rounded-lg">
+                                            <i class="fas fa-box-open text-red-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Product</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Price</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Stock</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTableBody">
+                                        <!-- Products will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customers Management -->
+                    <div id="customersSection" class="admin-section hidden">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Customer Management</h2>
+                                <div class="relative">
+                                    <input type="text" id="customerSearch" placeholder="Search customers..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Customer</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Orders</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Total Spent</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customersTableBody">
+                                        <!-- Customers will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analytics -->
+                    <div id="analyticsSection" class="admin-section hidden">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Analytics Dashboard</h2>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-gray-50 rounded-xl p-4">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Revenue Overview</h3>
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                                <div class="bg-gray-50 rounded-xl p-4">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-4">Top Categories</h3>
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-xl p-4">
+                                <h3 class="text-lg font-bold text-gray-800 mb-4">Order Trends</h3>
+                                <canvas id="ordersChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Inventory -->
+                    <div id="inventorySection" class="admin-section hidden">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-gray-800">Inventory Management</h2>
+                                <button id="bulkUpdateBtn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold px-5 py-2.5 rounded-lg hover:opacity-90 transition duration-300">
+                                    <i class="fas fa-sync-alt mr-2"></i> Bulk Update
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                                <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Critical Stock</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">8</h3>
+                                        </div>
+                                        <div class="bg-red-100 p-3 rounded-lg">
+                                            <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-red-600 text-sm mt-3">Needs immediate attention</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Reorder Soon</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">15</h3>
+                                        </div>
+                                        <div class="bg-orange-100 p-3 rounded-lg">
+                                            <i class="fas fa-clock text-orange-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-orange-600 text-sm mt-3">Will need restocking soon</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">In Stock</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">142</h3>
+                                        </div>
+                                        <div class="bg-green-100 p-3 rounded-lg">
+                                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-green-600 text-sm mt-3">Adequate inventory</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-5">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="text-gray-500">Overstocked</p>
+                                            <h3 class="text-3xl font-bold text-gray-800 mt-2">6</h3>
+                                        </div>
+                                        <div class="bg-blue-100 p-3 rounded-lg">
+                                            <i class="fas fa-archive text-blue-600 text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-blue-600 text-sm mt-3">Consider promotions</p>
+                                </div>
+                            </div>
+                            
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100">
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Product</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Current Stock</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Reorder Level</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Last Ordered</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                            <th class="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventoryTableBody">
+                                        <!-- Inventory will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Authentication Modal -->
+        <div id="authModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl w-full max-w-md">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800" id="authTitle">Login</h2>
+                        <button id="closeAuthBtn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex border-b mb-6">
+                        <button id="loginTab" class="auth-tab active flex-1 py-3 text-center font-medium text-pink-600 border-b-2 border-pink-600">Login</button>
+                        <button id="registerTab" class="auth-tab flex-1 py-3 text-center font-medium text-gray-500">Register</button>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="loginEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Password</label>
+                                <input type="password" id="loginPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300 mb-4">
+                            Login <i class="fas fa-sign-in-alt ml-2"></i>
+                        </button>
+                        
+                        <div class="text-center mb-4">
+                            <span class="text-gray-500">or login with</span>
+                        </div>
+                        
+                        <button type="button" id="googleLoginBtn" class="w-full border border-gray-300 text-gray-700 font-medium py-3 rounded-lg hover:bg-gray-50 transition duration-300 mb-6">
+                            <i class="fab fa-google mr-2 text-red-500"></i> Google
+                        </button>
+                        
+                        <div class="text-center">
+                            <a href="#" class="text-pink-600 hover:text-pink-800 text-sm">Forgot your password?</a>
+                        </div>
+                    </form>
+                    
+                    <form id="registerForm" class="hidden">
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Full Name</label>
+                                <input type="text" id="registerName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="registerEmail" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Password</label>
+                                <input type="password" id="registerPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Confirm Password</label>
+                                <input type="password" id="registerConfirmPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-3 rounded-lg hover:opacity-90 transition duration-300">
+                            Create Account <i class="fas fa-user-plus ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Detail Modal -->
+        <div id="productDetailModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div class="p-6">
+                    <button id="closeProductDetailBtn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                    
+                    <div id="productDetailContent">
+                        <!-- Product details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add/Edit Product Modal -->
+        <div id="productModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800" id="productModalTitle">Add New Product</h2>
+                        <button id="closeProductModalBtn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-2xl"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="productForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Product Name</label>
+                                <input type="text" id="productName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Category</label>
+                                <select id="productCategory" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                    <option value="birthday">Birthday Cakes</option>
+                                    <option value="wedding">Wedding Cakes</option>
+                                    <option value="cupcakes">Cupcakes</option>
+                                    <option value="desserts">Desserts</option>
+                                    <option value="custom">Custom Cakes</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Price ($)</label>
+                                <input type="number" id="productPrice" min="0" step="0.01" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Stock Quantity</label>
+                                <input type="number" id="productStock" min="0" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2">Description</label>
+                                <textarea id="productDescription" rows="4" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 mb-2">Image URL</label>
+                                <input type="text" id="productImage" placeholder="https://example.com/image.jpg" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                                <p class="text-sm text-gray-500 mt-2">Leave empty to use a default cake image</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancelProductBtn" class="border border-gray-300 text-gray-700 font-medium px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-300">
+                                Cancel
+                            </button>
+                            <button type="submit" id="saveProductBtn" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold px-6 py-3 rounded-lg hover:opacity-90 transition duration-300">
+                                Save Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="hidden fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center">
+            <div class="text-center">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-700 font-medium">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+                            <i class="fas fa-birthday-cake text-white text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold">Sweet Dreams</h2>
+                    </div>
+                    <p class="text-gray-400">Delicious cakes made with love for every celebration since 2015.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#home" class="hover:text-white transition duration-300">Home</a></li>
+                        <li><a href="#shop" class="hover:text-white transition duration-300">Shop</a></li>
+                        <li><a href="#about" class="hover:text-white transition duration-300">About Us</a></li>
+                        <li><a href="#contact" class="hover:text-white transition duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt mr-3"></i> 123 Cake Street, Sweet City</li>
+                        <li class="flex items-center"><i class="fas fa-phone mr-3"></i> (123) 456-7890</li>
+                        <li class="flex items-center"><i class="fas fa-envelope mr-3"></i> info@sweetdreams.com</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Subscribe for delicious updates!</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="flex-grow px-4 py-2 rounded-l-lg text-gray-900">
+                        <button class="bg-gradient-to-r from-pink-500 to-purple-500 px-4 py-2 rounded-r-lg font-medium">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Sweet Dreams Cake Shop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        // Initialize Supabase client (for actual implementation)
+        // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // For demo purposes, we'll use localStorage to simulate database
+        class Database {
+            constructor() {
+                this.products = JSON.parse(localStorage.getItem('sweetdreams_products')) || this.getDefaultProducts();
+                this.users = JSON.parse(localStorage.getItem('sweetdreams_users')) || [
+                    { id: 1, email: 'admin@sweetdreams.com', password: 'admin123', name: 'Admin User', role: 'admin', status: 'active', orders: 15, totalSpent: 1250.75 },
+                    { id: 2, email: 'customer@example.com', password: 'customer123', name: 'John Doe', role: 'customer', status: 'active', orders: 3, totalSpent: 189.50 }
+                ];
+                this.orders = JSON.parse(localStorage.getItem('sweetdreams_orders')) || this.getDefaultOrders();
+                this.cart = JSON.parse(localStorage.getItem('sweetdreams_cart')) || [];
+                this.currentUser = JSON.parse(localStorage.getItem('sweetdreams_currentUser')) || null;
+                
+                this.saveData();
+            }
+            
+            saveData() {
+                localStorage.setItem('sweetdreams_products', JSON.stringify(this.products));
+                localStorage.setItem('sweetdreams_users', JSON.stringify(this.users));
+                localStorage.setItem('sweetdreams_orders', JSON.stringify(this.orders));
+                localStorage.setItem('sweetdreams_cart', JSON.stringify(this.cart));
+                localStorage.setItem('sweetdreams_currentUser', JSON.stringify(this.currentUser));
+            }
+            
+            getDefaultProducts() {
+                return [
+                    { id: 1, name: 'Chocolate Fudge Cake', category: 'birthday', price: 45.99, stock: 15, description: 'Rich chocolate cake with fudge frosting and chocolate shavings.', image: '', rating: 4.8, sales: 128 },
+                    { id: 2, name: 'Vanilla Bean Dream', category: 'birthday', price: 42.50, stock: 8, description: 'Classic vanilla cake with real vanilla bean frosting.', image: '', rating: 4.6, sales: 95 },
+                    { id: 3, name: 'Red Velvet Delight', category: 'birthday', price: 48.75, stock: 12, description: 'Moist red velvet cake with cream cheese frosting.', image: '', rating: 4.9, sales: 156 },
+                    { id: 4, name: 'Elegant Wedding Cake', category: 'wedding', price: 299.99, stock: 5, description: 'Three-tier wedding cake with floral accents.', image: '', rating: 4.9, sales: 32 },
+                    { id: 5, name: 'Rose Gold Wedding Cake', category: 'wedding', price: 349.99, stock: 3, description: 'Modern wedding cake with rose gold accents.', image: '', rating: 4.7, sales: 28 },
+                    { id: 6, name: 'Chocolate Cupcakes (6 pack)', category: 'cupcakes', price: 24.99, stock: 25, description: 'Moist chocolate cupcakes with buttercream frosting.', image: '', rating: 4.5, sales: 210 },
+                    { id: 7, name: 'Vanilla Cupcakes (6 pack)', category: 'cupcakes', price: 22.99, stock: 30, description: 'Classic vanilla cupcakes with vanilla frosting.', image: '', rating: 4.4, sales: 195 },
+                    { id: 8, name: 'Carrot Cake', category: 'desserts', price: 38.50, stock: 18, description: 'Moist carrot cake with cream cheese frosting and walnuts.', image: '', rating: 4.7, sales: 87 },
+                    { id: 9, name: 'Lemon Drizzle Cake', category: 'desserts', price: 35.99, stock: 10, description: 'Tangy lemon cake with lemon glaze.', image: '', rating: 4.6, sales: 72 },
+                    { id: 10, name: 'Custom Photo Cake', category: 'custom', price: 59.99, stock: 0, description: 'Custom cake with edible printed photo.', image: '', rating: 4.8, sales: 45 },
+                    { id: 11, name: 'Strawberry Shortcake', category: 'desserts', price: 41.25, stock: 7, description: 'Light sponge cake with fresh strawberries and cream.', image: '', rating: 4.5, sales: 63 },
+                    { id: 12, name: 'Rainbow Sprinkle Cupcakes', category: 'cupcakes', price: 26.50, stock: 22, description: 'Fun vanilla cupcakes with rainbow sprinkles.', image: '', rating: 4.3, sales: 178 }
+                ];
+            }
+            
+            getDefaultOrders() {
+                return [
+                    { id: 1001, customerId: 2, customerName: 'John Doe', date: '2023-10-15', total: 89.98, status: 'delivered', items: [{productId: 1, quantity: 2}] },
+                    { id: 1002, customerId: 1, customerName: 'Jane Smith', date: '2023-10-18', total: 299.99, status: 'processing', items: [{productId: 4, quantity: 1}] },
+                    { id: 1003, customerId: 3, customerName: 'Bob Johnson', date: '2023-10-20', total: 124.97, status: 'pending', items: [{productId: 6, quantity: 3}, {productId: 8, quantity: 1}] },
+                    { id: 1004, customerId: 4, customerName: 'Alice Williams', date: '2023-10-22', total: 48.75, status: 'shipped', items: [{productId: 3, quantity: 1}] },
+                    { id: 1005, customerId: 5, customerName: 'Charlie Brown', date: '2023-10-25', total: 68.49, status: 'pending', items: [{productId: 11, quantity: 1}, {productId: 7, quantity: 1}] }
+                ];
+            }
+            
+            // Product methods
+            getProducts(category = 'all') {
+                if (category === 'all') return this.products;
+                return this.products.filter(p => p.category === category);
+            }
+            
+            getProduct(id) {
+                return this.products.find(p => p.id === id);
+            }
+            
+            addProduct(product) {
+                const newId = Math.max(...this.products.map(p => p.id)) + 1;
+                product.id = newId;
+                product.sales = 0;
+                product.rating = 4.5;
+                this.products.push(product);
+                this.saveData();
+                return product;
+            }
+            
+            updateProduct(id, updates) {
+                const index = this.products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    this.products[index] = { ...this.products[index], ...updates };
+                    this.saveData();
+                    return this.products[index];
+                }
+                return null;
+            }
+            
+            deleteProduct(id) {
+                this.products = this.products.filter(p => p.id !== id);
+                this.saveData();
+            }
+            
+            // User methods
+            login(email, password) {
+                const user = this.users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    this.currentUser = { ...user };
+                    this.saveData();
+                    return { success: true, user: this.currentUser };
+                }
+                return { success: false, message: 'Invalid email or password' };
+            }
+            
+            register(name, email, password) {
+                if (this.users.find(u => u.email === email)) {
+                    return { success: false, message: 'Email already registered' };
+                }
+                
+                const newId = Math.max(...this.users.map(u => u.id)) + 1;
+                const newUser = {
+                    id: newId,
+                    name,
+                    email,
+                    password,
+                    role: 'customer',
+                    status: 'active',
+                    orders: 0,
+                    totalSpent: 0
+                };
+                
+                this.users.push(newUser);
+                this.currentUser = { ...newUser };
+                this.saveData();
+                
+                return { success: true, user: this.currentUser };
+            }
+            
+            logout() {
+                this.currentUser = null;
+                this.saveData();
+            }
+            
+            // Cart methods
+            getCart() {
+                return this.cart.map(item => {
+                    const product = this.getProduct(item.productId);
+                    return { ...item, product };
+                }).filter(item => item.product); // Remove items if product no longer exists
+            }
+            
+            addToCart(productId, quantity = 1) {
+                const existing = this.cart.find(item => item.productId === productId);
+                if (existing) {
+                    existing.quantity += quantity;
+                } else {
+                    this.cart.push({ productId, quantity });
+                }
+                this.saveData();
+                return this.getCart();
+            }
+            
+            updateCartItem(productId, quantity) {
+                if (quantity <= 0) {
+                    this.cart = this.cart.filter(item => item.productId !== productId);
+                } else {
+                    const item = this.cart.find(item => item.productId === productId);
+                    if (item) item.quantity = quantity;
+                }
+                this.saveData();
+                return this.getCart();
+            }
+            
+            removeFromCart(productId) {
+                this.cart = this.cart.filter(item => item.productId !== productId);
+                this.saveData();
+                return this.getCart();
+            }
+            
+            clearCart() {
+                this.cart = [];
+                this.saveData();
+            }
+            
+            // Order methods
+            createOrder(orderData) {
+                const newId = Math.max(...this.orders.map(o => o.id)) + 1;
+                const order = {
+                    id: newId,
+                    ...orderData,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'pending'
+                };
+                
+                this.orders.push(order);
+                
+                // Update user's order count and total spent
+                if (this.currentUser) {
+                    const userIndex = this.users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        this.users[userIndex].orders += 1;
+                        this.users[userIndex].totalSpent += order.total;
+                        this.currentUser = this.users[userIndex];
+                    }
+                }
+                
+                this.saveData();
+                return order;
+            }
+            
+            getOrders() {
+                return this.orders;
+            }
+            
+            updateOrderStatus(orderId, status) {
+                const order = this.orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = status;
+                    this.saveData();
+                    return order;
+                }
+                return null;
+            }
+            
+            // Analytics
+            getStats() {
+                const pendingOrders = this.orders.filter(o => o.status === 'pending').length;
+                const totalRevenue = this.orders.reduce((sum, order) => sum + order.total, 0);
+                const totalCustomers = this.users.filter(u => u.role === 'customer').length;
+                
+                return { pendingOrders, totalRevenue, totalCustomers };
+            }
+        }
+
+        // Initialize the app
+        const db = new Database();
+        let currentView = 'customer';
+        let editingProductId = null;
+
+        // DOM Elements
+        const elements = {
+            // Views
+            customerView: document.getElementById('customerView'),
+            adminView: document.getElementById('adminView'),
+            
+            // Auth elements
+            authModal: document.getElementById('authModal'),
+            loginTab: document.getElementById('loginTab'),
+            registerTab: document.getElementById('registerTab'),
+            loginForm: document.getElementById('loginForm'),
+            registerForm: document.getElementById('registerForm'),
+            authTitle: document.getElementById('authTitle'),
+            closeAuthBtn: document.getElementById('closeAuthBtn'),
+            googleLoginBtn: document.getElementById('googleLoginBtn'),
+            
+            // User menu
+            userMenuBtn: document.getElementById('userMenuBtn'),
+            userMenu: document.getElementById('userMenu'),
+            userName: document.getElementById('userName'),
+            loginBtn: document.getElementById('loginBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            adminBtn: document.getElementById('adminBtn'),
+            backToStore: document.getElementById('backToStore'),
+            
+            // Cart
+            cartBtn: document.getElementById('cartBtn'),
+            cartModal: document.getElementById('cartModal'),
+            closeCartBtn: document.getElementById('closeCartBtn'),
+            cartItems: document.getElementById('cartItems'),
+            emptyCart: document.getElementById('emptyCart'),
+            cartCount: document.getElementById('cartCount'),
+            cartSubtotal: document.getElementById('cartSubtotal'),
+            cartShipping: document.getElementById('cartShipping'),
+            cartTotal: document.getElementById('cartTotal'),
+            checkoutBtn: document.getElementById('checkoutBtn'),
+            continueShopping: document.getElementById('continueShopping'),
+            
+            // Checkout
+            checkoutModal: document.getElementById('checkoutModal'),
+            closeCheckoutBtn: document.getElementById('closeCheckoutBtn'),
+            checkoutForm: document.getElementById('checkoutForm'),
+            checkoutItems: document.getElementById('checkoutItems'),
+            checkoutSubtotal: document.getElementById('checkoutSubtotal'),
+            checkoutShipping: document.getElementById('checkoutShipping'),
+            checkoutTax: document.getElementById('checkoutTax'),
+            checkoutTotal: document.getElementById('checkoutTotal'),
+            
+            // Products
+            productsGrid: document.getElementById('productsGrid'),
+            productSearch: document.getElementById('productSearch'),
+            sortProducts: document.getElementById('sortProducts'),
+            categoryBtns: document.querySelectorAll('.category-btn'),
+            loadMore: document.getElementById('loadMore'),
+            
+            // Product detail
+            productDetailModal: document.getElementById('productDetailModal'),
+            closeProductDetailBtn: document.getElementById('closeProductDetailBtn'),
+            productDetailContent: document.getElementById('productDetailContent'),
+            
+            // Product management
+            productModal: document.getElementById('productModal'),
+            closeProductModalBtn: document.getElementById('closeProductModalBtn'),
+            productForm: document.getElementById('productForm'),
+            productModalTitle: document.getElementById('productModalTitle'),
+            cancelProductBtn: document.getElementById('cancelProductBtn'),
+            saveProductBtn: document.getElementById('saveProductBtn'),
+            
+            // Admin sections
+            adminSections: {
+                dashboard: document.getElementById('dashboardSection'),
+                orders: document.getElementById('ordersSection'),
+                products: document.getElementById('productsSection'),
+                customers: document.getElementById('customersSection'),
+                analytics: document.getElementById('analyticsSection'),
+                inventory: document.getElementById('inventorySection')
+            },
+            sidebarBtns: document.querySelectorAll('.sidebar-btn'),
+            
+            // Admin elements
+            addProductBtn: document.getElementById('addProductBtn'),
+            pendingOrdersBadge: document.getElementById('pendingOrdersBadge'),
+            ordersTableBody: document.getElementById('ordersTableBody'),
+            productsTableBody: document.getElementById('productsTableBody'),
+            customersTableBody: document.getElementById('customersTableBody'),
+            inventoryTableBody: document.getElementById('inventoryTableBody'),
+            orderSearch: document.getElementById('orderSearch'),
+            orderFilter: document.getElementById('orderFilter'),
+            exportOrdersBtn: document.getElementById('exportOrdersBtn'),
+            customerSearch: document.getElementById('customerSearch'),
+            bulkUpdateBtn: document.getElementById('bulkUpdateBtn'),
+            
+            // Loading
+            loadingOverlay: document.getElementById('loadingOverlay'),
+            
+            // Mobile menu
+            mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+            mobileMenu: document.getElementById('mobileMenu')
+        };
+
+        // Initialize the app
+        function initApp() {
+            updateUIForAuthState();
+            loadProducts();
+            updateCartCount();
+            setupEventListeners();
+            
+            // Check if user is admin
+            if (db.currentUser && db.currentUser.role === 'admin') {
+                elements.adminBtn.classList.remove('hidden');
+            }
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Auth events
+            elements.userMenuBtn.addEventListener('click', toggleUserMenu);
+            elements.loginBtn.addEventListener('click', () => showAuthModal('login'));
+            elements.logoutBtn.addEventListener('click', logout);
+            elements.loginTab.addEventListener('click', () => switchAuthTab('login'));
+            elements.registerTab.addEventListener('click', () => switchAuthTab('register'));
+            elements.closeAuthBtn.addEventListener('click', hideAuthModal);
+            elements.googleLoginBtn.addEventListener('click', loginWithGoogle);
+            
+            // Login/register forms
+            elements.loginForm.addEventListener('submit', handleLogin);
+            elements.registerForm.addEventListener('submit', handleRegister);
+            
+            // Cart events
+            elements.cartBtn.addEventListener('click', showCart);
+            elements.closeCartBtn.addEventListener('click', hideCart);
+            elements.checkoutBtn.addEventListener('click', showCheckout);
+            elements.continueShopping.addEventListener('click', hideCart);
+            elements.closeCheckoutBtn.addEventListener('click', hideCheckout);
+            elements.checkoutForm.addEventListener('submit', handleCheckout);
+            
+            // Product events
+            elements.productSearch.addEventListener('input', handleProductSearch);
+            elements.sortProducts.addEventListener('change', handleSortChange);
+            elements.loadMore.addEventListener('click', loadMoreProducts);
+            elements.categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => handleCategoryChange(btn.dataset.category));
+            });
+            
+            // Admin events
+            elements.adminBtn.addEventListener('click', showAdminDashboard);
+            elements.backToStore.addEventListener('click', showCustomerView);
+            
+            // Admin sidebar
+            elements.sidebarBtns.forEach(btn => {
+                btn.addEventListener('click', () => switchAdminSection(btn.dataset.section));
+            });
+            
+            // Product management
+            elements.addProductBtn.addEventListener('click', () => showProductModal());
+            elements.closeProductModalBtn.addEventListener('click', hideProductModal);
+            elements.cancelProductBtn.addEventListener('click', hideProductModal);
+            elements.productForm.addEventListener('submit', handleProductSave);
+            
+            // Product detail
+            elements.closeProductDetailBtn.addEventListener('click', hideProductDetail);
+            
+            // Order management
+            elements.orderSearch.addEventListener('input', handleOrderSearch);
+            elements.orderFilter.addEventListener('change', handleOrderFilter);
+            elements.exportOrdersBtn.addEventListener('click', exportOrders);
+            
+            // Customer management
+            elements.customerSearch.addEventListener('input', handleCustomerSearch);
+            
+            // Inventory
+            elements.bulkUpdateBtn.addEventListener('click', handleBulkUpdate);
+            
+            // Mobile menu
+            elements.mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#userMenu') && !e.target.closest('#userMenuBtn')) {
+                    elements.userMenu.classList.add('hidden');
+                }
+                
+                if (e.target === elements.cartModal) hideCart();
+                if (e.target === elements.checkoutModal) hideCheckout();
+                if (e.target === elements.authModal) hideAuthModal();
+                if (e.target === elements.productDetailModal) hideProductDetail();
+                if (e.target === elements.productModal) hideProductModal();
+            });
+            
+            // Handle escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    hideCart();
+                    hideCheckout();
+                    hideAuthModal();
+                    hideProductDetail();
+                    hideProductModal();
+                }
+            });
+        }
+
+        // Authentication functions
+        function updateUIForAuthState() {
+            const isLoggedIn = db.currentUser !== null;
+            
+            if (isLoggedIn) {
+                elements.userName.textContent = db.currentUser.name.split(' ')[0];
+                document.querySelectorAll('.auth-hidden').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.user-menu-item').forEach(el => el.classList.remove('hidden'));
+                
+                if (db.currentUser.role === 'admin') {
+                    elements.adminBtn.classList.remove('hidden');
+                } else {
+                    elements.adminBtn.classList.add('hidden');
+                }
+            } else {
+                elements.userName.textContent = 'Account';
+                document.querySelectorAll('.auth-hidden').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.user-menu-item').forEach(el => el.classList.add('hidden'));
+                elements.adminBtn.classList.add('hidden');
+            }
+        }
+
+        function toggleUserMenu() {
+            elements.userMenu.classList.toggle('hidden');
+        }
+
+        function showAuthModal(mode = 'login') {
+            elements.authModal.classList.remove('hidden');
+            switchAuthTab(mode);
+        }
+
+        function hideAuthModal() {
+            elements.authModal.classList.add('hidden');
+        }
+
+        function switchAuthTab(mode) {
+            if (mode === 'login') {
+                elements.loginTab.classList.add('active');
+                elements.loginTab.classList.remove('text-gray-500');
+                elements.loginTab.classList.add('text-pink-600');
+                elements.loginTab.classList.add('border-pink-600');
+                
+                elements.registerTab.classList.remove('active');
+                elements.registerTab.classList.add('text-gray-500');
+                elements.registerTab.classList.remove('text-pink-600');
+                elements.registerTab.classList.remove('border-pink-600');
+                
+                elements.loginForm.classList.remove('hidden');
+                elements.registerForm.classList.add('hidden');
+                elements.authTitle.textContent = 'Login';
+            } else {
+                elements.registerTab.classList.add('active');
+                elements.registerTab.classList.remove('text-gray-500');
+                elements.registerTab.classList.add('text-pink-600');
+                elements.registerTab.classList.add('border-pink-600');
+                
+                elements.loginTab.classList.remove('active');
+                elements.loginTab.classList.add('text-gray-500');
+                elements.loginTab.classList.remove('text-pink-600');
+                elements.loginTab.classList.remove('border-pink-600');
+                
+                elements.registerForm.classList.remove('hidden');
+                elements.loginForm.classList.add('hidden');
+                elements.authTitle.textContent = 'Register';
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const email = elements.loginEmail.value;
+            const password = elements.loginPassword.value;
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const result = db.login(email, password);
+            
+            hideLoading();
+            
+            if (result.success) {
+                hideAuthModal();
+                updateUIForAuthState();
+                showNotification('success', 'Login successful!', 'Welcome back to Sweet Dreams!');
+                elements.loginForm.reset();
+            } else {
+                showNotification('error', 'Login failed', result.message || 'Invalid email or password');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            showLoading();
+            
+            const name = elements.registerName.value;
+            const email = elements.registerEmail.value;
+            const password = elements.registerPassword.value;
+            const confirmPassword = elements.registerConfirmPassword.value;
+            
+            if (password !== confirmPassword) {
+                hideLoading();
+                showNotification('error', 'Registration failed', 'Passwords do not match');
+                return;
+            }
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            const result = db.register(name, email, password);
+            
+            hideLoading();
+            
+            if (result.success) {
+                hideAuthModal();
+                updateUIForAuthState();
+                showNotification('success', 'Registration successful!', 'Welcome to Sweet Dreams!');
+                elements.registerForm.reset();
+            } else {
+                showNotification('error', 'Registration failed', result.message || 'An error occurred');
+            }
+        }
+
+        function loginWithGoogle() {
+            showNotification('info', 'Google Login', 'This feature would integrate with Supabase Auth in a real application');
+            // In a real app, this would use: supabase.auth.signInWithOAuth({ provider: 'google' })
+        }
+
+        function logout() {
+            db.logout();
+            updateUIForAuthState();
+            showNotification('success', 'Logged out', 'You have been successfully logged out');
+            if (currentView === 'admin') {
+                showCustomerView();
+            }
+        }
+
+        // Product functions
+        function loadProducts(category = 'all') {
+            const products = db.getProducts(category);
+            renderProducts(products.slice(0, 8));
+            
+            // Update active category button
+            elements.categoryBtns.forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active-category');
+                    btn.classList.add('border-pink-300');
+                } else {
+                    btn.classList.remove('active-category');
+                    btn.classList.remove('border-pink-300');
+                }
+            });
+        }
+
+        function renderProducts(products) {
+            if (products.length === 0) {
+                elements.productsGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-birthday-cake text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 text-lg">No cakes found</p>
+                        <p class="text-gray-400">Try a different category or search term</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            elements.productsGrid.innerHTML = products.map(product => `
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover transition duration-300">
+                    <div class="relative h-48 bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center">
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover">` : 
+                            `<i class="fas fa-birthday-cake text-5xl text-pink-400"></i>`
+                        }
+                        ${product.stock === 0 ? 
+                            `<span class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>` : 
+                            product.stock < 5 ? 
+                            `<span class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">Low Stock</span>` :
+                            `<span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock</span>`
+                        }
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-gray-800 truncate">${product.name}</h3>
+                            <span class="text-pink-600 font-bold">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.description}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-gray-700 font-medium">${product.rating}</span>
+                                <span class="text-gray-500 text-sm ml-2">(${product.sales})</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="view-product-btn p-2 text-gray-600 hover:text-pink-600" data-id="${product.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="add-to-cart-btn ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''} bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2 rounded-lg font-medium transition duration-300" data-id="${product.id}" ${product.stock === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-cart-plus mr-2"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners to product buttons
+            document.querySelectorAll('.view-product-btn').forEach(btn => {
+                btn.addEventListener('click', () => showProductDetail(parseInt(btn.dataset.id)));
+            });
+            
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (!btn.disabled) {
+                        addToCart(parseInt(btn.dataset.id));
+                    }
+                });
+            });
+        }
+
+        function loadMoreProducts() {
+            const currentCategory = document.querySelector('.category-btn.active-category').dataset.category;
+            const products = db.getProducts(currentCategory);
+            const currentCount = elements.productsGrid.children.length;
+            
+            if (currentCount >= products.length) {
+                showNotification('info', 'No more products', 'You have reached the end of the product list');
+                return;
+            }
+            
+            const nextProducts = products.slice(currentCount, currentCount + 4);
+            nextProducts.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'bg-white rounded-xl shadow-md overflow-hidden card-hover transition duration-300';
+                productElement.innerHTML = `
+                    <div class="relative h-48 bg-gradient-to-br from-pink-50 to-purple-100 flex items-center justify-center">
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover">` : 
+                            `<i class="fas fa-birthday-cake text-5xl text-pink-400"></i>`
+                        }
+                        ${product.stock === 0 ? 
+                            `<span class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>` : 
+                            product.stock < 5 ? 
+                            `<span class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">Low Stock</span>` :
+                            `<span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">In Stock</span>`
+                        }
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-lg text-gray-800 truncate">${product.name}</h3>
+                            <span class="text-pink-600 font-bold">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">${product.description}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span class="text-gray-700 font-medium">${product.rating}</span>
+                                <span class="text-gray-500 text-sm ml-2">(${product.sales})</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="view-product-btn p-2 text-gray-600 hover:text-pink-600" data-id="${product.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="add-to-cart-btn ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''} bg-pink-100 text-pink-600 hover:bg-pink-200 px-4 py-2 rounded-lg font-medium transition duration-300" data-id="${product.id}" ${product.stock === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-cart-plus mr-2"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                elements.productsGrid.appendChild(productElement);
+                
+                // Add event listeners to the new buttons
+                productElement.querySelector('.view-product-btn').addEventListener('click', () => 
+                    showProductDetail(parseInt(productElement.querySelector('.view-product-btn').dataset.id)));
+                productElement.querySelector('.add-to-cart-btn').addEventListener('click', function() {
+                    if (!this.disabled) {
+                        addToCart(parseInt(this.dataset.id));
+                    }
+                });
+            });
+            
+            if (currentCount + nextProducts.length >= products.length) {
+                elements.loadMore.textContent = 'No More Cakes';
+                elements.loadMore.disabled = true;
+                elements.loadMore.classList.add('opacity-50');
+            }
+        }
+
+        function handleCategoryChange(category) {
+            loadProducts(category);
+        }
+
+        function handleProductSearch() {
+            const searchTerm = elements.productSearch.value.toLowerCase();
+            const currentCategory = document.querySelector('.category-btn.active-category').dataset.category;
+            let products = db.getProducts(currentCategory);
+            
+            if (searchTerm) {
+                products = products.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    p.description.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            renderProducts(products.slice(0, 8));
+        }
+
+        function handleSortChange() {
+            const sortBy = elements.sortProducts.value;
+            const currentCategory = document.querySelector('.category-btn.active-category').dataset.category;
+            let products = db.getProducts(currentCategory);
+            
+            switch (sortBy) {
+                case 'price-low':
+                    products.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    products.sort((a, b) => b.price - a.price);
+                    break;
+                case 'popular':
+                    products.sort((a, b) => b.sales - a.sales);
+                    break;
+                default: // name
+                    products.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            
+            renderProducts(products.slice(0, 8));
+        }
+
+        function showProductDetail(productId) {
+            const product = db.getProduct(productId);
+            if (!product) return;
+            
+            elements.productDetailContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gradient-to-br from-pink-50 to-purple-100 rounded-xl h-64 md:h-auto flex items-center justify-center">
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover rounded-xl">` : 
+                            `<i class="fas fa-birthday-cake text-8xl text-pink-400"></i>`
+                        }
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">${product.name}</h2>
+                        <div class="flex items-center mb-6">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-star text-yellow-400 mr-2"></i>
+                                <span class="text-gray-700 font-medium text-lg">${product.rating}</span>
+                                <span class="text-gray-500 ml-2">(${product.sales} sold)</span>
+                            </div>
+                            <span class="order-status ${getStatusClass(product.stock)}">
+                                ${product.stock === 0 ? 'Out of Stock' : product.stock < 5 ? 'Low Stock' : 'In Stock'}
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-lg mb-6">${product.description}</p>
+                        <div class="mb-6">
+                            <h3 class="font-bold text-gray-800 mb-2">Category</h3>
+                            <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full">${formatCategory(product.category)}</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-2">Price</h3>
+                                <span class="text-4xl font-bold text-pink-600">$${product.price.toFixed(2)}</span>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="font-bold text-gray-800 mb-2">Available Stock</h3>
+                                <span class="text-2xl font-bold ${product.stock === 0 ? 'text-red-600' : 'text-gray-800'}">${product.stock}</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button class="add-to-cart-detail-btn flex-1 ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''} bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold py-4 rounded-lg hover:opacity-90 transition duration-300" data-id="${product.id}" ${product.stock === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-cart-plus mr-3"></i> Add to Cart
+                            </button>
+                            <button class="p-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            elements.productDetailModal.classList.remove('hidden');
+            
+            // Add event listener to the add to cart button
+            const addBtn = elements.productDetailContent.querySelector('.add-to-cart-detail-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function() {
+                    if (!this.disabled) {
+                        addToCart(parseInt(this.dataset.id));
+                        hideProductDetail();
+                    }
+                });
+            }
+        }
+
+        function hideProductDetail() {
+            elements.productDetailModal.classList.add('hidden');
+        }
+
+        // Cart functions
+        function addToCart(productId, quantity = 1) {
+            if (!db.currentUser) {
+                showNotification('info', 'Login Required', 'Please login to add items to cart');
+                showAuthModal('login');
+                return;
+            }
+            
+            const product = db.getProduct(productId);
+            if (!product) return;
+            
+            if (product.stock === 0) {
+                showNotification('error', 'Out of Stock', 'This product is currently out of stock');
+                return;
+            }
+            
+            if (quantity > product.stock) {
+                showNotification('error', 'Insufficient Stock', `Only ${product.stock} items available`);
+                return;
+            }
+            
+            db.addToCart(productId, quantity);
+            updateCartCount();
+            updateCartModal();
+            
+            showNotification('success', 'Added to Cart', `${product.name} added to your cart`);
+        }
+
+        function updateCartCount() {
+            const cart = db.getCart();
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            elements.cartCount.textContent = totalItems;
+        }
+
+        function showCart() {
+            updateCartModal();
+            elements.cartModal.classList.remove('hidden');
+        }
+
+        function hideCart() {
+            elements.cartModal.classList.add('hidden');
+        }
+
+        function updateCartModal() {
+            const cart = db.getCart();
+            
+            if (cart.length === 0) {
+                elements.emptyCart.classList.remove('hidden');
+                elements.cartItems.innerHTML = '';
+                elements.cartSubtotal.textContent = '$0.00';
+                elements.cartTotal.textContent = '$5.00';
+                elements.checkoutBtn.disabled = true;
+                elements.checkoutBtn.classList.add('opacity-50');
+                return;
+            }
+            
+            elements.emptyCart.classList.add('hidden');
+            
+            let subtotal = 0;
+            elements.cartItems.innerHTML = cart.map(item => {
+                const itemTotal = item.product.price * item.quantity;
+                subtotal += itemTotal;
+                
+                return `
+                    <div class="cart-item-enter flex items-center border-b border-gray-100 pb-4 mb-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-pink-50 to-purple-100 rounded-lg flex items-center justify-center mr-4">
+                            ${item.product.image ? 
+                                `<img src="${item.product.image}" alt="${item.product.name}" class="h-full w-full object-cover rounded-lg">` : 
+                                `<i class="fas fa-birthday-cake text-pink-400"></i>`
+                            }
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-gray-800">${item.product.name}</h4>
+                            <p class="text-gray-600 text-sm">$${item.product.price.toFixed(2)} each</p>
+                        </div>
+                        <div class="flex items-center">
+                            <button class="decrease-qty w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-lg" data-id="${item.product.id}">
+                                <i class="fas fa-minus text-gray-600"></i>
+                            </button>
+                            <input type="number" min="1" max="${item.product.stock}" value="${item.quantity}" class="cart-qty w-12 h-8 border-t border-b border-gray-300 text-center" data-id="${item.product.id}">
+                            <button class="increase-qty w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-lg" data-id="${item.product.id}">
+                                <i class="fas fa-plus text-gray-600"></i>
+                            </button>
+                            <button class="remove-item ml-4 text-red-500 hover:text-red-700" data-id="${item.product.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="ml-6 text-right">
+                            <div class="font-bold text-gray-800">$${itemTotal.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const shipping = 5.00;
+            const total = subtotal + shipping;
+            
+            elements.cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            elements.cartTotal.textContent = `$${total.toFixed(2)}`;
+            
+            elements.checkoutBtn.disabled = false;
+            elements.checkoutBtn.classList.remove('opacity-50');
+            
+            // Add event listeners to cart item buttons
+            document.querySelectorAll('.decrease-qty').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const productId = parseInt(btn.dataset.id);
+                    const cartItem = cart.find(item => item.product.id === productId);
+                    if (cartItem && cartItem.quantity > 1) {
+                        db.updateCartItem(productId, cartItem.quantity - 1);
+                        updateCartModal();
+                        updateCartCount();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.increase-qty').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const productId = parseInt(btn.dataset.id);
+                    const cartItem = cart.find(item => item.product.id === productId);
+                    if (cartItem && cartItem.quantity < cartItem.product.stock) {
+                        db.updateCartItem(productId, cartItem.quantity + 1);
+                        updateCartModal();
+                        updateCartCount();
+                    } else {
+                        showNotification('error', 'Stock Limit', 'Cannot add more than available stock');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.cart-qty').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const productId = parseInt(e.target.dataset.id);
+                    const cartItem = cart.find(item => item.product.id === productId);
+                    const newQty = parseInt(e.target.value) || 1;
+                    
+                    if (newQty < 1) {
+                        e.target.value = 1;
+                        db.updateCartItem(productId, 1);
+                    } else if (newQty > cartItem.product.stock) {
+                        e.target.value = cartItem.product.stock;
+                        db.updateCartItem(productId, cartItem.product.stock);
+                        showNotification('error', 'Stock Limit', 'Cannot add more than available stock');
+                    } else {
+                        db.updateCartItem(productId, newQty);
+                    }
+                    
+                    updateCartModal();
+                    updateCartCount();
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const productId = parseInt(btn.dataset.id);
+                    db.removeFromCart(productId);
+                    updateCartModal();
+                    updateCartCount();
+                    showNotification('info', 'Removed', 'Item removed from cart');
+                });
+            });
+        }
+
+        function showCheckout() {
+            if (!db.currentUser) {
+                showNotification('info', 'Login Required', 'Please login to proceed to checkout');
+                showAuthModal('login');
+                return;
+            }
+            
+            const cart = db.getCart();
+            if (cart.length === 0) {
+                showNotification('error', 'Empty Cart', 'Your cart is empty');
+                return;
+            }
+            
+            updateCheckoutModal();
+            elements.checkoutModal.classList.remove('hidden');
+            hideCart();
+        }
+
+        function hideCheckout() {
+            elements.checkoutModal.classList.add('hidden');
+        }
+
+        function updateCheckoutModal() {
+            const cart = db.getCart();
+            let subtotal = 0;
+            
+            elements.checkoutItems.innerHTML = cart.map(item => {
+                const itemTotal = item.product.price * item.quantity;
+                subtotal += itemTotal;
+                
+                return `
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <div class="font-medium">${item.product.name} x ${item.quantity}</div>
+                            <div class="text-gray-500 text-sm">$${item.product.price.toFixed(2)} each</div>
+                        </div>
+                        <div class="font-bold">$${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            const shipping = 5.00;
+            const tax = subtotal * 0.08; // 8% tax
+            const total = subtotal + shipping + tax;
+            
+            elements.checkoutSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            elements.checkoutShipping.textContent = `$${shipping.toFixed(2)}`;
+            elements.checkoutTax.textContent = `$${tax.toFixed(2)}`;
+            elements.checkoutTotal.textContent = `$${total.toFixed(2)}`;
+        }
+
+        async function handleCheckout(e) {
+            e.preventDefault();
+            showLoading();
+            
+            if (!db.currentUser) {
+                hideLoading();
+                showNotification('error', 'Not Logged In', 'Please login to place an order');
+                return;
+            }
+            
+            const cart = db.getCart();
+            if (cart.length === 0) {
+                hideLoading();
+                showNotification('error', 'Empty Cart', 'Your cart is empty');
+                return;
+            }
+            
+            // Check stock availability
+            for (const item of cart) {
+                if (item.quantity > item.product.stock) {
+                    hideLoading();
+                    showNotification('error', 'Stock Issue', `${item.product.name} has only ${item.product.stock} items available`);
+                    return;
+                }
+            }
+            
+            // Calculate total
+            const subtotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+            const shipping = 5.00;
+            const tax = subtotal * 0.08;
+            const total = subtotal + shipping + tax;
+            
+            // Create order
+            const orderData = {
+                customerId: db.currentUser.id,
+                customerName: db.currentUser.name,
+                items: cart.map(item => ({
+                    productId: item.product.id,
+                    productName: item.product.name,
+                    quantity: item.quantity,
+                    price: item.product.price
+                })),
+                subtotal,
+                shipping,
+                tax,
+                total,
+                shippingAddress: e.target.querySelector('textarea').value,
+                paymentMethod: document.querySelector('input[name="payment"]:checked').value
+            };
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Create order in database
+            const order = db.createOrder(orderData);
+            
+            // Update product stock
+            cart.forEach(item => {
+                const product = db.getProduct(item.product.id);
+                if (product) {
+                    product.stock -= item.quantity;
+                    product.sales += item.quantity;
+                }
+            });
+            
+            // Clear cart
+            db.clearCart();
+            
+            hideLoading();
+            hideCheckout();
+            updateCartCount();
+            
+            showNotification('success', 'Order Placed!', `Order #${order.id} has been placed successfully. Total: $${total.toFixed(2)}`);
+            
+            // Update admin dashboard if open
+            if (currentView === 'admin') {
+                loadAdminDashboard();
+            }
+        }
+
+        // Admin functions
+        function showAdminDashboard() {
+            if (!db.currentUser || db.currentUser.role !== 'admin') {
+                showNotification('error', 'Access Denied', 'Admin privileges required');
+                return;
+            }
+            
+            currentView = 'admin';
+            elements.customerView.classList.add('hidden');
+            elements.adminView.classList.remove('hidden');
+            
+            loadAdminDashboard();
+            switchAdminSection('dashboard');
+        }
+
+        function showCustomerView() {
+            currentView = 'customer';
+            elements.adminView.classList.add('hidden');
+            elements.customerView.classList.remove('hidden');
+        }
+
+        function switchAdminSection(section) {
+            // Hide all sections
+            Object.values(elements.adminSections).forEach(sec => {
+                sec.classList.add('hidden');
+            });
+            
+            // Show selected section
+            if (elements.adminSections[section]) {
+                elements.adminSections[section].classList.remove('hidden');
+            }
+            
+            // Update active sidebar button
+            elements.sidebarBtns.forEach(btn => {
+                if (btn.dataset.section === section) {
+                    btn.classList.add('sidebar-item', 'active');
+                } else {
+                    btn.classList.remove('sidebar-item', 'active');
+                }
+            });
+            
+            // Load section data
+            switch (section) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'orders':
+                    loadOrders();
+                    break;
+                case 'products':
+                    loadAdminProducts();
+                    break;
+                case 'customers':
+                    loadCustomers();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+                case 'inventory':
+                    loadInventory();
+                    break;
+            }
+        }
+
+        function loadAdminDashboard() {
+            const stats = db.getStats();
+            elements.pendingOrdersBadge.textContent = stats.pendingOrders;
+            
+            // Load recent orders
+            const recentOrders = db.getOrders().slice(-5).reverse();
+            elements.recentOrdersList.innerHTML = recentOrders.map(order => `
+                <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                    <div>
+                        <div class="font-medium">Order #${order.id}</div>
+                        <div class="text-gray-500 text-sm">${order.customerName}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold">$${order.total.toFixed(2)}</div>
+                        <span class="order-status ${getStatusClass(order.status)}">${order.status}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Load top products
+            const topProducts = [...db.products].sort((a, b) => b.sales - a.sales).slice(0, 5);
+            elements.topProductsList.innerHTML = topProducts.map(product => `
+                <div class="flex justify-between items-center p-3 bg-white rounded-lg">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-pink-50 to-purple-100 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-birthday-cake text-pink-400"></i>
+                        </div>
+                        <div>
+                            <div class="font-medium truncate max-w-xs">${product.name}</div>
+                            <div class="text-gray-500 text-sm">${formatCategory(product.category)}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold">${product.sales} sold</div>
+                        <div class="text-gray-500 text-sm">$${product.price.toFixed(2)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update stats in dashboard cards
+            document.getElementById('totalProducts').textContent = db.products.length;
+            document.getElementById('outOfStock').textContent = db.products.filter(p => p.stock === 0).length;
+            document.getElementById('lowStock').textContent = db.products.filter(p => p.stock > 0 && p.stock < 10).length;
+        }
+
+        function loadDashboard() {
+            // This would load more detailed dashboard data
+            loadAdminDashboard();
+        }
+
+        function loadOrders() {
+            const orders = db.getOrders();
+            renderOrdersTable(orders);
+        }
+
+        function renderOrdersTable(orders) {
+            elements.ordersTableBody.innerHTML = orders.map(order => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4 font-medium">#${order.id}</td>
+                    <td class="py-3 px-4">${order.customerName}</td>
+                    <td class="py-3 px-4">${order.date}</td>
+                    <td class="py-3 px-4 font-bold">$${order.total.toFixed(2)}</td>
+                    <td class="py-3 px-4">
+                        <span class="order-status ${getStatusClass(order.status)}">${order.status}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex space-x-2">
+                            <button class="view-order-btn p-2 text-blue-600 hover:bg-blue-50 rounded-lg" data-id="${order.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <select class="update-order-status border border-gray-300 rounded-lg px-3 py-1 text-sm" data-id="${order.id}">
+                                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewOrderDetails(parseInt(btn.dataset.id)));
+            });
+            
+            document.querySelectorAll('.update-order-status').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    updateOrderStatus(parseInt(e.target.dataset.id), e.target.value);
+                });
+            });
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = db.orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            // Get order items with product details
+            const orderItems = order.items.map(item => {
+                const product = db.getProduct(item.productId);
+                return { ...item, productName: product ? product.name : 'Unknown Product' };
+            });
+            
+            const orderDetailsHTML = `
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-2xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Order #${order.id} Details</h3>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-2">Customer Information</h4>
+                            <p class="text-gray-600"><strong>Name:</strong> ${order.customerName}</p>
+                            <p class="text-gray-600"><strong>Order Date:</strong> ${order.date}</p>
+                            <p class="text-gray-600"><strong>Status:</strong> <span class="order-status ${getStatusClass(order.status)}">${order.status}</span></p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-2">Order Summary</h4>
+                            <p class="text-gray-600"><strong>Subtotal:</strong> $${order.subtotal?.toFixed(2) || order.total.toFixed(2)}</p>
+                            <p class="text-gray-600"><strong>Shipping:</strong> $${order.shipping?.toFixed(2) || '5.00'}</p>
+                            <p class="text-gray-600"><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-bold text-gray-700 mb-3">Order Items</h4>
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        ${orderItems.map(item => `
+                            <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                                <div>
+                                    <p class="font-medium">${item.productName}</p>
+                                    <p class="text-gray-500 text-sm">Quantity: ${item.quantity}</p>
+                                </div>
+                                <div class="font-bold">
+                                    $${(item.price * item.quantity).toFixed(2)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button onclick="this.closest('.swal2-popup') && Swal.close()" class="border border-gray-300 text-gray-700 font-medium px-6 py-2 rounded-lg hover:bg-gray-50 transition duration-300">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            Swal.fire({
+                html: orderDetailsHTML,
+                showConfirmButton: false,
+                width: '800px'
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = db.updateOrderStatus(orderId, newStatus);
+            if (order) {
+                showNotification('success', 'Order Updated', `Order #${orderId} status updated to ${newStatus}`);
+                loadOrders();
+                loadAdminDashboard(); // Update dashboard stats
+            }
+        }
+
+        function handleOrderSearch() {
+            const searchTerm = elements.orderSearch.value.toLowerCase();
+            const statusFilter = elements.orderFilter.value;
+            
+            let orders = db.getOrders();
+            
+            if (statusFilter !== 'all') {
+                orders = orders.filter(o => o.status === statusFilter);
+            }
+            
+            if (searchTerm) {
+                orders = orders.filter(o => 
+                    o.customerName.toLowerCase().includes(searchTerm) ||
+                    o.id.toString().includes(searchTerm)
+                );
+            }
+            
+            renderOrdersTable(orders);
+        }
+
+        function handleOrderFilter() {
+            handleOrderSearch(); // Reuse the same logic
+        }
+
+        function exportOrders() {
+            const orders = db.getOrders();
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + ["Order ID,Customer,Date,Total,Status"].concat(
+                    orders.map(order => 
+                        `${order.id},${order.customerName},${order.date},${order.total},${order.status}`
+                    )
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "sweetdreams_orders.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('success', 'Export Complete', 'Orders exported to CSV file');
+        }
+
+        function loadAdminProducts() {
+            renderProductsTable(db.products);
+        }
+
+        function renderProductsTable(products) {
+            elements.productsTableBody.innerHTML = products.map(product => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-br from-pink-50 to-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                ${product.image ? 
+                                    `<img src="${product.image}" alt="${product.name}" class="h-full w-full object-cover rounded-lg">` : 
+                                    `<i class="fas fa-birthday-cake text-pink-400"></i>`
+                                }
+                            </div>
+                            <div>
+                                <div class="font-medium">${product.name}</div>
+                                <div class="text-gray-500 text-sm truncate max-w-xs">${product.description}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm">${formatCategory(product.category)}</span>
+                    </td>
+                    <td class="py-3 px-4 font-bold">$${product.price.toFixed(2)}</td>
+                    <td class="py-3 px-4">
+                        <span class="${product.stock === 0 ? 'text-red-600' : product.stock < 10 ? 'text-amber-600' : 'text-green-600'} font-bold">
+                            ${product.stock}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="order-status ${getStatusClass(product.stock)}">
+                            ${product.stock === 0 ? 'Out of Stock' : product.stock < 10 ? 'Low Stock' : 'In Stock'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex space-x-2">
+                            <button class="edit-product-btn p-2 text-blue-600 hover:bg-blue-50 rounded-lg" data-id="${product.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-product-btn p-2 text-red-600 hover:bg-red-50 rounded-lg" data-id="${product.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.edit-product-btn').forEach(btn => {
+                btn.addEventListener('click', () => showProductModal(parseInt(btn.dataset.id)));
+            });
+            
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteProduct(parseInt(btn.dataset.id)));
+            });
+            
+            // Update product stats
+            document.getElementById('totalProducts').textContent = products.length;
+            document.getElementById('outOfStock').textContent = products.filter(p => p.stock === 0).length;
+            document.getElementById('lowStock').textContent = products.filter(p => p.stock > 0 && p.stock < 10).length;
+        }
+
+        function showProductModal(productId = null) {
+            editingProductId = productId;
+            
+            if (productId) {
+                // Edit existing product
+                const product = db.getProduct(productId);
+                if (!product) return;
+                
+                elements.productModalTitle.textContent = 'Edit Product';
+                elements.productName.value = product.name;
+                elements.productCategory.value = product.category;
+                elements.productPrice.value = product.price;
+                elements.productStock.value = product.stock;
+                elements.productDescription.value = product.description;
+                elements.productImage.value = product.image || '';
+            } else {
+                // Add new product
+                elements.productModalTitle.textContent = 'Add New Product';
+                elements.productForm.reset();
+            }
+            
+            elements.productModal.classList.remove('hidden');
+        }
+
+        function hideProductModal() {
+            elements.productModal.classList.add('hidden');
+            editingProductId = null;
+        }
+
+        function handleProductSave(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: elements.productName.value,
+                category: elements.productCategory.value,
+                price: parseFloat(elements.productPrice.value),
+                stock: parseInt(elements.productStock.value),
+                description: elements.productDescription.value,
+                image: elements.productImage.value || ''
+            };
+            
+            if (editingProductId) {
+                // Update existing product
+                db.updateProduct(editingProductId, productData);
+                showNotification('success', 'Product Updated', `${productData.name} has been updated`);
+            } else {
+                // Add new product
+                db.addProduct(productData);
+                showNotification('success', 'Product Added', `${productData.name} has been added to the catalog`);
+            }
+            
+            hideProductModal();
+            loadAdminProducts();
+            loadProducts(); // Refresh customer view if needed
+        }
+
+        function deleteProduct(productId) {
+            const product = db.getProduct(productId);
+            if (!product) return;
+            
+            Swal.fire({
+                title: 'Delete Product',
+                text: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.deleteProduct(productId);
+                    showNotification('success', 'Product Deleted', `${product.name} has been deleted`);
+                    loadAdminProducts();
+                    loadProducts(); // Refresh customer view if needed
+                }
+            });
+        }
+
+        function loadCustomers() {
+            const customers = db.users.filter(u => u.role === 'customer');
+            renderCustomersTable(customers);
+        }
+
+        function renderCustomersTable(customers) {
+            elements.customersTableBody.innerHTML = customers.map(user => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold mr-3">
+                                ${user.name.charAt(0)}
+                            </div>
+                            <div>
+                                <div class="font-medium">${user.name}</div>
+                                <div class="text-gray-500 text-sm">Customer since 2023</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">${user.email}</td>
+                    <td class="py-3 px-4 font-bold">${user.orders}</td>
+                    <td class="py-3 px-4 font-bold">$${user.totalSpent.toFixed(2)}</td>
+                    <td class="py-3 px-4">
+                        <span class="order-status ${user.status === 'active' ? 'status-delivered' : 'status-cancelled'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex space-x-2">
+                            <button class="toggle-user-status p-2 ${user.status === 'active' ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'} rounded-lg" data-id="${user.id}">
+                                <i class="fas ${user.status === 'active' ? 'fa-ban' : 'fa-check'}"></i>
+                            </button>
+                            <button class="make-admin-btn p-2 text-purple-600 hover:bg-purple-50 rounded-lg" data-id="${user.id}">
+                                <i class="fas fa-crown"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.toggle-user-status').forEach(btn => {
+                btn.addEventListener('click', () => toggleUserStatus(parseInt(btn.dataset.id)));
+            });
+            
+            document.querySelectorAll('.make-admin-btn').forEach(btn => {
+                btn.addEventListener('click', () => makeUserAdmin(parseInt(btn.dataset.id)));
+            });
+        }
+
+        function toggleUserStatus(userId) {
+            const user = db.users.find(u => u.id === userId);
+            if (!user) return;
+            
+            user.status = user.status === 'active' ? 'banned' : 'active';
+            db.saveData();
+            
+            showNotification('success', 'User Status Updated', `${user.name} is now ${user.status}`);
+            loadCustomers();
+        }
+
+        function makeUserAdmin(userId) {
+            const user = db.users.find(u => u.id === userId);
+            if (!user) return;
+            
+            user.role = 'admin';
+            db.saveData();
+            
+            showNotification('success', 'Admin Privileges Granted', `${user.name} is now an admin`);
+            loadCustomers();
+        }
+
+        function handleCustomerSearch() {
+            const searchTerm = elements.customerSearch.value.toLowerCase();
+            const customers = db.users.filter(u => 
+                u.role === 'customer' && 
+                (u.name.toLowerCase().includes(searchTerm) || u.email.toLowerCase().includes(searchTerm))
+            );
+            
+            renderCustomersTable(customers);
+        }
+
+        function loadAnalytics() {
+            // Create revenue chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: [12500, 14200, 13800, 18900, 21000, 19800, 22500, 24000, 21800, 23500, 24800, 26500],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+            
+            // Create category chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Birthday Cakes', 'Wedding Cakes', 'Cupcakes', 'Desserts', 'Custom'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#f472b6',
+                            '#8b5cf6',
+                            '#fbbf24',
+                            '#10b981',
+                            '#6b7280'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            
+            // Create orders chart
+            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+            new Chart(ordersCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Orders',
+                            data: [142, 168, 155, 189, 210, 198, 225, 240, 218, 235, 248, 265],
+                            backgroundColor: '#f472b6',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Customers',
+                            data: [120, 142, 138, 165, 189, 175, 195, 210, 198, 215, 225, 240],
+                            backgroundColor: '#8b5cf6',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadInventory() {
+            const inventory = db.products.map(product => ({
+                ...product,
+                reorderLevel: Math.ceil(product.sales / 12) * 2, // Dynamic reorder level based on sales
+                lastOrdered: '2023-10-' + (10 + product.id % 20) // Simulated date
+            }));
+            
+            renderInventoryTable(inventory);
+        }
+
+        function renderInventoryTable(inventory) {
+            elements.inventoryTableBody.innerHTML = inventory.map(product => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gradient-to-br from-pink-50 to-purple-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-birthday-cake text-pink-400"></i>
+                            </div>
+                            <div class="font-medium">${product.name}</div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center">
+                            <div class="w-24 bg-gray-200 rounded-full h-2.5 mr-3">
+                                <div class="h-2.5 rounded-full ${getStockBarColor(product.stock, product.reorderLevel)}" 
+                                     style="width: ${Math.min(100, (product.stock / (product.reorderLevel * 3)) * 100)}%"></div>
+                            </div>
+                            <span class="font-bold ${product.stock === 0 ? 'text-red-600' : product.stock < product.reorderLevel ? 'text-amber-600' : 'text-green-600'}">
+                                ${product.stock}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 font-medium">${product.reorderLevel}</td>
+                    <td class="py-3 px-4 text-gray-600">${product.lastOrdered}</td>
+                    <td class="py-3 px-4">
+                        <span class="order-status ${getInventoryStatus(product.stock, product.reorderLevel)}">
+                            ${getInventoryStatusText(product.stock, product.reorderLevel)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex space-x-2">
+                            <button class="restock-btn p-2 text-green-600 hover:bg-green-50 rounded-lg" data-id="${product.id}">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                            <button class="adjust-stock-btn p-2 text-blue-600 hover:bg-blue-50 rounded-lg" data-id="${product.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Add event listeners
+            document.querySelectorAll('.restock-btn').forEach(btn => {
+                btn.addEventListener('click', () => restockProduct(parseInt(btn.dataset.id)));
+            });
+            
+            document.querySelectorAll('.adjust-stock-btn').forEach(btn => {
+                btn.addEventListener('click', () => adjustStock(parseInt(btn.dataset.id)));
+            });
+        }
+
+        function getStockBarColor(stock, reorderLevel) {
+            if (stock === 0) return 'bg-red-500';
+            if (stock < reorderLevel) return 'bg-amber-500';
+            if (stock > reorderLevel * 2) return 'bg-blue-500';
+            return 'bg-green-500';
+        }
+
+        function getInventoryStatus(stock, reorderLevel) {
+            if (stock === 0) return 'status-cancelled';
+            if (stock < reorderLevel) return 'status-pending';
+            if (stock > reorderLevel * 2) return 'status-delivered';
+            return 'status-processing';
+        }
+
+        function getInventoryStatusText(stock, reorderLevel) {
+            if (stock === 0) return 'Out of Stock';
+            if (stock < reorderLevel) return 'Reorder';
+            if (stock > reorderLevel * 2) return 'Overstocked';
+            return 'Adequate';
+        }
+
+        function restockProduct(productId) {
+            const product = db.getProduct(productId);
+            if (!product) return;
+            
+            const newStock = product.stock + 20; // Add 20 units
+            db.updateProduct(productId, { stock: newStock });
+            
+            showNotification('success', 'Stock Updated', `Added 20 units to ${product.name}. New stock: ${newStock}`);
+            loadInventory();
+            loadAdminProducts();
+        }
+
+        function adjustStock(productId) {
+            const product = db.getProduct(productId);
+            if (!product) return;
+            
+            Swal.fire({
+                title: 'Adjust Stock',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-4">Current stock for <strong>${product.name}</strong>: ${product.stock}</p>
+                        <input type="number" id="newStock" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="${product.stock}" min="0">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update Stock',
+                preConfirm: () => {
+                    const newStock = parseInt(document.getElementById('newStock').value);
+                    if (isNaN(newStock) || newStock < 0) {
+                        Swal.showValidationMessage('Please enter a valid stock number');
+                        return false;
+                    }
+                    return newStock;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.updateProduct(productId, { stock: result.value });
+                    showNotification('success', 'Stock Updated', `${product.name} stock updated to ${result.value}`);
+                    loadInventory();
+                    loadAdminProducts();
+                }
+            });
+        }
+
+        function handleBulkUpdate() {
+            Swal.fire({
+                title: 'Bulk Stock Update',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-4">Add stock to all low inventory items:</p>
+                        <input type="number" id="bulkStockAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg" value="10" min="1">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update All',
+                preConfirm: () => {
+                    const amount = parseInt(document.getElementById('bulkStockAmount').value);
+                    if (isNaN(amount) || amount < 1) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                    return amount;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const lowStockProducts = db.products.filter(p => p.stock < 10);
+                    lowStockProducts.forEach(product => {
+                        db.updateProduct(product.id, { stock: product.stock + result.value });
+                    });
+                    
+                    showNotification('success', 'Bulk Update Complete', `Added ${result.value} units to ${lowStockProducts.length} products`);
+                    loadInventory();
+                    loadAdminProducts();
+                }
+            });
+        }
+
+        // Utility functions
+        function getStatusClass(status) {
+            if (typeof status === 'number') {
+                // For stock levels
+                if (status === 0) return 'status-cancelled';
+                if (status < 5) return 'status-pending';
+                if (status < 10) return 'status-processing';
+                return 'status-delivered';
+            }
+            
+            // For order status
+            switch(status) {
+                case 'pending': return 'status-pending';
+                case 'processing': return 'status-processing';
+                case 'shipped': return 'status-shipped';
+                case 'delivered': return 'status-delivered';
+                case 'cancelled': return 'status-cancelled';
+                default: return 'status-pending';
+            }
+        }
+
+        function formatCategory(category) {
+            const words = category.split('-');
+            return words.map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function showLoading() {
+            elements.loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            elements.loadingOverlay.classList.add('hidden');
+        }
+
+        function showNotification(type, title, message) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+            
+            Toast.fire({
+                icon: type,
+                title: title,
+                text: message
+            });
+        }
+
+        function toggleMobileMenu() {
+            elements.mobileMenu.classList.toggle('hidden');
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
