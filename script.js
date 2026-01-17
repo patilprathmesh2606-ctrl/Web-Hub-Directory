@@ -46,7 +46,7 @@ const webPages = [
     {
         title: "JayeshBhoir Catering",
         url: "JayeshBhoir Catering",
-        image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
+        image: "https://images.pexels.com/photos/11508780/pexels-photo-11508780.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Jayeshbhoir Catering",
         category: "Service"
@@ -362,3 +362,4 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
