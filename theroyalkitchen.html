@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .dish-image {
             height: 200px;
@@ -189,6 +190,100 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+        
+        /* Staff Status */
+        .staff-active {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .staff-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Category Status */
+        .category-active {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .category-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        /* Permission Toggle */
+        .permission-toggle {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .permission-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .permission-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        
+        .permission-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .permission-toggle input:checked + .permission-slider {
+            background-color: #10b981;
+        }
+        
+        .permission-toggle input:checked + .permission-slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Button animations */
+        .button-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Disabled state */
+        .disabled-btn {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+        }
+        
+        .disabled-btn:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-red-50 to-amber-50 min-h-screen">
@@ -227,14 +322,17 @@
                         <i class="fas fa-user mr-2"></i>My Profile
                         <span id="notificationBadge" class="notification-badge hidden">0</span>
                     </button>
-                    <button id="waiterToggle" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md">
+                    <button id="waiterToggle" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hidden">
                         <i class="fas fa-user-check mr-2"></i>Waiter
                     </button>
-                    <button id="managerToggle" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md">
+                    <button id="managerToggle" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hidden">
                         <i class="fas fa-user-tie mr-2"></i>Manager
                     </button>
                     <button id="adminToggle" class="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-lg hover:shadow-lg transition-all duration-300">
                         <i class="fas fa-lock mr-2"></i>Admin
+                    </button>
+                    <button id="adminIconToggle" class="px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-lg hover:shadow-lg transition-all duration-300 hidden">
+                        <i class="fas fa-lock"></i>
                     </button>
                     <button id="closeAllDashboards" class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hidden">
                         <i class="fas fa-times mr-2"></i>Close Dashboard
@@ -427,10 +525,10 @@
                     <div class="dashboard-card">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">Performance</p>
-                                <p class="text-2xl font-bold text-gray-800" id="waiterPerformance">0%</p>
+                                <p class="text-sm text-gray-600">Your Status</p>
+                                <p class="text-2xl font-bold text-gray-800" id="waiterStatus">Active</p>
                             </div>
-                            <i class="fas fa-chart-line text-3xl text-red-500"></i>
+                            <i class="fas fa-user text-3xl text-red-500"></i>
                         </div>
                     </div>
                 </div>
@@ -520,7 +618,7 @@
                             <i class="fas fa-users text-3xl text-red-500"></i>
                         </div>
                     </div>
-                    <div class="dashboard-card">
+                    <div class="dashboard-card" id="revenueCard" style="display: none;">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-600">Today's Revenue</p>
@@ -600,6 +698,17 @@
                         <!-- Orders will be loaded here -->
                     </div>
                 </div>
+                
+                <!-- Table Management Section -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-table text-green-600"></i>
+                        Table Status
+                    </h3>
+                    <div id="managerTables" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <!-- Tables will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -650,7 +759,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-600">Total Managers</p>
-                                <p class="text-2xl font-bold text-gray-800" id="totalManagers">1</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalManagers">0</p>
                             </div>
                             <i class="fas fa-user-tie text-3xl text-blue-500"></i>
                         </div>
@@ -659,7 +768,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm text-gray-600">Total Waiters</p>
-                                <p class="text-2xl font-bold text-gray-800" id="totalWaiters">1</p>
+                                <p class="text-2xl font-bold text-gray-800" id="totalWaiters">0</p>
                             </div>
                             <i class="fas fa-user-check text-3xl text-green-500"></i>
                         </div>
@@ -684,38 +793,111 @@
                     </div>
                 </div>
                 
-                <!-- Add Staff Section -->
+                <!-- Performance & Export Section -->
                 <div class="mb-8">
                     <div class="bg-white rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Staff</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Performance & Export</h3>
+                            <button id="exportExcelBtn" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-5 py-2 rounded-lg hover:from-green-700 hover:to-green-800">
+                                <i class="fas fa-file-excel mr-2"></i>Export to Excel
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Staff Performance -->
                             <div>
-                                <label class="block text-gray-700 mb-2">Staff Name</label>
-                                <input type="text" id="staffName" class="w-full p-3 border border-gray-300 rounded-lg">
+                                <h4 class="font-bold text-gray-700 mb-3">Staff Performance</h4>
+                                <div id="staffPerformance" class="space-y-3">
+                                    <!-- Performance data will be loaded here -->
+                                </div>
                             </div>
+                            
+                            <!-- Revenue Trends -->
                             <div>
-                                <label class="block text-gray-700 mb-2">Username</label>
-                                <input type="text" id="staffUsername" class="w-full p-3 border border-gray-300 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Role</label>
-                                <select id="staffRole" class="w-full p-3 border border-gray-300 rounded-lg">
-                                    <option value="waiter">Waiter</option>
-                                    <option value="manager">Manager</option>
-                                </select>
+                                <h4 class="font-bold text-gray-700 mb-3">Revenue Trends</h4>
+                                <div id="revenueTrends" class="space-y-2">
+                                    <!-- Revenue trends will be loaded here -->
+                                </div>
                             </div>
                         </div>
-                        <button id="addStaffBtn" class="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800">
-                            Add Staff Member
-                        </button>
                     </div>
                 </div>
                 
-                <!-- Staff List -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Staff Members</h3>
-                    <div id="staffList" class="space-y-3">
-                        <!-- Staff members will be loaded here -->
+                <!-- Category Management Section -->
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Menu Category Management</h3>
+                        <div id="categoryManagement" class="space-y-4">
+                            <!-- Category controls will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Staff Management Section -->
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Staff Management</h3>
+                        
+                        <!-- Add Staff -->
+                        <div class="mb-6">
+                            <h4 class="font-bold text-gray-700 mb-3">Add New Staff</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Staff Name</label>
+                                    <input type="text" id="staffName" class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Username</label>
+                                    <input type="text" id="staffUsername" class="w-full p-3 border border-gray-300 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Role</label>
+                                    <select id="staffRole" class="w-full p-3 border border-gray-300 rounded-lg">
+                                        <option value="waiter">Waiter</option>
+                                        <option value="manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="addStaffBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800">
+                                        <i class="fas fa-plus mr-2"></i>Add Staff
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Staff List -->
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-3">Staff Members</h4>
+                            <div id="staffList" class="space-y-3">
+                                <!-- Staff members will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Manager Permissions -->
+                <div class="mb-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Manager Permissions</h3>
+                        <div id="managerPermissions" class="space-y-4">
+                            <!-- Manager permissions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Management -->
+                <div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">Table Management</h3>
+                            <button id="addTableBtn" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-green-800">
+                                <i class="fas fa-plus mr-2"></i>Add Table
+                            </button>
+                        </div>
+                        
+                        <div id="adminTables" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <!-- Tables will be loaded here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -732,30 +914,24 @@
             </div>
             
             <!-- Menu Filters -->
-            <div class="flex flex-wrap justify-center gap-3 mb-10">
-                <button class="filter-btn active px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300" data-category="all">
-                    All Items
-                </button>
-                <button class="filter-btn px-5 py-2.5 bg-white text-red-700 border border-red-200 rounded-full font-medium hover:bg-red-50 transition-all duration-300" data-category="chinese">
-                    <i class="fas fa-dragon mr-2"></i>Chinese Food
-                </button>
-                <button class="filter-btn px-5 py-2.5 bg-white text-blue-700 border border-blue-200 rounded-full font-medium hover:bg-blue-50 transition-all duration-300" data-category="fastfood">
-                    <i class="fas fa-hamburger mr-2"></i>Fast Food
-                </button>
-                <button class="filter-btn px-5 py-2.5 bg-white text-green-700 border border-green-200 rounded-full font-medium hover:bg-green-50 transition-all duration-300" data-category="drinks">
-                    <i class="fas fa-glass-whiskey mr-2"></i>Drinks
-                </button>
-                <button class="filter-btn px-5 py-2.5 bg-white text-amber-700 border border-amber-200 rounded-full font-medium hover:bg-amber-50 transition-all duration-300" data-category="soups">
-                    <i class="fas fa-utensil-spoon mr-2"></i>Soups
-                </button>
-                <button class="filter-btn px-5 py-2.5 bg-white text-purple-700 border border-purple-200 rounded-full font-medium hover:bg-purple-50 transition-all duration-300" data-category="noodles">
-                    <i class="fas fa-utensils mr-2"></i>Noodles
-                </button>
+            <div id="menuFilters" class="flex flex-wrap justify-center gap-3 mb-10">
+                <!-- Filters will be loaded here -->
             </div>
             
             <!-- Menu Grid -->
             <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <!-- Menu items will be loaded here -->
+            </div>
+            
+            <!-- Empty State when no categories are active -->
+            <div id="noCategoriesMessage" class="text-center py-12 hidden">
+                <div class="w-32 h-32 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-utensils text-5xl text-red-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">Menu Currently Unavailable</h3>
+                <p class="text-gray-600 max-w-md mx-auto">
+                    All menu categories are currently disabled. Please check back later or contact the restaurant for available options.
+                </p>
             </div>
         </div>
     </main>
@@ -915,7 +1091,7 @@
                 
                 <div class="mt-8 pt-6 border-t border-gray-200">
                     <button id="downloadReceiptBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 mb-3">
-                        <i class="fas fa-download mr-2"></i>Download Receipt
+                        <i class="fas fa-download mr-2"></i>Download Receipt (PDF)
                     </button>
                     <button id="closeReceipt" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl font-medium hover:from-red-700 hover:to-red-800 transition-all duration-300">
                         Close Receipt
@@ -1028,6 +1204,7 @@ let managers = JSON.parse(localStorage.getItem('dragonManagers')) || initializeM
 let waiters = JSON.parse(localStorage.getItem('dragonWaiters')) || initializeWaiters();
 let restaurantSettings = JSON.parse(localStorage.getItem('dragonSettings')) || initializeRestaurantSettings();
 let users = JSON.parse(localStorage.getItem('dragonUsers')) || {};
+let categories = JSON.parse(localStorage.getItem('dragonCategories')) || initializeCategories();
 let currentFilter = 'all';
 let currentManager = null;
 let currentWaiter = null;
@@ -1051,7 +1228,8 @@ function initializeTables() {
             customerName: '',
             customerPhone: '',
             occupiedSince: null,
-            assignedWaiter: null
+            assignedWaiter: null,
+            isActive: true
         });
     }
     localStorage.setItem('dragonTables', JSON.stringify(tables));
@@ -1066,10 +1244,12 @@ function initializeManagers() {
         password: "manager123",
         createdDate: new Date().toISOString(),
         lastLogin: null,
-        performance: {
-            totalOrders: 0,
-            totalRevenue: 0,
-            averageRating: 0
+        isActive: true,
+        permissions: {
+            viewRevenue: false,
+            viewHistory: false,
+            manageTables: true,
+            manageOrders: true
         }
     }];
     localStorage.setItem('dragonManagers', JSON.stringify(managers));
@@ -1085,6 +1265,7 @@ function initializeWaiters() {
         assignedTables: [1, 2, 3, 4],
         createdDate: new Date().toISOString(),
         lastLogin: null,
+        isActive: false, // Initially inactive
         performance: {
             ordersServed: 0,
             averageServiceTime: 0,
@@ -1105,6 +1286,19 @@ function initializeRestaurantSettings() {
     };
     localStorage.setItem('dragonSettings', JSON.stringify(settings));
     return settings;
+}
+
+function initializeCategories() {
+    const categories = {
+        all: { name: "All Items", isActive: true },
+        chinese: { name: "Chinese Food", isActive: true },
+        fastfood: { name: "Fast Food", isActive: true },
+        drinks: { name: "Drinks", isActive: true },
+        soups: { name: "Soups", isActive: true },
+        noodles: { name: "Noodles", isActive: true }
+    };
+    localStorage.setItem('dragonCategories', JSON.stringify(categories));
+    return categories;
 }
 
 function initializeMenuData() {
@@ -1284,6 +1478,361 @@ function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function downloadReceiptAsPDF(order) {
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Add restaurant name and logo
+        doc.setFontSize(24);
+        doc.setTextColor(220, 38, 38);
+        doc.text(APP_CONFIG.restaurantName, 105, 20, null, null, 'center');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Authentic Chinese Cuisine', 105, 28, null, null, 'center');
+        doc.text('------------------------------------------------', 105, 34, null, null, 'center');
+        
+        // Order details
+        doc.setFontSize(16);
+        doc.setTextColor(0, 0, 0);
+        doc.text('ORDER RECEIPT', 105, 45, null, null, 'center');
+        
+        doc.setFontSize(10);
+        doc.text(`Order ID: ${order.id.slice(-8)}`, 20, 55);
+        doc.text(`Table No: ${order.tableNumber}`, 20, 60);
+        doc.text(`Date: ${new Date(order.orderTime).toLocaleDateString()}`, 20, 65);
+        doc.text(`Time: ${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`, 20, 70);
+        
+        // Customer details
+        doc.text(`Customer: ${order.customerName}`, 20, 78);
+        doc.text(`Phone: ${order.customerPhone}`, 20, 83);
+        
+        // Items table
+        doc.setFontSize(12);
+        doc.text('ITEMS', 20, 93);
+        doc.text('QTY', 110, 93);
+        doc.text('AMOUNT', 150, 93);
+        
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, 95, 190, 95);
+        
+        let yPosition = 102;
+        doc.setFontSize(10);
+        
+        order.items.forEach(item => {
+            // Wrap item name if too long
+            const itemName = item.name.length > 30 ? item.name.substring(0, 27) + '...' : item.name;
+            doc.text(itemName, 20, yPosition);
+            doc.text(item.quantity.toString(), 110, yPosition);
+            doc.text(`₹${item.price * item.quantity}`, 150, yPosition);
+            yPosition += 8;
+        });
+        
+        // Total
+        doc.setFontSize(12);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, yPosition + 5, 190, yPosition + 5);
+        
+        yPosition += 15;
+        doc.setTextColor(220, 38, 38);
+        doc.text('TOTAL AMOUNT', 20, yPosition);
+        doc.text(`₹${order.total}`, 150, yPosition);
+        
+        // Footer
+        yPosition += 20;
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Thank you for dining with us!', 105, yPosition, null, null, 'center');
+        doc.text('Your order will be ready in approximately 20 minutes.', 105, yPosition + 6, null, null, 'center');
+        doc.text('For queries, call: +91 9876543210', 105, yPosition + 12, null, null, 'center');
+        
+        // Save the PDF
+        doc.save(`Receipt_${order.id.slice(-8)}.pdf`);
+        showNotification('Receipt downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        showNotification('Failed to download receipt', 'error');
+    }
+}
+
+function exportToExcel() {
+    try {
+        // Prepare data for export
+        const exportData = [];
+        
+        // Add orders data
+        orders.forEach(order => {
+            exportData.push({
+                'Order ID': order.id,
+                'Table No': order.tableNumber,
+                'Customer Name': order.customerName,
+                'Customer Phone': order.customerPhone,
+                'Status': order.status,
+                'Payment Status': order.paymentStatus,
+                'Order Time': new Date(order.orderTime).toLocaleString(),
+                'Total Amount': `₹${order.total}`,
+                'Items': order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')
+            });
+        });
+        
+        // Create worksheet
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        
+        // Create workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Orders");
+        
+        // Export to Excel
+        const date = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `RoyalKitchen_Orders_${date}.xlsx`);
+        showNotification('Data exported to Excel successfully!', 'success');
+    } catch (error) {
+        console.error('Error exporting to Excel:', error);
+        showNotification('Failed to export data', 'error');
+    }
+}
+
+// ===============================
+// HEADER BUTTON VISIBILITY MANAGEMENT
+// ===============================
+function updateHeaderButtons() {
+    // Check if there are any active waiters
+    const activeWaiters = waiters.filter(w => w.isActive);
+    const waiterToggle = document.getElementById('waiterToggle');
+    
+    if (activeWaiters.length > 0) {
+        waiterToggle.classList.remove('hidden');
+    } else {
+        waiterToggle.classList.add('hidden');
+    }
+    
+    // Check if there are any active managers
+    const activeManagers = managers.filter(m => m.isActive);
+    const managerToggle = document.getElementById('managerToggle');
+    
+    if (activeManagers.length > 0) {
+        managerToggle.classList.remove('hidden');
+    } else {
+        managerToggle.classList.add('hidden');
+    }
+    
+    // Check if both waiters and managers are disabled
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const adminToggle = document.getElementById('adminToggle');
+    const adminIconToggle = document.getElementById('adminIconToggle');
+    const plateBtn = document.getElementById('plateBtn');
+    
+    if (activeWaiters.length === 0 && activeManagers.length === 0) {
+        // Both are disabled, show only admin icon and hide user profile and cart
+        userProfileBtn.classList.add('hidden');
+        adminToggle.classList.add('hidden');
+        adminIconToggle.classList.remove('hidden');
+        plateBtn.classList.add('hidden');
+    } else {
+        // At least one is enabled, show full admin button and user profile
+        userProfileBtn.classList.remove('hidden');
+        adminToggle.classList.remove('hidden');
+        adminIconToggle.classList.add('hidden');
+        plateBtn.classList.remove('hidden');
+    }
+}
+
+// ===============================
+// CATEGORY MANAGEMENT
+// ===============================
+function loadCategoryManagement() {
+    const container = document.getElementById('categoryManagement');
+    container.innerHTML = '';
+    
+    Object.entries(categories).forEach(([key, category]) => {
+        if (key === 'all') return; // Skip "All Items" category from admin controls
+        
+        const categoryElement = document.createElement('div');
+        categoryElement.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg';
+        categoryElement.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div>
+                    <div class="font-medium">${category.name}</div>
+                    <div class="text-sm text-gray-600">ID: ${key}</div>
+                </div>
+                <span class="px-2 py-1 text-xs rounded ${category.isActive ? 'category-active' : 'category-inactive'}">
+                    ${category.isActive ? 'Active' : 'Inactive'}
+                </span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleCategoryStatus('${key}')" class="px-3 py-1 text-sm ${category.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} rounded">
+                    ${category.isActive ? 'Disable' : 'Enable'}
+                </button>
+            </div>
+        `;
+        container.appendChild(categoryElement);
+    });
+}
+
+function toggleCategoryStatus(categoryKey) {
+    if (categoryKey === 'all') {
+        showNotification('Cannot disable "All Items" category', 'error');
+        return;
+    }
+    
+    if (categories[categoryKey]) {
+        categories[categoryKey].isActive = !categories[categoryKey].isActive;
+        localStorage.setItem('dragonCategories', JSON.stringify(categories));
+        showNotification(`${categories[categoryKey].name} ${categories[categoryKey].isActive ? 'enabled' : 'disabled'}`, 'success');
+        
+        // Update category management display
+        loadCategoryManagement();
+        
+        // Update menu display
+        renderMenuFilters();
+        renderMenuItems();
+    }
+}
+
+// ===============================
+// MENU FILTERS AND DISPLAY
+// ===============================
+function renderMenuFilters() {
+    const container = document.getElementById('menuFilters');
+    const activeCategories = Object.entries(categories).filter(([key, cat]) => cat.isActive);
+    
+    if (activeCategories.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    // Always show "All Items" if there are any active categories
+    let filtersHTML = `
+        <button class="filter-btn active px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300" data-category="all">
+            All Items
+        </button>
+    `;
+    
+    // Add other active categories
+    activeCategories.forEach(([key, category]) => {
+        if (key === 'all') return;
+        
+        let icon = '';
+        let colorClass = '';
+        
+        switch(key) {
+            case 'chinese':
+                icon = 'fa-dragon';
+                colorClass = 'text-red-700 border-red-200 hover:bg-red-50';
+                break;
+            case 'fastfood':
+                icon = 'fa-hamburger';
+                colorClass = 'text-blue-700 border-blue-200 hover:bg-blue-50';
+                break;
+            case 'drinks':
+                icon = 'fa-glass-whiskey';
+                colorClass = 'text-green-700 border-green-200 hover:bg-green-50';
+                break;
+            case 'soups':
+                icon = 'fa-utensil-spoon';
+                colorClass = 'text-amber-700 border-amber-200 hover:bg-amber-50';
+                break;
+            case 'noodles':
+                icon = 'fa-utensils';
+                colorClass = 'text-purple-700 border-purple-200 hover:bg-purple-50';
+                break;
+        }
+        
+        filtersHTML += `
+            <button class="filter-btn px-5 py-2.5 bg-white ${colorClass} border rounded-full font-medium transition-all duration-300" data-category="${key}">
+                <i class="fas ${icon} mr-2"></i>${category.name}
+            </button>
+        `;
+    });
+    
+    container.innerHTML = filtersHTML;
+    
+    // Re-attach event listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.category;
+            renderMenuItems();
+        });
+    });
+}
+
+function renderMenuItems() {
+    const container = document.getElementById('menuGrid');
+    const noCategoriesMessage = document.getElementById('noCategoriesMessage');
+    
+    // Check if there are any active categories (excluding 'all')
+    const activeCategories = Object.entries(categories).filter(([key, cat]) => 
+        key !== 'all' && cat.isActive
+    );
+    
+    if (activeCategories.length === 0) {
+        container.innerHTML = '';
+        noCategoriesMessage.classList.remove('hidden');
+        return;
+    }
+    
+    noCategoriesMessage.classList.add('hidden');
+    
+    // Filter menu items based on current filter and active categories
+    let filteredItems;
+    if (currentFilter === 'all') {
+        filteredItems = menuData.filter(item => 
+            categories[item.category]?.isActive
+        );
+    } else {
+        filteredItems = menuData.filter(item => 
+            item.category === currentFilter && 
+            categories[item.category]?.isActive
+        );
+    }
+    
+    if (filteredItems.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="w-32 h-32 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-utensils text-5xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">No Items Available</h3>
+                <p class="text-gray-600 max-w-md mx-auto">
+                    No menu items are available in the selected category. Please select another category.
+                </p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = filteredItems.map(item => `
+            <div class="dish-card bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="relative">
+                    <img src="${item.image}" alt="${item.name}" class="dish-image">
+                    <span class="absolute top-3 right-3 category-badge ${item.category === 'chinese' ? 'bg-red-100 text-red-800' : 
+                        item.category === 'fastfood' ? 'bg-blue-100 text-blue-800' : 
+                        item.category === 'drinks' ? 'bg-green-100 text-green-800' : 
+                        item.category === 'soups' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
+                        ${item.category === 'chinese' ? 'Chinese' : 
+                         item.category === 'fastfood' ? 'Fast Food' : 
+                         item.category === 'drinks' ? 'Drinks' : 
+                         item.category === 'soups' ? 'Soup' : 'Noodles'}
+                    </span>
+                </div>
+                <div class="p-5 flex-grow">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-gray-800">${item.name}</h3>
+                        <span class="text-xl font-bold text-red-700">₹${item.price}</span>
+                    </div>
+                    <p class="text-gray-600 mb-4 text-sm">${item.description}</p>
+                </div>
+                <div class="p-5 pt-0">
+                    <button onclick="addToCart(${item.id})" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                        <i class="fas fa-plus mr-2"></i>Add to Order
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
 // ===============================
 // DASHBOARD MANAGEMENT
 // ===============================
@@ -1302,8 +1851,10 @@ function showDashboard(dashboardType) {
         document.getElementById('waiterDashboard').classList.add('active');
     } else if (dashboardType === 'manager') {
         document.getElementById('managerDashboard').classList.add('active');
+        updateManagerDashboard();
     } else if (dashboardType === 'admin') {
         document.getElementById('adminDashboard').classList.add('active');
+        updateAdminDashboard();
     }
 }
 
@@ -1558,6 +2109,11 @@ function handleWaiterLogin() {
     const waiter = waiters.find(w => w.username === username && w.password === password);
     
     if (waiter) {
+        if (!waiter.isActive) {
+            showNotification('Your account is inactive. Please contact admin.', 'error');
+            return;
+        }
+        
         currentWaiter = waiter;
         waiter.lastLogin = new Date().toISOString();
         localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
@@ -1604,9 +2160,67 @@ function updateWaiterDashboard() {
     document.getElementById('waiterAssignedTables').textContent = assignedTables;
     document.getElementById('waiterActiveOrders').textContent = activeOrders;
     document.getElementById('waiterServedToday').textContent = servedToday;
+    document.getElementById('waiterStatus').textContent = currentWaiter.isActive ? 'Active' : 'Inactive';
     
-    const performance = Math.min(100, servedToday * 20);
-    document.getElementById('waiterPerformance').textContent = `${performance}%`;
+    // Load assigned tables
+    const tablesContainer = document.getElementById('waiterTables');
+    tablesContainer.innerHTML = '';
+    
+    currentWaiter.assignedTables.forEach(tableNumber => {
+        const table = tables.find(t => t.number === tableNumber);
+        if (table) {
+            const tableElement = document.createElement('div');
+            tableElement.className = `p-4 rounded-lg text-center ${table.status === 'free' ? 'table-free' : 'table-occupied'}`;
+            tableElement.innerHTML = `
+                <div class="text-2xl font-bold">${table.number}</div>
+                <div class="text-sm mt-1">${table.status === 'free' ? 'Free' : 'Occupied'}</div>
+                ${table.status === 'occupied' ? `<div class="text-xs mt-1">${table.customerName || 'Customer'}</div>` : ''}
+            `;
+            tablesContainer.appendChild(tableElement);
+        }
+    });
+    
+    // Load assigned orders
+    const ordersContainer = document.getElementById('waiterOrders');
+    const waiterOrders = orders.filter(o => 
+        currentWaiter.assignedTables.includes(o.tableNumber) && 
+        o.status !== 'paid' && 
+        o.status !== 'cancelled'
+    );
+    
+    if (waiterOrders.length === 0) {
+        ordersContainer.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-clipboard-list text-4xl mb-3"></i>
+                <p>No active orders for your tables</p>
+            </div>
+        `;
+    } else {
+        ordersContainer.innerHTML = waiterOrders.map(order => `
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                        <p class="text-sm text-gray-600">Table ${order.tableNumber}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                        ${order.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    ${order.items.map(item => `
+                        <div class="text-sm text-gray-700">${item.quantity}x ${item.name}</div>
+                    `).join('')}
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-red-700">₹${order.total}</span>
+                    <span class="text-xs text-gray-500">
+                        ${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
 }
 
 // ===============================
@@ -1619,6 +2233,11 @@ function handleManagerLogin() {
     const manager = managers.find(m => m.username === username && m.password === password);
     
     if (manager) {
+        if (!manager.isActive) {
+            showNotification('Your account is inactive. Please contact admin.', 'error');
+            return;
+        }
+        
         currentManager = manager;
         manager.lastLogin = new Date().toISOString();
         localStorage.setItem('dragonManagers', JSON.stringify(managers));
@@ -1652,17 +2271,121 @@ function updateManagerDashboard() {
     const occupiedTables = tables.filter(t => t.status === 'occupied').length;
     const activeOrders = orders.filter(o => o.status !== 'paid' && o.status !== 'cancelled').length;
     
-    const today = new Date().toDateString();
-    const todayOrders = orders.filter(o => 
-        new Date(o.orderTime).toDateString() === today && 
-        o.paymentStatus === 'paid'
-    );
-    const todaysRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+    // Show/hide revenue based on permission
+    const revenueCard = document.getElementById('revenueCard');
+    if (currentManager.permissions.viewRevenue) {
+        const today = new Date().toDateString();
+        const todayOrders = orders.filter(o => 
+            new Date(o.orderTime).toDateString() === today && 
+            o.paymentStatus === 'paid'
+        );
+        const todaysRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+        document.getElementById('managerTodayRevenue').textContent = `₹${todaysRevenue}`;
+        revenueCard.style.display = 'block';
+    } else {
+        revenueCard.style.display = 'none';
+    }
     
     document.getElementById('managerFreeTables').textContent = freeTables;
     document.getElementById('managerOccupiedTables').textContent = occupiedTables;
-    document.getElementById('managerTodayRevenue').textContent = `₹${todaysRevenue}`;
     document.getElementById('managerActiveOrders').textContent = activeOrders;
+    
+    // Load active orders
+    const ordersContainer = document.getElementById('activeOrders');
+    const activeOrdersList = orders.filter(o => o.status !== 'paid' && o.status !== 'cancelled')
+        .sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime));
+    
+    if (activeOrdersList.length === 0) {
+        ordersContainer.innerHTML = `
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-clipboard-list text-4xl mb-3"></i>
+                <p>No active orders</p>
+            </div>
+        `;
+    } else {
+        ordersContainer.innerHTML = activeOrdersList.map(order => {
+            const waiter = waiters.find(w => w.assignedTables.includes(order.tableNumber));
+            return `
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Order #${order.id.slice(-6)}</h4>
+                            <p class="text-sm text-gray-600">
+                                Table ${order.tableNumber} • ${order.customerName}
+                                ${waiter ? `• Waiter: ${waiter.name}` : ''}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <select class="border rounded px-2 py-1 text-sm" onchange="updateOrderStatus('${order.id}', this.value)">
+                                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="preparing" ${order.status === 'preparing' ? 'selected' : ''}>Preparing</option>
+                                <option value="ready" ${order.status === 'ready' ? 'selected' : ''}>Ready</option>
+                                <option value="served" ${order.status === 'served' ? 'selected' : ''}>Served</option>
+                                <option value="paid" ${order.status === 'paid' ? 'selected' : ''}>Paid</option>
+                                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        ${order.items.map(item => `
+                            <div class="text-sm text-gray-700">${item.quantity}x ${item.name} - ₹${item.price * item.quantity}</div>
+                        `).join('')}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-red-700">Total: ₹${order.total}</span>
+                        <span class="text-xs text-gray-500">
+                            ${new Date(order.orderTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Load tables
+    const tablesContainer = document.getElementById('managerTables');
+    tablesContainer.innerHTML = '';
+    
+    tables.forEach(table => {
+        const tableElement = document.createElement('div');
+        tableElement.className = `p-4 rounded-lg text-center ${table.status === 'free' ? 'table-free' : 'table-occupied'}`;
+        
+        let tableInfo = `<div class="text-2xl font-bold">${table.number}</div>`;
+        tableInfo += `<div class="text-sm mt-1">${table.status === 'free' ? 'Free' : 'Occupied'}</div>`;
+        tableInfo += `<div class="text-xs mt-1">Capacity: ${table.capacity}</div>`;
+        
+        if (table.status === 'occupied') {
+            tableInfo += `<div class="text-xs mt-1">${table.customerName || 'Customer'}</div>`;
+            tableInfo += `<div class="text-xs mt-1">${table.customerPhone || ''}</div>`;
+        }
+        
+        tableElement.innerHTML = tableInfo;
+        tablesContainer.appendChild(tableElement);
+    });
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    order.status = newStatus;
+    
+    if (newStatus === 'paid' || newStatus === 'cancelled') {
+        const table = tables.find(t => t.number === order.tableNumber);
+        if (table) {
+            table.status = 'free';
+            table.orderId = null;
+            table.customerName = '';
+            table.customerPhone = '';
+            table.occupiedSince = null;
+        }
+    }
+    
+    localStorage.setItem('dragonOrders', JSON.stringify(orders));
+    localStorage.setItem('dragonTables', JSON.stringify(tables));
+    
+    updateManagerDashboard();
+    showNotification(`Order status updated to ${newStatus}`, 'success');
 }
 
 // ===============================
@@ -1697,6 +2420,8 @@ function resetAdminLogin() {
 }
 
 function updateAdminDashboard() {
+    if (!currentAdmin) return;
+    
     document.getElementById('totalManagers').textContent = managers.length;
     document.getElementById('totalWaiters').textContent = waiters.length;
     document.getElementById('totalOrders').textContent = orders.length;
@@ -1705,6 +2430,181 @@ function updateAdminDashboard() {
         .filter(o => o.paymentStatus === 'paid')
         .reduce((sum, o) => sum + o.total, 0);
     document.getElementById('totalRevenue').textContent = `₹${totalRevenue}`;
+    
+    // Load category management
+    loadCategoryManagement();
+    
+    // Load staff list
+    const staffListContainer = document.getElementById('staffList');
+    const allStaff = [
+        ...managers.map(m => ({...m, role: 'manager'})),
+        ...waiters.map(w => ({...w, role: 'waiter'}))
+    ];
+    
+    staffListContainer.innerHTML = allStaff.map(staff => `
+        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-medium">${staff.name}</span>
+                    <span class="px-2 py-1 text-xs rounded ${staff.role === 'manager' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
+                        ${staff.role === 'manager' ? 'Manager' : 'Waiter'}
+                    </span>
+                    <span class="px-2 py-1 text-xs rounded ${staff.isActive ? 'staff-active' : 'staff-inactive'}">
+                        ${staff.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                </div>
+                <div class="text-sm text-gray-600">Username: ${staff.username}</div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleStaffStatus('${staff.role}', ${staff.id})" class="px-3 py-1 text-sm ${staff.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'} rounded">
+                    ${staff.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                ${staff.role === 'manager' ? `
+                    <button onclick="editManagerPermissions(${staff.id})" class="px-3 py-1 text-sm bg-blue-100 text-blue-700 hover:bg-blue-200 rounded">
+                        Permissions
+                    </button>
+                ` : `
+                    <button onclick="editWaiterTables(${staff.id})" class="px-3 py-1 text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 rounded">
+                        Assign Tables
+                    </button>
+                `}
+            </div>
+        </div>
+    `).join('');
+    
+    // Load manager permissions
+    const permissionsContainer = document.getElementById('managerPermissions');
+    permissionsContainer.innerHTML = managers.map(manager => `
+        <div class="p-4 bg-gray-50 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+                <div class="font-medium">${manager.name}</div>
+                <span class="px-2 py-1 text-xs rounded ${manager.isActive ? 'staff-active' : 'staff-inactive'}">
+                    ${manager.isActive ? 'Active' : 'Inactive'}
+                </span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">View Revenue</span>
+                    <label class="permission-toggle">
+                        <input type="checkbox" ${manager.permissions.viewRevenue ? 'checked' : ''} 
+                               onchange="updateManagerPermission(${manager.id}, 'viewRevenue', this.checked)">
+                        <span class="permission-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">View Order History</span>
+                    <label class="permission-toggle">
+                        <input type="checkbox" ${manager.permissions.viewHistory ? 'checked' : ''} 
+                               onchange="updateManagerPermission(${manager.id}, 'viewHistory', this.checked)">
+                        <span class="permission-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">Manage Tables</span>
+                    <label class="permission-toggle">
+                        <input type="checkbox" ${manager.permissions.manageTables ? 'checked' : ''} 
+                               onchange="updateManagerPermission(${manager.id}, 'manageTables', this.checked)">
+                        <span class="permission-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">Manage Orders</span>
+                    <label class="permission-toggle">
+                        <input type="checkbox" ${manager.permissions.manageOrders ? 'checked' : ''} 
+                               onchange="updateManagerPermission(${manager.id}, 'manageOrders', this.checked)">
+                        <span class="permission-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Load tables
+    const tablesContainer = document.getElementById('adminTables');
+    tablesContainer.innerHTML = '';
+    
+    tables.forEach(table => {
+        const tableElement = document.createElement('div');
+        tableElement.className = `p-4 rounded-lg text-center ${table.status === 'free' ? 'table-free' : 'table-occupied'}`;
+        
+        let tableInfo = `<div class="text-2xl font-bold">${table.number}</div>`;
+        tableInfo += `<div class="text-sm mt-1">${table.status === 'free' ? 'Free' : 'Occupied'}</div>`;
+        tableInfo += `<div class="text-xs mt-1">Capacity: ${table.capacity}</div>`;
+        
+        if (table.status === 'occupied') {
+            tableInfo += `<div class="text-xs mt-1">${table.customerName || 'Customer'}</div>`;
+        }
+        
+        tableInfo += `
+            <div class="flex justify-center gap-2 mt-3">
+                <button onclick="toggleTableStatus(${table.id})" class="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">
+                    ${table.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button onclick="editTable(${table.id})" class="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded">
+                    Edit
+                </button>
+            </div>
+        `;
+        
+        tableElement.innerHTML = tableInfo;
+        tablesContainer.appendChild(tableElement);
+    });
+    
+    // Load performance data
+    const performanceContainer = document.getElementById('staffPerformance');
+    const today = new Date().toDateString();
+    
+    const waiterPerformance = waiters.map(waiter => {
+        const todayOrders = orders.filter(o => 
+            waiter.assignedTables.includes(o.tableNumber) && 
+            new Date(o.orderTime).toDateString() === today
+        ).length;
+        
+        return {
+            name: waiter.name,
+            todayOrders: todayOrders,
+            totalOrders: waiter.performance.ordersServed,
+            status: waiter.isActive ? 'Active' : 'Inactive'
+        };
+    });
+    
+    performanceContainer.innerHTML = waiterPerformance.map(waiter => `
+        <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+            <div>
+                <div class="font-medium">${waiter.name}</div>
+                <div class="text-xs text-gray-600">Today: ${waiter.todayOrders} orders</div>
+            </div>
+            <div class="text-right">
+                <div class="font-bold">${waiter.totalOrders}</div>
+                <div class="text-xs ${waiter.status === 'Active' ? 'text-green-600' : 'text-red-600'}">${waiter.status}</div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Load revenue trends
+    const revenueContainer = document.getElementById('revenueTrends');
+    const last7Days = Array.from({length: 7}, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toDateString();
+    }).reverse();
+    
+    const dailyRevenue = last7Days.map(day => {
+        const dayRevenue = orders
+            .filter(o => new Date(o.orderTime).toDateString() === day && o.paymentStatus === 'paid')
+            .reduce((sum, o) => sum + o.total, 0);
+        return {
+            day: new Date(day).toLocaleDateString('en-US', { weekday: 'short' }),
+            revenue: dayRevenue
+        };
+    });
+    
+    revenueContainer.innerHTML = dailyRevenue.map(day => `
+        <div class="flex items-center justify-between">
+            <span class="text-sm">${day.day}</span>
+            <span class="font-medium">₹${day.revenue}</span>
+        </div>
+    `).join('');
 }
 
 function addStaffMember() {
@@ -1717,15 +2617,23 @@ function addStaffMember() {
         return;
     }
     
+    // Check if username already exists
+    const allStaff = [...managers, ...waiters];
+    if (allStaff.some(staff => staff.username === username)) {
+        showNotification('Username already exists', 'error');
+        return;
+    }
+    
     if (role === 'waiter') {
         const newWaiter = {
-            id: waiters.length + 1,
+            id: waiters.length > 0 ? Math.max(...waiters.map(w => w.id)) + 1 : 1,
             name: name,
             username: username,
             password: 'password123',
             assignedTables: [],
             createdDate: new Date().toISOString(),
             lastLogin: null,
+            isActive: false, // Initially inactive
             performance: {
                 ordersServed: 0,
                 averageServiceTime: 0,
@@ -1737,16 +2645,18 @@ function addStaffMember() {
         showNotification(`Waiter ${name} added successfully!`, 'success');
     } else {
         const newManager = {
-            id: managers.length + 1,
+            id: managers.length > 0 ? Math.max(...managers.map(m => m.id)) + 1 : 1,
             name: name,
             username: username,
             password: 'password123',
             createdDate: new Date().toISOString(),
             lastLogin: null,
-            performance: {
-                totalOrders: 0,
-                totalRevenue: 0,
-                averageRating: 0
+            isActive: false, // Initially inactive
+            permissions: {
+                viewRevenue: false,
+                viewHistory: false,
+                manageTables: true,
+                manageOrders: true
             }
         };
         managers.push(newManager);
@@ -1756,6 +2666,93 @@ function addStaffMember() {
     
     document.getElementById('staffName').value = '';
     document.getElementById('staffUsername').value = '';
+    updateAdminDashboard();
+    updateHeaderButtons(); // Update header buttons after adding staff
+}
+
+function toggleStaffStatus(role, staffId) {
+    if (role === 'waiter') {
+        const waiter = waiters.find(w => w.id === staffId);
+        if (waiter) {
+            waiter.isActive = !waiter.isActive;
+            localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
+            showNotification(`Waiter ${waiter.name} ${waiter.isActive ? 'activated' : 'deactivated'}`, 'success');
+        }
+    } else {
+        const manager = managers.find(m => m.id === staffId);
+        if (manager) {
+            manager.isActive = !manager.isActive;
+            localStorage.setItem('dragonManagers', JSON.stringify(managers));
+            showNotification(`Manager ${manager.name} ${manager.isActive ? 'activated' : 'deactivated'}`, 'success');
+        }
+    }
+    updateAdminDashboard();
+    updateHeaderButtons(); // Update header buttons after changing status
+}
+
+function updateManagerPermission(managerId, permission, value) {
+    const manager = managers.find(m => m.id === managerId);
+    if (manager) {
+        manager.permissions[permission] = value;
+        localStorage.setItem('dragonManagers', JSON.stringify(managers));
+        showNotification(`Permission updated for ${manager.name}`, 'success');
+        
+        // If current manager is viewing dashboard, update it
+        if (currentManager && currentManager.id === managerId) {
+            updateManagerDashboard();
+        }
+    }
+}
+
+function toggleTableStatus(tableId) {
+    const table = tables.find(t => t.id === tableId);
+    if (table) {
+        table.isActive = !table.isActive;
+        localStorage.setItem('dragonTables', JSON.stringify(tables));
+        showNotification(`Table ${table.number} ${table.isActive ? 'activated' : 'deactivated'}`, 'success');
+        updateAdminDashboard();
+    }
+}
+
+function editTable(tableId) {
+    const table = tables.find(t => t.id === tableId);
+    if (!table) return;
+    
+    const newCapacity = prompt(`Edit capacity for Table ${table.number}:`, table.capacity);
+    if (newCapacity && !isNaN(newCapacity) && newCapacity > 0) {
+        table.capacity = parseInt(newCapacity);
+        localStorage.setItem('dragonTables', JSON.stringify(tables));
+        showNotification(`Table ${table.number} capacity updated to ${table.capacity}`, 'success');
+        updateAdminDashboard();
+    }
+}
+
+function editWaiterTables(waiterId) {
+    const waiter = waiters.find(w => w.id === waiterId);
+    if (!waiter) return;
+    
+    const availableTables = tables
+        .filter(t => t.isActive)
+        .map(t => t.number);
+    
+    const currentTables = waiter.assignedTables.join(', ');
+    const newTables = prompt(`Assign tables to ${waiter.name} (comma-separated):`, currentTables);
+    
+    if (newTables !== null) {
+        const tableNumbers = newTables.split(',')
+            .map(num => parseInt(num.trim()))
+            .filter(num => !isNaN(num) && availableTables.includes(num));
+        
+        waiter.assignedTables = tableNumbers;
+        localStorage.setItem('dragonWaiters', JSON.stringify(waiters));
+        showNotification(`Tables assigned to ${waiter.name}`, 'success');
+        updateAdminDashboard();
+    }
+}
+
+function editManagerPermissions(managerId) {
+    // This is handled by the inline toggles in updateAdminDashboard
+    showNotification('Use the toggle switches above to edit permissions', 'info');
 }
 
 // ===============================
@@ -1763,44 +2760,9 @@ function addStaffMember() {
 // ===============================
 function loadMenu() {
     menuData = initializeMenuData();
+    renderMenuFilters();
     renderMenuItems();
     updateTableOptions();
-}
-
-function renderMenuItems() {
-    const container = document.getElementById('menuGrid');
-    const filteredItems = currentFilter === 'all' 
-        ? menuData 
-        : menuData.filter(item => item.category === currentFilter);
-    
-    container.innerHTML = filteredItems.map(item => `
-        <div class="dish-card bg-white rounded-xl shadow-lg overflow-hidden">
-            <div class="relative">
-                <img src="${item.image}" alt="${item.name}" class="dish-image">
-                <span class="absolute top-3 right-3 category-badge ${item.category === 'chinese' ? 'bg-red-100 text-red-800' : 
-                    item.category === 'fastfood' ? 'bg-blue-100 text-blue-800' : 
-                    item.category === 'drinks' ? 'bg-green-100 text-green-800' : 
-                    item.category === 'soups' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
-                    ${item.category === 'chinese' ? 'Chinese' : 
-                     item.category === 'fastfood' ? 'Fast Food' : 
-                     item.category === 'drinks' ? 'Drinks' : 
-                     item.category === 'soups' ? 'Soup' : 'Noodles'}
-                </span>
-            </div>
-            <div class="p-5 flex-grow">
-                <div class="flex justify-between items-start mb-3">
-                    <h3 class="text-lg font-bold text-gray-800">${item.name}</h3>
-                    <span class="text-xl font-bold text-red-700">₹${item.price}</span>
-                </div>
-                <p class="text-gray-600 mb-4 text-sm">${item.description}</p>
-            </div>
-            <div class="p-5 pt-0">
-                <button onclick="addToCart(${item.id})" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
-                    <i class="fas fa-plus mr-2"></i>Add to Order
-                </button>
-            </div>
-        </div>
-    `).join('');
 }
 
 function addToCart(itemId) {
@@ -1902,10 +2864,12 @@ function removeFromCart(itemId) {
 
 function updateTableOptions() {
     const select = document.getElementById('customerTable');
+    const availableTables = tables.filter(t => t.isActive && t.status === 'free');
+    
     select.innerHTML = '<option value="">Select Table</option>' +
-        tables.map(table => `
-            <option value="${table.number}" ${table.status === 'occupied' ? 'disabled' : ''}>
-                Table ${table.number} ${table.status === 'occupied' ? '(Occupied)' : ''}
+        availableTables.map(table => `
+            <option value="${table.number}">
+                Table ${table.number} (Capacity: ${table.capacity})
             </option>
         `).join('');
 }
@@ -1931,6 +2895,11 @@ function placeOrder() {
     }
     
     const table = tables.find(t => t.number === tableNumber);
+    if (!table || !table.isActive) {
+        showNotification('This table is not available', 'error');
+        return;
+    }
+    
     if (table.status === 'occupied') {
         showNotification('This table is already occupied', 'error');
         return;
@@ -2039,6 +3008,11 @@ function showReceipt(order) {
     `;
     
     document.getElementById('receiptModal').classList.remove('hidden');
+    
+    // Set up download button
+    document.getElementById('downloadReceiptBtn').onclick = () => {
+        downloadReceiptAsPDF(order);
+    };
 }
 
 // ===============================
@@ -2047,6 +3021,7 @@ function showReceipt(order) {
 document.addEventListener('DOMContentLoaded', function() {
     loadMenu();
     updateCart();
+    updateHeaderButtons(); // Initialize header buttons visibility
     
     // User Profile Button
     document.getElementById('userProfileBtn').addEventListener('click', () => {
@@ -2074,6 +3049,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showDashboard('admin');
     });
     
+    document.getElementById('adminIconToggle').addEventListener('click', () => {
+        showDashboard('admin');
+    });
+    
     document.getElementById('closeAllDashboards').addEventListener('click', hideAllDashboards);
     
     // Waiter Login
@@ -2091,20 +3070,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add Staff Button
     document.getElementById('addStaffBtn').addEventListener('click', addStaffMember);
     
-    // Menu Filters
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            currentFilter = this.dataset.category;
-            renderMenuItems();
-        });
-    });
+    // Export to Excel Button
+    document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
     
     // Cart Management
     document.getElementById('plateBtn').addEventListener('click', function() {
         document.getElementById('platePanel').classList.add('open');
         document.getElementById('overlay').classList.remove('hidden');
+        updateTableOptions();
     });
     
     document.getElementById('closePlate').addEventListener('click', function() {
@@ -2151,9 +3124,285 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('receiptModal').classList.add('hidden');
     });
     
-    // Update table options when cart opens
-    document.getElementById('plateBtn').addEventListener('click', updateTableOptions);
+    // Refresh Orders Button
+    document.getElementById('refreshOrders').addEventListener('click', function() {
+        if (currentManager) {
+            updateManagerDashboard();
+            showNotification('Orders refreshed', 'info');
+        }
+    });
+    
+    // Add Table Button
+    document.getElementById('addTableBtn').addEventListener('click', function() {
+        const newTableNumber = tables.length + 1;
+        const newTable = {
+            id: newTableNumber,
+            number: newTableNumber,
+            status: 'free',
+            capacity: newTableNumber <= 5 ? 2 : newTableNumber <= 10 ? 4 : 6,
+            orderId: null,
+            customerName: '',
+            customerPhone: '',
+            occupiedSince: null,
+            assignedWaiter: null,
+            isActive: true
+        };
+        
+        tables.push(newTable);
+        localStorage.setItem('dragonTables', JSON.stringify(tables));
+        updateAdminDashboard();
+        showNotification(`Table ${newTableNumber} added successfully!`, 'success');
+    });
+    
+    // Restaurant Control
+    document.getElementById('toggleRestaurantStatus').addEventListener('click', function() {
+        restaurantSettings.isOpen = !restaurantSettings.isOpen;
+        localStorage.setItem('dragonSettings', JSON.stringify(restaurantSettings));
+        
+        const statusElement = document.getElementById('restaurantStatus');
+        const button = this;
+        
+        if (restaurantSettings.isOpen) {
+            statusElement.textContent = 'OPEN';
+            statusElement.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-800';
+            button.textContent = 'Close Restaurant';
+            button.className = 'bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300';
+        } else {
+            statusElement.textContent = 'CLOSED';
+            statusElement.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-red-100 text-red-800';
+            button.textContent = 'Open Restaurant';
+            button.className = 'bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-2 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300';
+        }
+        
+        showNotification(`Restaurant ${restaurantSettings.isOpen ? 'opened' : 'closed'}`, 'success');
+    });
+    
+    document.getElementById('saveClosureMessage').addEventListener('click', function() {
+        const message = document.getElementById('closureMessageInput').value.trim();
+        if (message) {
+            restaurantSettings.closureMessage = message;
+            localStorage.setItem('dragonSettings', JSON.stringify(restaurantSettings));
+            showNotification('Closure message saved', 'success');
+        } else {
+            showNotification('Please enter a message', 'error');
+        }
+    });
+    
+    // Initialize restaurant settings
+    const statusElement = document.getElementById('restaurantStatus');
+    const toggleButton = document.getElementById('toggleRestaurantStatus');
+    
+    if (restaurantSettings.isOpen) {
+        statusElement.textContent = 'OPEN';
+        statusElement.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-800';
+        toggleButton.textContent = 'Close Restaurant';
+    } else {
+        statusElement.textContent = 'CLOSED';
+        statusElement.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-red-100 text-red-800';
+        toggleButton.textContent = 'Open Restaurant';
+    }
+    
+    document.getElementById('openingTime').value = restaurantSettings.openingTime;
+    document.getElementById('closingTime').value = restaurantSettings.closingTime;
+    document.getElementById('closureMessageInput').value = restaurantSettings.closureMessage;
+    
+    document.getElementById('updateTimings').addEventListener('click', function() {
+        const openingTime = document.getElementById('openingTime').value;
+        const closingTime = document.getElementById('closingTime').value;
+        
+        if (openingTime && closingTime) {
+            restaurantSettings.openingTime = openingTime;
+            restaurantSettings.closingTime = closingTime;
+            localStorage.setItem('dragonSettings', JSON.stringify(restaurantSettings));
+            showNotification('Restaurant timings updated', 'success');
+        } else {
+            showNotification('Please enter both opening and closing times', 'error');
+        }
+    });
 });
+
+// ===============================
+// MENU FILTERS AND DISPLAY
+// ===============================
+function renderMenuFilters() {
+    const container = document.getElementById('menuFilters');
+    const activeCategories = Object.entries(categories).filter(([key, cat]) => cat.isActive);
+    
+    if (activeCategories.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    // Always show "All Items" if there are any active categories
+    let filtersHTML = `
+        <button class="filter-btn active px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300" data-category="all">
+            All Items
+        </button>
+    `;
+    
+    // Add other active categories
+    activeCategories.forEach(([key, category]) => {
+        if (key === 'all') return;
+        
+        let icon = '';
+        let colorClass = '';
+        
+        switch(key) {
+            case 'chinese':
+                icon = 'fa-dragon';
+                colorClass = 'text-red-700 border-red-200 hover:bg-red-50';
+                break;
+            case 'fastfood':
+                icon = 'fa-hamburger';
+                colorClass = 'text-blue-700 border-blue-200 hover:bg-blue-50';
+                break;
+            case 'drinks':
+                icon = 'fa-glass-whiskey';
+                colorClass = 'text-green-700 border-green-200 hover:bg-green-50';
+                break;
+            case 'soups':
+                icon = 'fa-utensil-spoon';
+                colorClass = 'text-amber-700 border-amber-200 hover:bg-amber-50';
+                break;
+            case 'noodles':
+                icon = 'fa-utensils';
+                colorClass = 'text-purple-700 border-purple-200 hover:bg-purple-50';
+                break;
+        }
+        
+        filtersHTML += `
+            <button class="filter-btn px-5 py-2.5 bg-white ${colorClass} border rounded-full font-medium transition-all duration-300" data-category="${key}">
+                <i class="fas ${icon} mr-2"></i>${category.name}
+            </button>
+        `;
+    });
+    
+    container.innerHTML = filtersHTML;
+    
+    // Re-attach event listeners
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.category;
+            renderMenuItems();
+        });
+    });
+}
+
+function renderMenuItems() {
+    const container = document.getElementById('menuGrid');
+    const noCategoriesMessage = document.getElementById('noCategoriesMessage');
+    
+    // Check if there are any active categories (excluding 'all')
+    const activeCategories = Object.entries(categories).filter(([key, cat]) => 
+        key !== 'all' && cat.isActive
+    );
+    
+    if (activeCategories.length === 0) {
+        container.innerHTML = '';
+        noCategoriesMessage.classList.remove('hidden');
+        return;
+    }
+    
+    noCategoriesMessage.classList.add('hidden');
+    
+    // Filter menu items based on current filter and active categories
+    let filteredItems;
+    if (currentFilter === 'all') {
+        filteredItems = menuData.filter(item => 
+            categories[item.category]?.isActive
+        );
+    } else {
+        // Only show items from the selected category if it's active
+        if (categories[currentFilter]?.isActive) {
+            filteredItems = menuData.filter(item => 
+                item.category === currentFilter && 
+                categories[item.category]?.isActive
+            );
+        } else {
+            filteredItems = [];
+        }
+    }
+    
+    if (filteredItems.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <div class="w-32 h-32 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-utensils text-5xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-3">No Items Available</h3>
+                <p class="text-gray-600 max-w-md mx-auto">
+                    No menu items are available in the selected category. Please select another category.
+                </p>
+            </div>
+        `;
+    } else {
+        container.innerHTML = filteredItems.map(item => `
+            <div class="dish-card bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="relative">
+                    <img src="${item.image}" alt="${item.name}" class="dish-image">
+                    <span class="absolute top-3 right-3 category-badge ${item.category === 'chinese' ? 'bg-red-100 text-red-800' : 
+                        item.category === 'fastfood' ? 'bg-blue-100 text-blue-800' : 
+                        item.category === 'drinks' ? 'bg-green-100 text-green-800' : 
+                        item.category === 'soups' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}">
+                        ${item.category === 'chinese' ? 'Chinese' : 
+                         item.category === 'fastfood' ? 'Fast Food' : 
+                         item.category === 'drinks' ? 'Drinks' : 
+                         item.category === 'soups' ? 'Soup' : 'Noodles'}
+                    </span>
+                </div>
+                <div class="p-5 flex-grow">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-gray-800">${item.name}</h3>
+                        <span class="text-xl font-bold text-red-700">₹${item.price}</span>
+                    </div>
+                    <p class="text-gray-600 mb-4 text-sm">${item.description}</p>
+                </div>
+                <div class="p-5 pt-0">
+                    <button onclick="addToCart(${item.id})" class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300">
+                        <i class="fas fa-plus mr-2"></i>Add to Order
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// Also update the toggleCategoryStatus function to refresh the menu display
+function toggleCategoryStatus(categoryKey) {
+    if (categoryKey === 'all') {
+        showNotification('Cannot disable "All Items" category', 'error');
+        return;
+    }
+    
+    if (categories[categoryKey]) {
+        categories[categoryKey].isActive = !categories[categoryKey].isActive;
+        localStorage.setItem('dragonCategories', JSON.stringify(categories));
+        showNotification(`${categories[categoryKey].name} ${categories[categoryKey].isActive ? 'enabled' : 'disabled'}`, 'success');
+        
+        // Update category management display
+        loadCategoryManagement();
+        
+        // Update menu display
+        renderMenuFilters();
+        renderMenuItems();
+        
+        // If current filter is the disabled category, switch to "all"
+        if (currentFilter === categoryKey && !categories[categoryKey].isActive) {
+            currentFilter = 'all';
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.category === 'all') {
+                    btn.classList.add('active');
+                }
+            });
+            renderMenuItems();
+        }
+    }
+}
+
     </script>
 </body>
 </html>
