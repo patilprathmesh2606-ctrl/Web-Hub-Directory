@@ -50,6 +50,14 @@ const webPages = [
         area: "Wada",
         shopName: "Jayeshbhoir Catering",
         category: "Service"
+    },
+    {
+        title: "Cake Shop",
+        url: "Cake Shop",
+        image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
+        area: "Vajreshwari",
+        shopName: "Cake Shop",
+        category: "Food"
     }
 ];
 
@@ -850,6 +858,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
+
 
 
 
