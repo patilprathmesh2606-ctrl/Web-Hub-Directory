@@ -1,7 +1,7 @@
 // Set current year in footer
 document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-// Web pages data array - Fixing category casing to be consistent
+// Web pages data array
 const webPages = [
     {
         title: "Photographer",
@@ -13,7 +13,7 @@ const webPages = [
     },
     {
         title: "Shahapur Electrical Work",
-        url: "Shahapur Electrical Work",
+        url: "shahapurelectricalwork.html",
         image: "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Shahapur",
         shopName: "shahapurelectricalwork",
@@ -21,7 +21,7 @@ const webPages = [
     },
     {
         title: "Gym",
-        url: "Gym",
+        url: "gym.html",
         image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Gym",
@@ -29,7 +29,7 @@ const webPages = [
     },
     {
         title: "The Royal Kitchen",
-        url: "The Royal Kitchen",
+        url: "theroyalkitchen.html",
         image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Bhaveghar",
         shopName: "The Royal Kitchen",
@@ -37,16 +37,16 @@ const webPages = [
     },
     {
         title: "Tanvi Fashion Hub",
-        url: "Tanvi Fashion Hub",
+        url: "tanvifashionhub.html",
         image: "https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Virar",
         shopName: "Tanvi Fashion Hub",
         category: "Retail"
     },
     {
-        title: "JayeshBhoir Catering",
-        url: "JayeshBhoir Catering",
-        image: "https://images.pexels.com/photos/11508780/pexels-photo-11508780.jpeg?auto=compress&cs=tinysrgb&w=800",
+        title: "Jayeshbhoir Catering",
+        url: "jayeshbhoircatering.html",
+        image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Jayeshbhoir Catering",
         category: "Service"
@@ -71,18 +71,24 @@ function init() {
     renderCards(webPages);
     setupEventListeners();
     updateResultCount(webPages.length);
-    populateAreaFilters();
-    populateShopFilters();
-    populateCategoryFilters(); // NEW: Add this function
+    populateAllFilters();
 }
 
-// NEW: Populate category filters in sidebar
+// Populate all filters
+function populateAllFilters() {
+    populateCategoryFilters();
+    populateAreaFilters();
+    populateShopFilters();
+}
+
+// Populate category filters
 function populateCategoryFilters() {
-    const categoryFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:first-child .filter-options');
+    const categoryFilterContainer = document.querySelector('.filter-section-sidebar[data-filter-type="category"] .filter-options') || 
+                                   document.querySelector('.sidebar-filter-content .filter-section-sidebar:first-child .filter-options');
     
     if (!categoryFilterContainer) return;
     
-    // Get unique categories (normalize to lowercase for comparison)
+    // Get unique categories
     const categories = [...new Set(webPages.map(page => page.category))];
     
     // Clear existing options except "All"
@@ -90,7 +96,9 @@ function populateCategoryFilters() {
     categoryFilterContainer.innerHTML = '';
     
     // Add "All" option back
-    categoryFilterContainer.appendChild(allOption);
+    if (allOption) {
+        categoryFilterContainer.appendChild(allOption);
+    }
     
     // Add category filter options
     categories.forEach(category => {
@@ -98,8 +106,17 @@ function populateCategoryFilters() {
         categoryOption.className = 'filter-option-sidebar';
         categoryOption.setAttribute('data-filter-type', 'category');
         categoryOption.setAttribute('data-value', category);
+        
+        // Determine icon based on category
+        let icon = 'fas fa-tag';
+        if (category === 'Food') icon = 'fas fa-utensils';
+        if (category === 'Retail') icon = 'fas fa-shopping-bag';
+        if (category === 'Service') icon = 'fas fa-tools';
+        if (category === 'Entertainment') icon = 'fas fa-film';
+        
         categoryOption.innerHTML = `
             <div class="filter-option-content">
+                <i class="${icon}"></i>
                 <span>${category}</span>
             </div>
             <i class="fas fa-check check-icon"></i>
@@ -110,7 +127,8 @@ function populateCategoryFilters() {
 
 // Populate area filters
 function populateAreaFilters() {
-    const areaFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:nth-child(2) .filter-options');
+    const areaFilterContainer = document.querySelector('.filter-section-sidebar[data-filter-type="area"] .filter-options') ||
+                                document.querySelector('.sidebar-filter-content .filter-section-sidebar:nth-child(2) .filter-options');
     
     if (!areaFilterContainer) return;
     
@@ -122,7 +140,9 @@ function populateAreaFilters() {
     areaFilterContainer.innerHTML = '';
     
     // Add "All" option back
-    areaFilterContainer.appendChild(allOption);
+    if (allOption) {
+        areaFilterContainer.appendChild(allOption);
+    }
     
     // Add area filter options
     areas.forEach(area => {
@@ -142,7 +162,8 @@ function populateAreaFilters() {
 
 // Populate shop filters
 function populateShopFilters() {
-    const shopFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:last-child .filter-options');
+    const shopFilterContainer = document.querySelector('.filter-section-sidebar[data-filter-type="shop"] .filter-options') ||
+                                document.querySelector('.sidebar-filter-content .filter-section-sidebar:last-child .filter-options');
     
     if (!shopFilterContainer) return;
     
@@ -154,7 +175,9 @@ function populateShopFilters() {
     shopFilterContainer.innerHTML = '';
     
     // Add "All" option back
-    shopFilterContainer.appendChild(allOption);
+    if (allOption) {
+        shopFilterContainer.appendChild(allOption);
+    }
     
     // Add shop filter options
     shopNames.forEach(shopName => {
@@ -188,9 +211,9 @@ function renderCards(pages) {
         card.className = 'card-item';
         card.setAttribute('data-index', index);
         
-        // Determine category class - FIXED: Use consistent casing
+        // Determine category class
         let categoryClass = '';
-        let categoryText = page.category; // Use the actual category from data
+        let categoryText = page.category;
         
         // Convert to lowercase for class assignment
         const categoryLower = page.category.toLowerCase();
@@ -263,22 +286,22 @@ function renderCards(pages) {
     });
 }
 
-// Filter cards based on search and filters - FIXED: Case-insensitive matching
+// Filter cards based on search and filters
 function filterCards() {
     const filtered = webPages.filter(page => {
-        // Check category filter - FIXED: Use case-insensitive comparison
+        // Check category filter
         const categoryMatch = currentFilter === 'all' || 
                              page.category.toLowerCase() === currentFilter.toLowerCase();
         
-        // Check area filter - FIXED: Use case-insensitive comparison
+        // Check area filter
         const areaMatch = currentAreaFilter === 'all' || 
                          page.area.toLowerCase() === currentAreaFilter.toLowerCase();
         
-        // Check shop filter - FIXED: Use case-insensitive comparison
+        // Check shop filter
         const shopMatch = currentShopFilter === 'all' || 
                          page.shopName.toLowerCase() === currentShopFilter.toLowerCase();
         
-        // Check search filter - FIXED: Use case-insensitive comparison
+        // Check search filter
         const searchMatch = currentSearch === '' || 
             page.title.toLowerCase().includes(currentSearch) ||
             page.area.toLowerCase().includes(currentSearch) ||
@@ -300,29 +323,36 @@ function updateResultCount(count) {
 // Setup event listeners
 function setupEventListeners() {
     // Search input listener
-    searchInput.addEventListener('input', (e) => {
-        currentSearch = e.target.value.toLowerCase().trim();
-        filterCards();
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase().trim();
+            filterCards();
+        });
+    }
     
     // Filter chips listeners
-    filterChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            // Remove active class from all chips
-            filterChips.forEach(c => c.classList.remove('active'));
-            
-            // Add active class to clicked chip
-            chip.classList.add('active');
-            
-            // Update current filter
-            currentFilter = chip.getAttribute('data-category');
-            filterCards();
-            updateFilterBadge();
+    if (filterChips.length > 0) {
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                // Remove active class from all chips
+                filterChips.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked chip
+                chip.classList.add('active');
+                
+                // Update current filter
+                currentFilter = chip.getAttribute('data-category');
+                filterCards();
+                updateFilterBadge();
+            });
         });
-    });
-    
-    // Set 'All' as active by default
-    document.querySelector('.filter-chip[data-category="all"]').classList.add('active');
+        
+        // Set 'All' as active by default
+        const allChip = document.querySelector('.filter-chip[data-category="all"]');
+        if (allChip) {
+            allChip.classList.add('active');
+        }
+    }
 }
 
 // Update filter badge
@@ -336,16 +366,474 @@ function updateFilterBadge() {
     if (currentShopFilter !== 'all') activeFilterCount++;
     
     if (activeFilterCount > 0) {
-        filterBadge.textContent = activeFilterCount;
-        filterBadge.classList.add('active');
-        dropdownFilterBadge.textContent = activeFilterCount;
+        if (filterBadge) {
+            filterBadge.textContent = activeFilterCount;
+            filterBadge.classList.add('active');
+        }
+        if (dropdownFilterBadge) {
+            dropdownFilterBadge.textContent = activeFilterCount;
+        }
     } else {
-        filterBadge.classList.remove('active');
-        dropdownFilterBadge.textContent = '';
+        if (filterBadge) {
+            filterBadge.classList.remove('active');
+        }
+        if (dropdownFilterBadge) {
+            dropdownFilterBadge.textContent = '';
+        }
     }
 }
 
-// ... Rest of your code remains the same for mobile dropdown, sidebar filter, etc.
+// Mobile Dropdown Functionality
+function initMobileDropdown() {
+    const mobileDropdownBtn = document.getElementById('mobileDropdownBtn');
+    const mobileDropdownMenu = document.getElementById('mobileDropdownMenu');
+    const dropdownSearchBtn = document.getElementById('dropdownSearchBtn');
+    const dropdownFilterBtn = document.getElementById('dropdownFilterBtn');
+    const dropdownViewAllBtn = document.getElementById('dropdownViewAllBtn');
+    const dropdownCollapseBtn = document.getElementById('dropdownCollapseBtn');
+    
+    if (!mobileDropdownBtn) return { updateFilterBadge };
+    
+    let isDropdownOpen = false;
+    
+    // Toggle dropdown menu
+    mobileDropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isDropdownOpen = !isDropdownOpen;
+        
+        if (isDropdownOpen) {
+            mobileDropdownMenu.classList.add('show');
+            mobileDropdownBtn.innerHTML = '<i class="fas fa-times"></i>';
+        } else {
+            mobileDropdownMenu.classList.remove('show');
+            mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!mobileDropdownBtn.contains(e.target) && !mobileDropdownMenu.contains(e.target)) {
+            isDropdownOpen = false;
+            mobileDropdownMenu.classList.remove('show');
+            mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    });
+    
+    // Dropdown button actions
+    if (dropdownSearchBtn) {
+        dropdownSearchBtn.addEventListener('click', () => {
+            openMobileSearch();
+            closeDropdown();
+        });
+    }
+    
+    if (dropdownFilterBtn) {
+        dropdownFilterBtn.addEventListener('click', () => {
+            openSidebarFilter();
+            closeDropdown();
+        });
+    }
+    
+    if (dropdownViewAllBtn) {
+        dropdownViewAllBtn.addEventListener('click', () => {
+            // Reset all filters
+            currentFilter = 'all';
+            currentAreaFilter = 'all';
+            currentShopFilter = 'all';
+            
+            // Reset search
+            if (searchInput) searchInput.value = '';
+            currentSearch = '';
+            
+            // Update desktop chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.getAttribute('data-category') === 'all') {
+                    chip.classList.add('active');
+                }
+            });
+            
+            filterCards();
+            updateFilterBadge();
+            closeDropdown();
+        });
+    }
+    
+    if (dropdownCollapseBtn) {
+        dropdownCollapseBtn.addEventListener('click', () => {
+            closeDropdown();
+        });
+    }
+    
+    function closeDropdown() {
+        isDropdownOpen = false;
+        mobileDropdownMenu.classList.remove('show');
+        mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+    
+    return { updateFilterBadge: updateFilterBadge };
+}
+
+// Sidebar Filter Functionality
+function initSidebarFilter() {
+    const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+    const sidebarFilterOverlay = document.getElementById('sidebarFilterOverlay');
+    const sidebarFilter = document.getElementById('sidebarFilter');
+    const closeSidebarFilterBtn = document.getElementById('closeSidebarFilterBtn');
+    const applyFilterBtn = document.getElementById('applyFilterBtn');
+    const clearFilterBtn = document.getElementById('clearFilterBtn');
+    const selectedFilterCount = document.getElementById('selectedFilterCount');
+    
+    if (!sidebarFilter) return { openSidebarFilter: () => {} };
+    
+    // Open sidebar filter
+    function openSidebarFilter() {
+        if (sidebarFilterOverlay) sidebarFilterOverlay.classList.add('show');
+        setTimeout(() => {
+            sidebarFilter.classList.add('show');
+        }, 10);
+        
+        // Set current active filters
+        updateSidebarFilterState();
+    }
+    
+    // Close sidebar filter
+    function closeSidebarFilter() {
+        sidebarFilter.classList.remove('show');
+        setTimeout(() => {
+            if (sidebarFilterOverlay) sidebarFilterOverlay.classList.remove('show');
+        }, 300);
+    }
+    
+    // Update sidebar filter state based on current filter
+    function updateSidebarFilterState() {
+        // Reset all options
+        document.querySelectorAll('.filter-option-sidebar').forEach(option => {
+            option.classList.remove('active');
+        });
+        
+        // Activate appropriate category option
+        const categoryOption = document.querySelector(`.filter-option-sidebar[data-filter-type="category"][data-value="${currentFilter}"]`);
+        if (categoryOption) categoryOption.classList.add('active');
+        
+        // Activate appropriate area option
+        const areaOption = document.querySelector(`.filter-option-sidebar[data-filter-type="area"][data-value="${currentAreaFilter}"]`);
+        if (areaOption) areaOption.classList.add('active');
+        
+        // Activate appropriate shop option
+        const shopOption = document.querySelector(`.filter-option-sidebar[data-filter-type="shop"][data-value="${currentShopFilter}"]`);
+        if (shopOption) shopOption.classList.add('active');
+        
+        updateSelectedFilterCount();
+    }
+    
+    // Update selected filter count
+    function updateSelectedFilterCount() {
+        let activeFilterCount = 0;
+        if (currentFilter !== 'all') activeFilterCount++;
+        if (currentAreaFilter !== 'all') activeFilterCount++;
+        if (currentShopFilter !== 'all') activeFilterCount++;
+        
+        if (selectedFilterCount) {
+            selectedFilterCount.textContent = activeFilterCount;
+        }
+    }
+    
+    // Filter option selection
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.filter-option-sidebar')) {
+            const option = e.target.closest('.filter-option-sidebar');
+            const filterType = option.getAttribute('data-filter-type');
+            const value = option.getAttribute('data-value');
+            
+            // Remove active class from all options of the same type
+            document.querySelectorAll(`.filter-option-sidebar[data-filter-type="${filterType}"]`).forEach(opt => {
+                opt.classList.remove('active');
+            });
+            
+            // Add active class to clicked option
+            option.classList.add('active');
+            
+            // Update current filter based on type
+            if (filterType === 'category') {
+                currentFilter = value;
+            } else if (filterType === 'area') {
+                currentAreaFilter = value;
+            } else if (filterType === 'shop') {
+                currentShopFilter = value;
+            }
+            
+            updateSelectedFilterCount();
+        }
+    });
+    
+    // Apply filter
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', () => {
+            // Update desktop chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.getAttribute('data-category') === currentFilter) {
+                    chip.classList.add('active');
+                }
+            });
+            
+            filterCards();
+            updateFilterBadge();
+            closeSidebarFilter();
+        });
+    }
+    
+    // Clear all filters
+    if (clearFilterBtn) {
+        clearFilterBtn.addEventListener('click', () => {
+            currentFilter = 'all';
+            currentAreaFilter = 'all';
+            currentShopFilter = 'all';
+            
+            // Update all filter options
+            document.querySelectorAll('.filter-option-sidebar').forEach(option => {
+                option.classList.remove('active');
+                if (option.getAttribute('data-value') === 'all') {
+                    option.classList.add('active');
+                }
+            });
+            
+            updateSelectedFilterCount();
+        });
+    }
+    
+    // Event listeners
+    if (mobileFilterBtn) {
+        mobileFilterBtn.addEventListener('click', openSidebarFilter);
+    }
+    
+    if (closeSidebarFilterBtn) {
+        closeSidebarFilterBtn.addEventListener('click', closeSidebarFilter);
+    }
+    
+    if (sidebarFilterOverlay) {
+        sidebarFilterOverlay.addEventListener('click', closeSidebarFilter);
+    }
+    
+    // Close with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebarFilter.classList.contains('show')) {
+            closeSidebarFilter();
+        }
+    });
+    
+    return { openSidebarFilter };
+}
+
+// Mobile Search Functionality
+function initMobileSearch() {
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+    const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const closeSearchBtn = document.getElementById('closeSearchBtn');
+    const mobileSearchResults = document.getElementById('mobileSearchResults');
+    
+    if (!mobileSearchOverlay) return { openMobileSearch: () => {} };
+    
+    function openMobileSearch() {
+        mobileSearchOverlay.classList.add('show');
+        setTimeout(() => {
+            if (mobileSearchInput) mobileSearchInput.focus();
+        }, 100);
+    }
+    
+    function closeMobileSearch() {
+        mobileSearchOverlay.classList.remove('show');
+        if (mobileSearchInput) mobileSearchInput.value = '';
+        currentSearch = '';
+        if (searchInput) searchInput.value = '';
+        filterCards();
+        if (mobileSearchResults) mobileSearchResults.innerHTML = '';
+    }
+    
+    // Event listeners
+    if (mobileSearchBtn) {
+        mobileSearchBtn.addEventListener('click', openMobileSearch);
+    }
+    
+    if (closeSearchBtn) {
+        closeSearchBtn.addEventListener('click', closeMobileSearch);
+    }
+    
+    // Sync mobile search with main search
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase().trim();
+            if (searchInput) searchInput.value = currentSearch;
+            filterCards();
+            updateMobileSearchResults();
+        });
+        
+        // Close search when pressing Escape
+        mobileSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileSearch();
+            }
+        });
+    }
+    
+    // Update mobile search results
+    function updateMobileSearchResults() {
+        if (!mobileSearchResults) return;
+        
+        if (currentSearch === '') {
+            mobileSearchResults.innerHTML = '<div class="empty-search">Type to search web pages...</div>';
+            return;
+        }
+        
+        const filtered = webPages.filter(page => {
+            return page.title.toLowerCase().includes(currentSearch) ||
+                   page.area.toLowerCase().includes(currentSearch) ||
+                   page.shopName.toLowerCase().includes(currentSearch) ||
+                   page.category.toLowerCase().includes(currentSearch);
+        });
+        
+        if (filtered.length === 0) {
+            mobileSearchResults.innerHTML = '<div class="empty-search">No results found</div>';
+            return;
+        }
+        
+        mobileSearchResults.innerHTML = filtered.map(page => `
+            <div class="mobile-search-result" data-url="${page.url}">
+                <div class="result-image">
+                    ${page.image ? 
+                        `<img src="${page.image}" alt="${page.title}">` : 
+                        `<div class="placeholder"><i class="fas fa-globe"></i></div>`
+                    }
+                </div>
+                <div class="result-info">
+                    <h4>${page.title}</h4>
+                    <p>${page.shopName} • ${page.area}</p>
+                    <span class="result-category">${page.category}</span>
+                </div>
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        `).join('');
+        
+        // Add click events to mobile search results
+        document.querySelectorAll('.mobile-search-result').forEach(result => {
+            result.addEventListener('click', () => {
+                const url = result.getAttribute('data-url');
+                window.open(url, '_blank');
+            });
+        });
+    }
+    
+    // Initialize mobile search results
+    updateMobileSearchResults();
+    
+    return { openMobileSearch };
+}
+
+// Expand/Collapse functionality
+function initExpandCollapse() {
+    const expandCollapseBtn = document.getElementById('expandCollapseBtn');
+    const expandCollapseIcon = document.getElementById('expandCollapseIcon');
+    const expandableContent = document.getElementById('expandableContent');
+    
+    if (!expandCollapseBtn) return;
+    
+    let isExpanded = false;
+    
+    // Check if we should start expanded on desktop
+    if (window.innerWidth >= 768) {
+        isExpanded = true;
+        expandableContent.classList.add('expanded');
+        expandCollapseBtn.classList.add('expanded');
+        expandCollapseIcon.classList.remove('fa-chevron-down');
+        expandCollapseIcon.classList.add('fa-chevron-up');
+    }
+    
+    // Toggle expansion
+    expandCollapseBtn.addEventListener('click', () => {
+        isExpanded = !isExpanded;
+        
+        if (isExpanded) {
+            expandableContent.classList.add('expanded');
+            expandCollapseBtn.classList.add('expanded');
+            expandCollapseIcon.classList.remove('fa-chevron-down');
+            expandCollapseIcon.classList.add('fa-chevron-up');
+            
+            // Focus search input when expanded
+            setTimeout(() => {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.focus();
+            }, 300);
+        } else {
+            expandableContent.classList.remove('expanded');
+            expandCollapseBtn.classList.remove('expanded');
+            expandCollapseIcon.classList.remove('fa-chevron-up');
+            expandCollapseIcon.classList.add('fa-chevron-down');
+        }
+    });
+    
+    // Auto-expand when clicking search input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            if (!isExpanded) {
+                isExpanded = true;
+                expandableContent.classList.add('expanded');
+                expandCollapseBtn.classList.add('expanded');
+                expandCollapseIcon.classList.remove('fa-chevron-down');
+                expandCollapseIcon.classList.add('fa-chevron-up');
+            }
+        });
+    }
+    
+    // Auto-expand when clicking filter chips
+    const filterChips = document.querySelectorAll('.filter-chip');
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            if (!isExpanded) {
+                isExpanded = true;
+                expandableContent.classList.add('expanded');
+                expandCollapseBtn.classList.add('expanded');
+                expandCollapseIcon.classList.remove('fa-chevron-down');
+                expandCollapseIcon.classList.add('fa-chevron-up');
+            }
+        });
+    });
+    
+    // Handle window resize
+    function handleResize() {
+        if (window.innerWidth >= 768) {
+            // Show expand/collapse button on desktop
+            expandCollapseBtn.style.display = 'flex';
+            
+            // Auto-expand on desktop if not already expanded
+            if (!isExpanded) {
+                isExpanded = true;
+                expandableContent.classList.add('expanded');
+                expandCollapseBtn.classList.add('expanded');
+                expandCollapseIcon.classList.remove('fa-chevron-down');
+                expandCollapseIcon.classList.add('fa-chevron-up');
+            }
+        } else {
+            // Hide expand/collapse button on mobile
+            expandCollapseBtn.style.display = 'none';
+            
+            // Collapse on mobile
+            if (isExpanded) {
+                isExpanded = false;
+                expandableContent.classList.remove('expanded');
+                expandCollapseBtn.classList.remove('expanded');
+                expandCollapseIcon.classList.remove('fa-chevron-up');
+                expandCollapseIcon.classList.add('fa-chevron-down');
+            }
+        }
+    }
+    
+    // Initial check
+    handleResize();
+    window.addEventListener('resize', handleResize);
+}
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -357,9 +845,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileSearch = initMobileSearch();
     initExpandCollapse();
     
-    // Global updateFilterBadge function
-    window.updateFilterBadge = updateFilterBadge; // Use the fixed function
+    // Global functions for mobile UI
+    window.updateFilterBadge = updateFilterBadge;
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
-
