@@ -30,7 +30,7 @@ const webPages = [
     {
         title: "The Royal Kitchen",
         url: "theroyalkitchen.html",
-        image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
+        image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Bhaveghar",
         shopName: "The Royal Kitchen",
         category: "Chinese Center"
