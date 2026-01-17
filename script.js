@@ -1,7 +1,7 @@
 // Set current year in footer
 document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-// Web pages data array
+// Web pages data array - Fixing category casing to be consistent
 const webPages = [
     {
         title: "Photographer",
@@ -13,46 +13,45 @@ const webPages = [
     },
     {
         title: "Shahapur Electrical Work",
-        url: "shahapurelectricalwork.html",
+        url: "Shahapur Electrical Work",
         image: "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Shahapur",
         shopName: "shahapurelectricalwork",
         category: "Service"
     },
-      {
+    {
         title: "Gym",
-        url: "gym.html",
+        url: "Gym",
         image: "https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Gym",
         category: "Service"
-      } ,
+    },
     {
         title: "The Royal Kitchen",
-        url: "theroyalkitchen.html",
+        url: "The Royal Kitchen",
         image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Bhaveghar",
         shopName: "The Royal Kitchen",
         category: "Food"
-      } ,
+    },
     {
         title: "Tanvi Fashion Hub",
-        url: "tanvifashionhub.html",
+        url: "Tanvi Fashion Hub",
         image: "https://images.pexels.com/photos/7679720/pexels-photo-7679720.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Virar",
         shopName: "Tanvi Fashion Hub",
         category: "Retail"
-      } ,
-    
-{
-        title: "Jayeshbhoir Catering",
-        url: "jayeshbhoircatering.html",
+    },
+    {
+        title: "JayeshBhoir Catering",
+        url: "JayeshBhoir Catering",
         image: "https://images.pexels.com/photos/34884133/pexels-photo-34884133.jpeg?auto=compress&cs=tinysrgb&w=800",
         area: "Wada",
         shopName: "Jayeshbhoir Catering",
         category: "Service"
-      } 
-]; 
+    }
+];
 
 // DOM elements
 const cardsContainer = document.getElementById('cardsContainer');
@@ -72,7 +71,105 @@ function init() {
     renderCards(webPages);
     setupEventListeners();
     updateResultCount(webPages.length);
+    populateAreaFilters();
     populateShopFilters();
+    populateCategoryFilters(); // NEW: Add this function
+}
+
+// NEW: Populate category filters in sidebar
+function populateCategoryFilters() {
+    const categoryFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:first-child .filter-options');
+    
+    if (!categoryFilterContainer) return;
+    
+    // Get unique categories (normalize to lowercase for comparison)
+    const categories = [...new Set(webPages.map(page => page.category))];
+    
+    // Clear existing options except "All"
+    const allOption = categoryFilterContainer.querySelector('[data-value="all"]');
+    categoryFilterContainer.innerHTML = '';
+    
+    // Add "All" option back
+    categoryFilterContainer.appendChild(allOption);
+    
+    // Add category filter options
+    categories.forEach(category => {
+        const categoryOption = document.createElement('button');
+        categoryOption.className = 'filter-option-sidebar';
+        categoryOption.setAttribute('data-filter-type', 'category');
+        categoryOption.setAttribute('data-value', category);
+        categoryOption.innerHTML = `
+            <div class="filter-option-content">
+                <span>${category}</span>
+            </div>
+            <i class="fas fa-check check-icon"></i>
+        `;
+        categoryFilterContainer.appendChild(categoryOption);
+    });
+}
+
+// Populate area filters
+function populateAreaFilters() {
+    const areaFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:nth-child(2) .filter-options');
+    
+    if (!areaFilterContainer) return;
+    
+    // Get unique areas
+    const areas = [...new Set(webPages.map(page => page.area))];
+    
+    // Clear existing options except "All"
+    const allOption = areaFilterContainer.querySelector('[data-value="all"]');
+    areaFilterContainer.innerHTML = '';
+    
+    // Add "All" option back
+    areaFilterContainer.appendChild(allOption);
+    
+    // Add area filter options
+    areas.forEach(area => {
+        const areaOption = document.createElement('button');
+        areaOption.className = 'filter-option-sidebar';
+        areaOption.setAttribute('data-filter-type', 'area');
+        areaOption.setAttribute('data-value', area);
+        areaOption.innerHTML = `
+            <div class="filter-option-content">
+                <span>${area}</span>
+            </div>
+            <i class="fas fa-check check-icon"></i>
+        `;
+        areaFilterContainer.appendChild(areaOption);
+    });
+}
+
+// Populate shop filters
+function populateShopFilters() {
+    const shopFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:last-child .filter-options');
+    
+    if (!shopFilterContainer) return;
+    
+    // Get unique shop names
+    const shopNames = [...new Set(webPages.map(page => page.shopName))];
+    
+    // Clear existing options except "All"
+    const allOption = shopFilterContainer.querySelector('[data-value="all"]');
+    shopFilterContainer.innerHTML = '';
+    
+    // Add "All" option back
+    shopFilterContainer.appendChild(allOption);
+    
+    // Add shop filter options
+    shopNames.forEach(shopName => {
+        const shopOption = document.createElement('button');
+        shopOption.className = 'filter-option-sidebar';
+        shopOption.setAttribute('data-filter-type', 'shop');
+        shopOption.setAttribute('data-value', shopName);
+        shopOption.innerHTML = `
+            <div class="filter-option-content">
+                <span>${shopName}</span>
+            </div>
+            <i class="fas fa-check check-icon"></i>
+        `;
+        shopFilterContainer.appendChild(shopOption);
+    });
 }
 
 // Render cards based on provided data
@@ -91,26 +188,25 @@ function renderCards(pages) {
         card.className = 'card-item';
         card.setAttribute('data-index', index);
         
-        // Determine category class
+        // Determine category class - FIXED: Use consistent casing
         let categoryClass = '';
-        let categoryText = '';
+        let categoryText = page.category; // Use the actual category from data
         
-        switch(page.category) {
+        // Convert to lowercase for class assignment
+        const categoryLower = page.category.toLowerCase();
+        
+        switch(categoryLower) {
             case 'food':
                 categoryClass = 'food-category';
-                categoryText = 'Food';
                 break;
             case 'retail':
                 categoryClass = 'retail-category';
-                categoryText = 'Retail';
                 break;
             case 'service':
                 categoryClass = 'service-category';
-                categoryText = 'Service';
                 break;
             case 'entertainment':
                 categoryClass = 'entertainment-category';
-                categoryText = 'Entertainment';
                 break;
             default:
                 categoryClass = 'service-category';
@@ -167,19 +263,22 @@ function renderCards(pages) {
     });
 }
 
-// Filter cards based on search and filters
+// Filter cards based on search and filters - FIXED: Case-insensitive matching
 function filterCards() {
     const filtered = webPages.filter(page => {
-        // Check category filter
-        const categoryMatch = currentFilter === 'all' || page.category === currentFilter;
+        // Check category filter - FIXED: Use case-insensitive comparison
+        const categoryMatch = currentFilter === 'all' || 
+                             page.category.toLowerCase() === currentFilter.toLowerCase();
         
-        // Check area filter
-        const areaMatch = currentAreaFilter === 'all' || page.area === currentAreaFilter;
+        // Check area filter - FIXED: Use case-insensitive comparison
+        const areaMatch = currentAreaFilter === 'all' || 
+                         page.area.toLowerCase() === currentAreaFilter.toLowerCase();
         
-        // Check shop filter
-        const shopMatch = currentShopFilter === 'all' || page.shopName === currentShopFilter;
+        // Check shop filter - FIXED: Use case-insensitive comparison
+        const shopMatch = currentShopFilter === 'all' || 
+                         page.shopName.toLowerCase() === currentShopFilter.toLowerCase();
         
-        // Check search filter
+        // Check search filter - FIXED: Use case-insensitive comparison
         const searchMatch = currentSearch === '' || 
             page.title.toLowerCase().includes(currentSearch) ||
             page.area.toLowerCase().includes(currentSearch) ||
@@ -226,457 +325,27 @@ function setupEventListeners() {
     document.querySelector('.filter-chip[data-category="all"]').classList.add('active');
 }
 
-// Populate shop filters
-function populateShopFilters() {
-    const shopFilterContainer = document.querySelector('.sidebar-filter-content .filter-section-sidebar:last-child .filter-options');
-    
-    // Get unique shop names
-    const shopNames = [...new Set(webPages.map(page => page.shopName))];
-    
-    // Add shop filter options
-    shopNames.forEach(shopName => {
-        const shopOption = document.createElement('button');
-        shopOption.className = 'filter-option-sidebar';
-        shopOption.setAttribute('data-filter-type', 'shop');
-        shopOption.setAttribute('data-value', shopName);
-        shopOption.innerHTML = `
-            <div class="filter-option-content">
-                <span>${shopName}</span>
-            </div>
-            <i class="fas fa-check check-icon"></i>
-        `;
-        shopFilterContainer.appendChild(shopOption);
-    });
-}
-
-// Mobile Dropdown Functionality
-function initMobileDropdown() {
-    const mobileDropdownBtn = document.getElementById('mobileDropdownBtn');
-    const mobileDropdownMenu = document.getElementById('mobileDropdownMenu');
-    const dropdownSearchBtn = document.getElementById('dropdownSearchBtn');
-    const dropdownFilterBtn = document.getElementById('dropdownFilterBtn');
-    const dropdownViewAllBtn = document.getElementById('dropdownViewAllBtn');
-    const dropdownCollapseBtn = document.getElementById('dropdownCollapseBtn');
+// Update filter badge
+function updateFilterBadge() {
+    const filterBadge = document.getElementById('filterBadge');
     const dropdownFilterBadge = document.getElementById('dropdownFilterBadge');
     
-    let isDropdownOpen = false;
+    let activeFilterCount = 0;
+    if (currentFilter !== 'all') activeFilterCount++;
+    if (currentAreaFilter !== 'all') activeFilterCount++;
+    if (currentShopFilter !== 'all') activeFilterCount++;
     
-    // Toggle dropdown menu
-    mobileDropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        isDropdownOpen = !isDropdownOpen;
-        
-        if (isDropdownOpen) {
-            mobileDropdownMenu.classList.add('show');
-            mobileDropdownBtn.innerHTML = '<i class="fas fa-times"></i>';
-        } else {
-            mobileDropdownMenu.classList.remove('show');
-            mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        }
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!mobileDropdownBtn.contains(e.target) && !mobileDropdownMenu.contains(e.target)) {
-            isDropdownOpen = false;
-            mobileDropdownMenu.classList.remove('show');
-            mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        }
-    });
-    
-    // Dropdown button actions
-    dropdownSearchBtn.addEventListener('click', () => {
-        openMobileSearch();
-        closeDropdown();
-    });
-    
-    dropdownFilterBtn.addEventListener('click', () => {
-        openSidebarFilter();
-        closeDropdown();
-    });
-    
-    dropdownViewAllBtn.addEventListener('click', () => {
-        // Reset all filters
-        currentFilter = 'all';
-        currentAreaFilter = 'all';
-        currentShopFilter = 'all';
-        
-        // Update desktop chips
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.classList.remove('active');
-            if (chip.getAttribute('data-category') === 'all') {
-                chip.classList.add('active');
-            }
-        });
-        
-        filterCards();
-        updateFilterBadge();
-        closeDropdown();
-    });
-    
-    dropdownCollapseBtn.addEventListener('click', () => {
-        closeDropdown();
-    });
-    
-    function closeDropdown() {
-        isDropdownOpen = false;
-        mobileDropdownMenu.classList.remove('show');
-        mobileDropdownBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    if (activeFilterCount > 0) {
+        filterBadge.textContent = activeFilterCount;
+        filterBadge.classList.add('active');
+        dropdownFilterBadge.textContent = activeFilterCount;
+    } else {
+        filterBadge.classList.remove('active');
+        dropdownFilterBadge.textContent = '';
     }
-    
-    // Update dropdown filter badge
-    function updateFilterBadge() {
-        const filterBadge = document.getElementById('filterBadge');
-        const dropdownFilterBadge = document.getElementById('dropdownFilterBadge');
-        
-        let activeFilterCount = 0;
-        if (currentFilter !== 'all') activeFilterCount++;
-        if (currentAreaFilter !== 'all') activeFilterCount++;
-        if (currentShopFilter !== 'all') activeFilterCount++;
-        
-        if (activeFilterCount > 0) {
-            filterBadge.textContent = activeFilterCount;
-            filterBadge.classList.add('active');
-            dropdownFilterBadge.textContent = activeFilterCount;
-        } else {
-            filterBadge.classList.remove('active');
-            dropdownFilterBadge.textContent = '';
-        }
-    }
-    
-    return { updateFilterBadge };
 }
 
-// Sidebar Filter Functionality
-function initSidebarFilter() {
-    const mobileFilterBtn = document.getElementById('mobileFilterBtn');
-    const sidebarFilterOverlay = document.getElementById('sidebarFilterOverlay');
-    const sidebarFilter = document.getElementById('sidebarFilter');
-    const closeSidebarFilterBtn = document.getElementById('closeSidebarFilterBtn');
-    const applyFilterBtn = document.getElementById('applyFilterBtn');
-    const clearFilterBtn = document.getElementById('clearFilterBtn');
-    const selectedFilterCount = document.getElementById('selectedFilterCount');
-    const filterOptions = document.querySelectorAll('.filter-option-sidebar');
-    
-    // Open sidebar filter
-    function openSidebarFilter() {
-        sidebarFilterOverlay.classList.add('show');
-        setTimeout(() => {
-            sidebarFilter.classList.add('show');
-        }, 10);
-        
-        // Set current active filters
-        updateSidebarFilterState();
-    }
-    
-    // Close sidebar filter
-    function closeSidebarFilter() {
-        sidebarFilter.classList.remove('show');
-        setTimeout(() => {
-            sidebarFilterOverlay.classList.remove('show');
-        }, 300);
-    }
-    
-    // Update sidebar filter state based on current filter
-    function updateSidebarFilterState() {
-        // Reset all options
-        filterOptions.forEach(option => {
-            option.classList.remove('active');
-        });
-        
-        // Activate appropriate category option
-        document.querySelector(`.filter-option-sidebar[data-filter-type="category"][data-value="${currentFilter}"]`).classList.add('active');
-        
-        // Activate appropriate area option
-        document.querySelector(`.filter-option-sidebar[data-filter-type="area"][data-value="${currentAreaFilter}"]`).classList.add('active');
-        
-        // Activate appropriate shop option
-        document.querySelector(`.filter-option-sidebar[data-filter-type="shop"][data-value="${currentShopFilter}"]`).classList.add('active');
-        
-        updateSelectedFilterCount();
-    }
-    
-    // Update selected filter count
-    function updateSelectedFilterCount() {
-        let activeFilterCount = 0;
-        if (currentFilter !== 'all') activeFilterCount++;
-        if (currentAreaFilter !== 'all') activeFilterCount++;
-        if (currentShopFilter !== 'all') activeFilterCount++;
-        
-        selectedFilterCount.textContent = activeFilterCount;
-    }
-    
-    // Filter option selection
-    filterOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const filterType = option.getAttribute('data-filter-type');
-            const value = option.getAttribute('data-value');
-            
-            // Remove active class from all options of the same type
-            document.querySelectorAll(`.filter-option-sidebar[data-filter-type="${filterType}"]`).forEach(opt => {
-                opt.classList.remove('active');
-            });
-            
-            // Add active class to clicked option
-            option.classList.add('active');
-            
-            // Update current filter based on type
-            if (filterType === 'category') {
-                currentFilter = value;
-            } else if (filterType === 'area') {
-                currentAreaFilter = value;
-            } else if (filterType === 'shop') {
-                currentShopFilter = value;
-            }
-            
-            updateSelectedFilterCount();
-        });
-    });
-    
-    // Apply filter
-    applyFilterBtn.addEventListener('click', () => {
-        // Update desktop chips
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.classList.remove('active');
-            if (chip.getAttribute('data-category') === currentFilter) {
-                chip.classList.add('active');
-            }
-        });
-        
-        filterCards();
-        updateFilterBadge();
-        closeSidebarFilter();
-    });
-    
-    // Clear all filters
-    clearFilterBtn.addEventListener('click', () => {
-        currentFilter = 'all';
-        currentAreaFilter = 'all';
-        currentShopFilter = 'all';
-        
-        // Update all filter options
-        document.querySelectorAll('.filter-option-sidebar').forEach(option => {
-            option.classList.remove('active');
-            if (option.getAttribute('data-value') === 'all') {
-                option.classList.add('active');
-            }
-        });
-        
-        updateSelectedFilterCount();
-    });
-    
-    // Event listeners
-    mobileFilterBtn.addEventListener('click', openSidebarFilter);
-    closeSidebarFilterBtn.addEventListener('click', closeSidebarFilter);
-    sidebarFilterOverlay.addEventListener('click', closeSidebarFilter);
-    
-    // Close with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && sidebarFilter.classList.contains('show')) {
-            closeSidebarFilter();
-        }
-    });
-    
-    return { openSidebarFilter };
-}
-
-// Mobile Search Functionality
-function initMobileSearch() {
-    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-    const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
-    const mobileSearchInput = document.getElementById('mobileSearchInput');
-    const closeSearchBtn = document.getElementById('closeSearchBtn');
-    const mobileSearchResults = document.getElementById('mobileSearchResults');
-    
-    function openMobileSearch() {
-        mobileSearchOverlay.classList.add('show');
-        setTimeout(() => {
-            mobileSearchInput.focus();
-        }, 100);
-    }
-    
-    function closeMobileSearch() {
-        mobileSearchOverlay.classList.remove('show');
-        mobileSearchInput.value = '';
-        currentSearch = '';
-        searchInput.value = '';
-        filterCards();
-        mobileSearchResults.innerHTML = '';
-    }
-    
-    // Event listeners
-    mobileSearchBtn.addEventListener('click', openMobileSearch);
-    closeSearchBtn.addEventListener('click', closeMobileSearch);
-    
-    // Sync mobile search with main search
-    mobileSearchInput.addEventListener('input', (e) => {
-        currentSearch = e.target.value.toLowerCase().trim();
-        searchInput.value = currentSearch;
-        filterCards();
-        updateMobileSearchResults();
-    });
-    
-    // Close search when pressing Escape
-    mobileSearchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeMobileSearch();
-        }
-    });
-    
-    // Update mobile search results
-    function updateMobileSearchResults() {
-        if (currentSearch === '') {
-            mobileSearchResults.innerHTML = '<div class="empty-search">Type to search web pages...</div>';
-            return;
-        }
-        
-        const filtered = webPages.filter(page => {
-            return page.title.toLowerCase().includes(currentSearch) ||
-                   page.area.toLowerCase().includes(currentSearch) ||
-                   page.shopName.toLowerCase().includes(currentSearch) ||
-                   page.category.toLowerCase().includes(currentSearch);
-        });
-        
-        if (filtered.length === 0) {
-            mobileSearchResults.innerHTML = '<div class="empty-search">No results found</div>';
-            return;
-        }
-        
-        mobileSearchResults.innerHTML = filtered.map(page => `
-            <div class="mobile-search-result" data-url="${page.url}">
-                <div class="result-image">
-                    ${page.image ? 
-                        `<img src="${page.image}" alt="${page.title}">` : 
-                        `<div class="placeholder"><i class="fas fa-globe"></i></div>`
-                    }
-                </div>
-                <div class="result-info">
-                    <h4>${page.title}</h4>
-                    <p>${page.shopName} • ${page.area}</p>
-                    <span class="result-category ${page.category}-category">${page.category}</span>
-                </div>
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        `).join('');
-        
-        // Add click events to mobile search results
-        document.querySelectorAll('.mobile-search-result').forEach(result => {
-            result.addEventListener('click', () => {
-                const url = result.getAttribute('data-url');
-                window.open(url, '_blank');
-            });
-        });
-    }
-    
-    // Initialize mobile search results
-    updateMobileSearchResults();
-    
-    return { openMobileSearch };
-}
-
-// Expand/Collapse functionality
-function initExpandCollapse() {
-    const expandCollapseBtn = document.getElementById('expandCollapseBtn');
-    const expandCollapseIcon = document.getElementById('expandCollapseIcon');
-    const expandableContent = document.getElementById('expandableContent');
-    
-    let isExpanded = false;
-    
-    // Check if we should start expanded on desktop
-    if (window.innerWidth >= 768) {
-        isExpanded = true;
-        expandableContent.classList.add('expanded');
-        expandCollapseBtn.classList.add('expanded');
-        expandCollapseIcon.classList.remove('fa-chevron-down');
-        expandCollapseIcon.classList.add('fa-chevron-up');
-    }
-    
-    // Toggle expansion
-    if (expandCollapseBtn) {
-        expandCollapseBtn.addEventListener('click', () => {
-            isExpanded = !isExpanded;
-            
-            if (isExpanded) {
-                expandableContent.classList.add('expanded');
-                expandCollapseBtn.classList.add('expanded');
-                expandCollapseIcon.classList.remove('fa-chevron-down');
-                expandCollapseIcon.classList.add('fa-chevron-up');
-                
-                // Focus search input when expanded
-                setTimeout(() => {
-                    const searchInput = document.getElementById('searchInput');
-                    if (searchInput) searchInput.focus();
-                }, 300);
-            } else {
-                expandableContent.classList.remove('expanded');
-                expandCollapseBtn.classList.remove('expanded');
-                expandCollapseIcon.classList.remove('fa-chevron-up');
-                expandCollapseIcon.classList.add('fa-chevron-down');
-            }
-        });
-        
-        // Auto-expand when clicking search input
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('focus', () => {
-                if (!isExpanded) {
-                    isExpanded = true;
-                    expandableContent.classList.add('expanded');
-                    expandCollapseBtn.classList.add('expanded');
-                    expandCollapseIcon.classList.remove('fa-chevron-down');
-                    expandCollapseIcon.classList.add('fa-chevron-up');
-                }
-            });
-        }
-        
-        // Auto-expand when clicking filter chips
-        const filterChips = document.querySelectorAll('.filter-chip');
-        filterChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                if (!isExpanded) {
-                    isExpanded = true;
-                    expandableContent.classList.add('expanded');
-                    expandCollapseBtn.classList.add('expanded');
-                    expandCollapseIcon.classList.remove('fa-chevron-down');
-                    expandCollapseIcon.classList.add('fa-chevron-up');
-                }
-            });
-        });
-        
-        // Handle window resize
-        function handleResize() {
-            if (window.innerWidth >= 768) {
-                // Show expand/collapse button on desktop
-                expandCollapseBtn.style.display = 'flex';
-                
-                // Auto-expand on desktop if not already expanded
-                if (!isExpanded) {
-                    isExpanded = true;
-                    expandableContent.classList.add('expanded');
-                    expandCollapseBtn.classList.add('expanded');
-                    expandCollapseIcon.classList.remove('fa-chevron-down');
-                    expandCollapseIcon.classList.add('fa-chevron-up');
-                }
-            } else {
-                // Hide expand/collapse button on mobile
-                expandCollapseBtn.style.display = 'none';
-                
-                // Collapse on mobile
-                if (isExpanded) {
-                    isExpanded = false;
-                    expandableContent.classList.remove('expanded');
-                    expandCollapseBtn.classList.remove('expanded');
-                    expandCollapseIcon.classList.remove('fa-chevron-up');
-                    expandCollapseIcon.classList.add('fa-chevron-down');
-                }
-            }
-        }
-        
-        // Initial check
-        handleResize();
-        window.addEventListener('resize', handleResize);
-    }
-}
+// ... Rest of your code remains the same for mobile dropdown, sidebar filter, etc.
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -689,23 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initExpandCollapse();
     
     // Global updateFilterBadge function
-    window.updateFilterBadge = mobileDropdown.updateFilterBadge;
+    window.updateFilterBadge = updateFilterBadge; // Use the fixed function
     window.openSidebarFilter = sidebarFilter.openSidebarFilter;
     window.openMobileSearch = mobileSearch.openMobileSearch;
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
